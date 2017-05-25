@@ -1,0 +1,24 @@
+Total stat = 901049
+uaplotter1::Loop(53) for 901049 events
+Warning in <TVector3::PseudoRapidity>: transvers momentum = 0! return +/- 10e10
+Acceptance: [-5,5]
+Total evts in chain : 901049
+Proceeded evts      : 901049
+Triggered evts      : 487799
+T2 active (no trigg): 304815
+Active (!bptx quiet): 487774
+No PU vertices      : 467874
+	sd- candidates      : 43390		sd+ candidates      : 34437
+0<= |deta| < 1		6755		4374
+1<= |deta| < 2		1814		1180
+2<= |deta| < 3		1236		710
+3<= |deta| < 4		1880		784
+4<= |deta| < 5		1813		575
+5<= |deta| < 6		2036		525
+6<= |deta| < 7		2343		526
+7<= |deta| < 8		1295		304
+8<= |deta| < 9		4876		1681
+9<= |deta| < 10		4553		3119
+10<= |deta| < 11		14789		20659
+(int)901049
+

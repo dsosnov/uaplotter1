@@ -1,0 +1,11 @@
+0  - everything after preselection
+1  - MC only - proton in proper direction
+2  - MC only - proton in proper direction E>3950 GeV
+3  - sd_flag_total[0]==4 - elastic candidates
+17 - sd_flag_total[0]==0 - ND candidates
+
+4  - sd_flag_total[0]==-1 - SD- (RG at -Z side)
+5-15:  RG: [0,1)="5", [1,2)="6", ..., [10,11)="15"
+
+19 - sd_flag_total[0]==+1 - SD+ (RG at +Z side)
+20-30: RG: [0,1)="20", [1,2)="21", ..., [10,11)="30"

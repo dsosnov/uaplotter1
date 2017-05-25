@@ -1,0 +1,738 @@
+/*
+ *
+ */
+
+#include "uaplotter1.h"
+
+#include "TString.h"
+#include "TMath.h"
+
+#include "iostream"
+#include "stdlib.h"
+
+ClassImp(uaplotter1)
+
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+uaplotter1::uaplotter1(const bool               cmstotem, 
+		       const bool               cmsdigis,
+		       const bool               CASTORp,
+		       const short int          MC, 
+		       const short unsigned int Ncuts
+		      ):
+		      uabase(cmstotem, MC, Ncuts), 
+		      tree_digi_flag(cmsdigis), 
+		      ppb(CASTORp),
+		      dummy_cut(Ncuts+1),
+		      current_event(0)
+{
+  first_central_bin = 0;
+  last_central_bin  = 0;
+  IniRapGapRange();
+  if(tree_combined_flag){
+    chainTree = new TChain("cms_totem");    
+  }else{
+    chainTree = new TChain("evt");
+  };
+  TString str = initializeChain();
+  str.Prepend("uaplot_output_histos_"); str+=".root";
+  
+  outputFile = TFile::Open(str.Data(),"RECREATE");
+
+  CMSmc      = 0;
+  if(mc>0){
+    TDirectory * dirMC = outputFile->mkdir("MC");
+    CMSmc              = new uamc(chainTree, dirMC, tree_combined_flag, ppb, mc, n_cuts);
+  };
+  
+  CMSevtinfo  = 0;
+  TDirectory * dirEVT = outputFile->mkdir("CMSinfo");
+  CMSevtinfo          = new uacmsevtinfo(chainTree, dirEVT, tree_combined_flag, mc, n_cuts);
+  
+  CMStracking = 0;
+  TDirectory * dirTRK = outputFile->mkdir("CMStracking");
+  CMStracking         = new uatracking(chainTree, dirTRK, tree_combined_flag, mc, n_cuts);
+
+  CMScalo    = 0;
+  TDirectory * dirCAL = outputFile->mkdir("CMScalo");
+  CMScalo             = new uacalo(chainTree, dirCAL, tree_combined_flag, mc, n_cuts);
+
+  CMSpf    = 0;
+  TDirectory * dirPF  = outputFile->mkdir("CMSpf");
+  CMSpf               = new uapf(chainTree, dirPF, tree_combined_flag, mc, n_cuts);
+
+  CMScastor = 0;
+  TDirectory * dirCAS = outputFile->mkdir("CMScastor");
+  CMScastor           = new uacastor(chainTree, dirCAS, tree_combined_flag, tree_digi_flag, mc, n_cuts);
+  
+  CMSforward = 0;
+  if(tree_digi_flag || (mc>0)){
+    TDirectory * dirZDC = outputFile->mkdir("ZDC");
+    CMSforward          = new uaforward(chainTree, dirZDC, tree_combined_flag, zdc56, mc, n_cuts);
+  };
+  
+  T2        = 0;
+  if(tree_combined_flag){
+    TDirectory *dirT2   = outputFile->mkdir("T2");
+    T2                  = new uat2(chainTree, dirT2, tree_combined_flag, n_cuts);
+  };
+  
+  if(tree_combined_flag || (mc>0)){
+    TDirectory * dirRP  = outputFile->mkdir("RP");
+    RP                  = new uarp(chainTree, dirRP, tree_combined_flag, ppb, mc, n_cuts);
+  };
+
+  //directory = outputFile->mkdir("main");
+  std::cout << "here1\n";
+  create_histos();
+  std::cout << "here2\n";
+}
+
+
+
+
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+uaplotter1::~uaplotter1()
+{
+  std::cout << "uaplotter1::~uaplotter1()\n";
+  if(tree_digi_flag || (mc>0)){
+    CMSforward->NormalizeFSCts();
+  };
+  outputFile->Write();
+  chainTree->Delete();
+  if(mc>0)
+    delete CMSmc;
+  delete CMSevtinfo;
+  delete CMStracking;
+  delete CMSpf;
+  delete CMScalo;
+  delete CMScastor;
+  if(tree_digi_flag || (mc>0)){
+    delete CMSforward;
+  };
+  if(tree_combined_flag)
+    delete T2;
+  if(tree_combined_flag || (mc>0))
+    delete RP;
+}
+
+
+
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+int uaplotter1::DefineTrigger(int trigger_bit_common, bool &tech_bit){
+  // ramdom trigger
+  if(mc<0)
+    return -1;
+  
+  int trigger_bit = trigger_bit_common;
+  if(trigger_bit>64){
+    tech_bit = false;
+    trigger_bit-=100;    
+  };
+  if(trigger_bit<0 || trigger_bit>127) trigger_bit = -1;
+  
+  std::cout << "uaplotter1::DefineTrigger: trigger selection on ";
+  if(trigger_bit!=-1){
+    if(tech_bit) {
+      std::cout << "tech bit # ";
+    }else{
+      std::cout << "algo bit # ";
+    }; std::cout << trigger_bit << std::endl;
+  };
+  return trigger_bit;
+}
+
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ //! Check trigger for DATA or MC (at the moment only tt53 for MC)
+/*!
+\param trigger_bit trigger bit; if < 0 => returns true always
+\param tech_bit    flag if the trigger bit was technical trigger, othervise algo trigger
+\return trigger bit status (DATA) or emulation (MC, tt53) or noise studies conditions
+*/
+bool uaplotter1::ProceedTrigger(int trigger_bit, bool tech_bit)
+{
+  bool proceed = true;
+  
+  if(mc<0){/////////////////// random trigger                                          
+    proceed = ( (!CMSevtinfo->CheckHLT("HLT_L1Tech53_MB")) && 
+		(!CMSevtinfo->GetTechBit(1)) && (!CMSevtinfo->GetAlgoBit(2)) );
+  }else if(trigger_bit>=0) {
+    if(tech_bit){///////////// tech trigger
+      if( (trigger_bit==53) && (mc>0) ){ // T2 trigger with MC
+	proceed = CMSmc->GetT2trigger();
+      }else{
+	proceed = CMSevtinfo->GetTechBit(trigger_bit);
+      };
+    }else{ ////////////////// phys trigger
+      proceed   = CMSevtinfo->GetAlgoBit(trigger_bit);
+    };
+  };
+  return proceed;
+}
+
+
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+bool uaplotter1::ProceedEvent(const short unsigned int cut, const bool fill, const bool info)
+{ bool proceed_mc = (mc>0);
+  
+  if(proceed_mc)
+    CMSmc->ProceedEvent(cut, fill, false);
+  
+  if(fill) 
+    CMSevtinfo->ProceedEvent(cut, fill, false); // does nothing except for fill
+  
+  CMStracking->ProceedEvent(cut, fill, false); 
+  CMSpf->ProceedEvent(cut, fill, false);
+  CMScalo->ProceedEvent(cut, fill, false); 
+  CMScastor->ProceedEvent(cut, fill, false); 
+  
+  // ********** ZDC/FSC ******************
+  if(tree_digi_flag){
+    CMSforward->ProceedEvent(cut, fill, false);
+  }else if(proceed_mc && fill){
+    double E[2]  = {0,0};
+    double EM[2] = {0,0};
+    EM[0] = CMSmc->GetZDCEg(false);       EM[1] = CMSmc->GetZDCEg(true); 
+    E[0]  = EM[0]+CMSmc->GetZDCEn(false); E[1]  = EM[1]+CMSmc->GetZDCEn(true);
+    CMSforward->FillZDCWithMCtruth(cut, E, EM);
+  };
+  
+  // ************** T2 ********************
+  if(tree_combined_flag && fill)// here to be optimized 
+    T2->ProceedEvent(cut, fill, false);
+  
+  // ************* forward dependencies ****************
+  if(fill){
+    if( tree_digi_flag ){
+      zdcM_vs_castor_h[cut]->Fill(CMScastor->GetE(),       CMSforward->GetZDCEtotal(false));
+      zdcM_vs_T2primM_h[cut]->Fill(T2->NPrimtracksMinus(), CMSforward->GetZDCEtotal(false));
+    }else if (proceed_mc){
+      zdcM_vs_castor_h[cut]->Fill(CMScastor->GetE(), CMSmc->GetZDCEg(false)+CMSmc->GetZDCEn(false));
+      zdcM_vs_T2primM_h[cut]->Fill(CMSmc->GetNT2trk(false), CMSmc->GetZDCEg(false)+CMSmc->GetZDCEn(false));
+    };
+  };
+  // ************** RP ********************
+  if(tree_combined_flag || proceed_mc){
+    RP->ProceedEvent(cut, fill, false); // if MC does nothing
+    if(fill && proceed_mc){
+      if(CMSmc->IntactProton()!=0){
+	double protonpt = CMSmc->IntactProtonPt();
+	RP->FillRPWithMCtruth(cut, CMSmc->IntactProtonXi(), -protonpt*protonpt);
+      };
+    };
+  };
+  
+  // ********** RapGap ******************
+  FindRapGap(true); // RG in RECO
+  if(proceed_mc)
+    FindRapGap(false); // RG in MCtruth
+  
+  // ************* SD ******************************************************
+  if( sd_flag_central[0]!=0 && (sd_flag_total[0]==1 || sd_flag_total[0]==-1) ){
+    CalculateSDdiffMass();
+    
+    if(fill){
+      if(tree_combined_flag){ 
+	if(RP->Valid())
+	  xi_p_reco_full_h[cut]->Fill(RP->Xi(), xi_full[0]);              // DATA -> X: RP xi, Y: xi reco full
+      }else if ( proceed_mc && (CMSmc->IntactProton()!=0) ){
+	xi_p_reco_full_h[cut]->Fill(CMSmc->IntactProtonXi(), xi_full[0]); // MC   -> X: proton xi, Y: xi reco full
+      };
+    };
+  };
+  
+  // ***********************************************************************
+  if(info)
+    PrintEventInfo(true);
+  return true;
+}
+
+
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+bool uaplotter1::FillLastEvent(const short unsigned int cut){ 
+  bool ok = true;
+  if(mc>0)
+    ok*=CMSmc->FillLastEvent(cut);
+  ok*=CMSevtinfo->FillLastEvent(cut);
+  ok*=CMStracking->FillLastEvent(cut);
+  ok*=CMSpf->FillLastEvent(cut);
+  ok*=CMScalo->FillLastEvent(cut);
+  ok*=CMScastor->FillLastEvent(cut);
+  if(tree_digi_flag){
+    ok*=CMSforward->FillLastEvent(cut);
+  }else if (mc>0){
+    double E[2]  = {0,0};
+    double EM[2] = {0,0};
+    EM[0] = CMSmc->GetZDCEg(false);       EM[1] = CMSmc->GetZDCEg(true); 
+    E[0]  = EM[0]+CMSmc->GetZDCEn(false); E[1]  = EM[1]+CMSmc->GetZDCEn(true);
+    CMSforward->FillZDCWithMCtruth(cut, E, EM);    
+  };
+  if(mc>0){
+    diff_flag_mc_full_reco_central_h[cut]->Fill(sd_flag_total[1], sd_flag_central[0]);
+    diff_flag_mc_full_reco_full_h[cut]->Fill(sd_flag_total[1], sd_flag_total[0]);
+    diff_flag_mc_full_mc_central_h[cut]->Fill(sd_flag_total[1], sd_flag_central[1]);
+    diff_flag_mc_total_mc_central_h[cut]->Fill(sd_flag_total[2], sd_flag_central[1]);
+    n_sd_minus_bins_mc_reco_h[cut]->Fill(n_sd_minus_bins[1], n_sd_minus_bins[0]);
+    n_sd_plus_bins_mc_reco_h[cut]->Fill(n_sd_plus_bins[1], n_sd_plus_bins[0]);
+    for(short unsigned int bin=0; bin<N_ETA_BINS; bin++)
+      if(CMSmc->GetActivityLoose(bin))
+	central_activity_mc_h[cut]->Fill(find_eta(bin));
+  };
+  n_sd_minus_bins_h[cut]->Fill(n_sd_minus_bins[0]);
+  n_sd_plus_bins_h[cut]->Fill(n_sd_plus_bins[0]);
+  for(short unsigned int bin=0; bin<N_ETA_BINS; bin++)
+    if(combined_central_activity[bin])
+      central_activity_h[cut]->Fill(find_eta(bin));
+  
+  if(mc>0){
+    if(CMSmc->IntactProton()!=0){
+      xi_mc_p_mc_total_h[cut]->Fill(TMath::Log10(CMSmc->IntactProtonXi()), TMath::Log10(xi_mc_total));
+      xi_mc_p_reco_full_h[cut]->Fill(TMath::Log10(CMSmc->IntactProtonXi()), TMath::Log10(xi_full[0]));
+    };
+    xi_mc_total_mc_full_h[cut]->Fill(TMath::Log10(xi_mc_total), TMath::Log10(xi_full[1]));
+    xi_mc_total_reco_full_h[cut]->Fill(TMath::Log10(xi_mc_total), TMath::Log10(xi_full[0]));
+    xi_calo_mc_reco_h[cut]->Fill(TMath::Log10(xi_calo[1]), TMath::Log10(xi_calo[0]));
+    xi_pf_mc_reco_h[cut]->Fill(TMath::Log10(xi_pf[1]), TMath::Log10(xi_pf[0]));
+    xi_cas_mc_reco_h[cut]->Fill(TMath::Log10(xi_cas[1]), TMath::Log10(xi_cas[0]));
+    xi_zdc_mc_reco_h[cut]->Fill(TMath::Log10(xi_zdc[1]), TMath::Log10(xi_zdc[0]));
+  };
+  xi_reco_full_h[cut]->Fill(TMath::Log10(xi_full[0]));
+  
+  if(tree_combined_flag) {
+    T2->ProceedEvent(cut, true, false); // to be optimized later!
+    RP->FillLastEvent(cut);
+  }else if (mc>0){
+    if(CMSmc->IntactProton()!=0){
+      double ptp = CMSmc->IntactProtonPt();
+      RP->FillRPWithMCtruth(cut, CMSmc->IntactProtonXi(), -ptp*ptp);
+    };
+  };
+  if( tree_digi_flag ){
+    zdcM_vs_castor_h[cut]->Fill(CMScastor->GetE(),       CMSforward->GetZDCEtotal(false));
+    zdcM_vs_T2primM_h[cut]->Fill(T2->NPrimtracksMinus(), CMSforward->GetZDCEtotal(false));
+    FSCmN_vs_castor_h[cut]->Fill(CMScastor->GetE(), CMSforward->GetFSCmN());
+  }else if (mc>0){
+    zdcM_vs_castor_h[cut]->Fill(CMScastor->GetE(), CMSmc->GetZDCEg(false)+CMSmc->GetZDCEn(false));
+    zdcM_vs_T2primM_h[cut]->Fill(CMSmc->GetNT2trk(false), CMSmc->GetZDCEg(false)+CMSmc->GetZDCEn(false));
+  };
+
+  if( sd_flag_central!=0 && (sd_flag_total[0]==1 || sd_flag_total[0]==-1) ){
+    if(tree_combined_flag){ 
+      if( RP->Valid() && ( RP->trackValidUp() || RP->trackValidDn()))
+	xi_p_reco_full_h[cut]->Fill(RP->Xi(), xi_full[0]);              // DATA -> X: RP xi, Y: xi reco full
+    }else if ( (mc>0) && (CMSmc->IntactProton()!=0) ){
+      xi_p_reco_full_h[cut]->Fill(CMSmc->IntactProtonXi(), xi_full[0]); // MC   -> X: proton xi, Y: xi reco full
+    };
+  };
+  
+  if( tree_digi_flag && RP->Valid() && ( RP->trackValidUp() || RP->trackValidDn())){
+    ZDCm_vs_xiRP_h[cut]->Fill(RP->Xi(), CMSforward->GetZDCEtotal(false));
+    ZDCp_vs_xiRP_h[cut]->Fill(RP->Xi(), CMSforward->GetZDCEtotal(true));
+    FSCmSi8_vs_xiRP_h[cut]->Fill(RP->Xi(), CMSforward->GetFSCmSignal8());
+    FSCmN_vs_xiRP_h[cut]->Fill(RP->Xi(), CMSforward->GetFSCmN());
+  };
+  return ok;
+}
+
+
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+void uaplotter1::PrintEventInfo(const bool detailed)
+{	
+  std::cout << "\n\n" << current_event 
+	    << "\t=====================================================\n";
+  if(mc>0)
+    CMSmc->PrintEventInfo(detailed);
+  CMSevtinfo->PrintEventInfo(detailed);
+  CMStracking->PrintEventInfo(detailed);
+  CMSpf->PrintEventInfo(detailed);
+  CMScalo->PrintEventInfo(detailed);
+  if(tree_digi_flag)
+    CMSforward->PrintEventInfo(detailed);
+  CMScastor->PrintEventInfo(detailed);
+  if(mc==0 && tree_combined_flag)
+    std::cout << "T2 info : T2-: " << T2->NPrimtracksMinus() <<  "(" << T2->NtracksMinus() 
+	      << ");\tT2+: " << T2->NPrimtracksPlus() << "(" << T2->NtracksPlus() << ")\n";
+  if(tree_combined_flag){
+    RP->PrintEventInfo(detailed);
+  };
+  PrintRapGap();
+  if( sd_flag_total[0]!=0 && (sd_flag_total[0]==1 || sd_flag_total[0]==-1) ){
+    PrintSDdiffMass(detailed);
+    if(mc>0)
+      CMSmc->PrintProtonInfo();
+  };
+}
+
+
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+int uaplotter1::Loop(const int evts, const int trigger){ 
+  
+  bool tech_bit   = true;
+  int trigger_bit = DefineTrigger(trigger, tech_bit); // just translate initial trigger value
+
+
+  int stat = chainTree->GetEntries(); 
+  unsigned int nevts = evts;
+  if(evts==-1 || evts>stat) nevts=stat;
+  std::cout << "Total stat = " << stat << std::endl;
+  std::cout << "uaplotter1::Loop(" << trigger_bit << ") for " << nevts << " events\n";
+
+
+  unsigned int selected_evts[n_cuts];
+  memset(selected_evts, 0, sizeof(selected_evts));
+  
+  unsigned int trigger_evts =0;
+  unsigned int t2prim_evts  =0;
+  unsigned int bptx_active  =0;
+  unsigned int vtx_cut      =0;
+  unsigned int sd_minus     =0;
+  unsigned int sd_plus      =0;
+  unsigned int sd_minus_eta[11];
+  unsigned int sd_plus_eta[11];
+  unsigned int goodFSC      =0;
+  memset(sd_minus_eta, 0, sizeof(sd_minus_eta));
+  memset(sd_plus_eta,  0, sizeof(sd_plus_eta));
+  
+  unsigned int kevt = 0;
+  for(long unsigned int i = 0; i<nevts; i++){  
+    unsigned int kevt_current = i/1000;
+    if(kevt_current>kevt){
+      kevt = kevt_current;
+      std::cout << kevt << std::endl;
+    };
+    chainTree->GetEntry(i);
+    current_event = i;
+
+    memset(sd_flag_central, 0, sizeof(sd_flag_central));
+    memset(sd_flag_total,   0, sizeof(sd_flag_total));
+    
+    if(mc>0){    // <============================  do MC loop here
+      CMSmc->ProceedEvent(dummy_cut, false, false);
+    };
+    
+    
+    if(ProceedTrigger(trigger_bit, tech_bit)){
+      trigger_evts++;
+      
+      
+      if(mc<0){  // <============================ call noise studies here
+	
+      }else if( !CMSevtinfo->GetTechBit(7)){ //<=== !bptx quiet 
+	bptx_active++;
+	CMStracking->ProceedEvent(dummy_cut, false, false);
+	if(CMStracking->NverticesGood()<2){
+	  vtx_cut++;
+	 
+	  // <==================================== T2 check
+	  bool t2prim = false;
+	  if(mc>0){
+	    if( tech_bit && (trigger_bit==53) ){
+	      t2prim = true; // we already checked in the ProceedTrigger; for MC it is the same!
+	    }else{
+	      t2prim = ProceedTrigger(53, true); 
+	    };
+	  }else if(tree_combined_flag && (mc==0)){
+	    T2->ProceedEvent(dummy_cut, false, false);
+	    t2prim = ( (T2->NPrimtracksMinus()>0) || (T2->NPrimtracksPlus()>0) );
+	  };
+	  if(t2prim) t2prim_evts++;
+	  // <=====================================
+	  
+	  
+	  ProceedEvent(0, false, false);
+	  if(tree_digi_flag && CMSforward->FSCvalid())
+	    goodFSC++;
+	  
+	  FillLastEvent(0); // -------------------------------->  all triggered events
+	    
+	  if(ppb){
+	    if(RP->Valid()){
+	      PrintEventInfo(true);
+	      T2->PrintAllTracks();
+	      //RP->PrintEventInfo(true);
+	      //CMSforward->PrintEventInfo(true);
+	    };
+	  };
+
+	  
+	  bool proper_proton = false;
+	  if(mc>0){
+	    proper_proton = ( (CMSmc->IntactProton()!=0) && ( (CMSmc->IntactProton()==-1) == ppb ) );
+	    if(proper_proton){   
+	      FillLastEvent(1); // ---------------------------> all events with proton in proper direction
+	      if(CMSmc->IntactProtonE()>3950){
+		FillLastEvent(2); //--------------------------> energetic protons
+		PrintEventInfo();
+	      };
+	    }; // end proper_proton
+	  }else if (mc==0){
+	    // Near and Far are of the same sign
+	    proper_proton = ( (RP->Valid()) && ( (RP->trackValidUp()) || (RP->trackValidDn()) ) );
+	    if(proper_proton){
+	      FillLastEvent(2);
+	    };
+	  };
+	  
+	  
+	  if(sd_flag_total[0]==4){ // elastic candidate
+	    CalculateSDdiffMass(false);
+	    FillLastEvent(3); // -----------------------------> elastic
+	  };
+	  
+	  if(sd_flag_total[0]==0){ // ND
+	      FillLastEvent(17); //---------------------------> ND
+	  };
+	  
+	  if(sd_flag_total[0]==-1){
+	    CalculateSDdiffMass(false);
+	    FillLastEvent(4); // -----------------------------> all SD- events "4"
+	    
+	    /*
+	    if(proper_proton){
+	      PrintEventInfo(true);
+	      //CMSmc->ProceedEvent(dummy_cut, false, true);
+	    };*/
+	    sd_minus++;
+	    for(short unsigned int ii=0; ii<11; ii++){ // RG: [0,1)="5", [1,2)="6", ..., [10,11)="15"
+	      short unsigned int cut   = 5+ii;
+	      short unsigned int rgbin = 2*ii;     
+	      if( (n_sd_minus_bins[0]>=rgbin) && (n_sd_minus_bins[0]<(rgbin+2)) ){
+		FillLastEvent(cut);
+		sd_minus_eta[ii]++;
+	      };
+	    };
+	  }else if (sd_flag_total[0]==1){//-------------------> all SD+ events "19"
+	    CalculateSDdiffMass(false);
+	    FillLastEvent(19);
+	    
+	    /*
+	    if(proper_proton){
+	      PrintEventInfo(true);
+	      CalculateSDdiffMass(true);
+	      //CMSmc->ProceedEvent(dummy_cut, false, true);
+	    };*/
+	    sd_plus++;
+	    for(short unsigned int ii=0; ii<11; ii++){// RG: [0,1)="20", [1,2)="21", ..., [10,11)="30"
+	      short unsigned int cut   = 20+ii;
+	      short unsigned int rgbin = 2*ii;
+	      if( (n_sd_plus_bins[0]>=rgbin) && (n_sd_plus_bins[0]<(rgbin+2)) ){
+		FillLastEvent(cut);
+		sd_plus_eta[ii]++;
+	      };
+	    };
+	  }; // end SD cases
+	  
+	}; // end vertices<2
+      }; // end !bptx quiet
+    }; // end trigger
+    
+  };// end loop
+  std::cout << "Acceptance: [" << ETA_BIN_L[first_central_bin] << "," << ETA_BIN_L[last_central_bin]+ETA_BIN_W << "]\n";
+  std::cout << "Total evts in chain       : " << stat << std::endl;
+  std::cout << "Proceeded evts            : " << (current_event+1)     << std::endl;
+  std::cout << "Triggered evts            : " << trigger_evts << std::endl;
+  std::cout << "T2 active (not selecting) : " << t2prim_evts  << std::endl;
+  std::cout << "Active (!bptx quiet)      : " << bptx_active << std::endl;
+  std::cout << "No PU vertices            : " << vtx_cut << std::endl;
+  std::cout << "Good FSC evt              : " << goodFSC << std::endl;
+  std::cout << "\tsd- candidates          : " << sd_minus << "\t\tsd+ candidates      : " << sd_plus << std::endl;
+  for(short unsigned int ii=0; ii<11; ii++){
+    std::cout << ii << "<= |deta| < " << ii+1 << "\t\t" << sd_minus_eta[ii] << "\t\t" << sd_plus_eta[ii] << std::endl;
+  };
+  return nevts;
+}
+
+
+void uaplotter1::create_histos()
+{
+  n_each_h2D = n_cuts;
+  n_each_h1D = n_cuts;
+  TString title1, title2;
+  
+  if(mc>0){//******************************************************************************************
+    diff_flag_mc_full_reco_central_h  = new TH2F * [n_each_h2D];
+    diff_flag_mc_full_reco_full_h     = new TH2F * [n_each_h2D];
+    diff_flag_mc_total_mc_central_h   = new TH2F * [n_each_h2D];
+    diff_flag_mc_full_mc_central_h    = new TH2F * [n_each_h2D];
+    n_sd_minus_bins_mc_reco_h         = new TH2F * [n_each_h2D];
+    n_sd_plus_bins_mc_reco_h          = new TH2F * [n_each_h2D];
+    
+    xi_mc_p_mc_total_h     = new TH2F * [n_each_h2D];
+    xi_mc_p_reco_full_h    = new TH2F * [n_each_h2D]; 
+    xi_mc_total_mc_full_h  = new TH2F * [n_each_h2D];
+    xi_mc_total_reco_full_h= new TH2F * [n_each_h2D]; 
+
+    xi_calo_mc_reco_h      = new TH2F * [n_each_h2D];
+    xi_pf_mc_reco_h        = new TH2F * [n_each_h2D];
+    xi_cas_mc_reco_h       = new TH2F * [n_each_h2D];
+    xi_zdc_mc_reco_h       = new TH2F * [n_each_h2D]; 
+            
+    for(unsigned int i=0; i<n_each_h2D; i++){
+      title1 = "diff_flag_mc_full_reco_central_h["; title1+=i; title1+="]";
+      title2 = title1; title2+=" ; diff_flag_full_MCtruth; diff_flag_central_RECO";
+      diff_flag_mc_full_reco_central_h[i] = new TH2F(title1.Data(), title2.Data(), 8, -2.5, 5.5, 8, -2.5, 5.5);
+
+      title1 = "diff_flag_mc_full_reco_full_h["; title1+=i; title1+="]";
+      title2 = title1; title2+=" ; diff_flag_full_MCtruth; diff_flag_full_RECO";
+      diff_flag_mc_full_reco_full_h[i] = new TH2F(title1.Data(), title2.Data(), 8, -2.5, 5.5, 8, -2.5, 5.5);
+      
+      title1 = "diff_flag_mc_total_mc_central_h["; title1+=i; title1+="]";
+      title2 = title1; title2+=" ; diff_flag_total_MCtruth; diff_flag_central_MCtruth";
+      diff_flag_mc_total_mc_central_h[i] = new TH2F(title1.Data(), title2.Data(), 8, -2.5, 5.5, 8, -2.5, 5.5);
+
+      title1 = "diff_flag_mc_full_mc_central_h["; title1+=i; title1+="]";
+      title2 = title1; title2+=" ; diff_flag_full_MCtruth; diff_flag_central_MCtruth";
+      diff_flag_mc_full_mc_central_h[i] = new TH2F(title1.Data(), title2.Data(), 8, -2.5, 5.5, 8, -2.5, 5.5);
+
+      title1 = "n_sd_minus_bins_mc_reco_h["; title1+=i; title1+="]";
+      title2 = title1; title2+=" ; MCtruth sd- bins; RECO sd- bins";
+      n_sd_minus_bins_mc_reco_h[i] = new TH2F(title1.Data(), title2.Data(), 30, -1, 29, 30, -1, 29);
+      
+      title1 = "n_sd_plus_bins_mc_reco_h["; title1+=i; title1+="]";
+      title2 = title1; title2+=" ; MCtruth sd+ bins; RECO sd+ bins";
+      n_sd_plus_bins_mc_reco_h[i] = new TH2F(title1.Data(), title2.Data(), 30, -1, 29, 30, -1, 29);
+      
+      title1 = "xi_mc_p_mc_total_h["; title1+=i; title1+="]";
+      title2 = title1; title2+=" ; #xi_{p}; #xi_{MCtruth_total}";
+      xi_mc_p_mc_total_h[i] = new TH2F(title1.Data(), title2.Data(), 200, -9., 1., 200, -9., 1.);
+
+      title1 = "xi_mc_p_reco_full_h["; title1+=i; title1+="]";
+      title2 = title1; title2+=" ; #xi_{p}; #xi_{RECO_full}";
+      xi_mc_p_reco_full_h[i] = new TH2F(title1.Data(), title2.Data(), 200, -9., 1., 200, -9., 1.);
+
+      title1 = "xi_mc_total_mc_full_h["; title1+=i; title1+="]";
+      title2 = title1; title2+=" ; #xi_{MCtruth_total}; #xi_{MCtruth_full}";
+      xi_mc_total_mc_full_h[i] = new TH2F(title1.Data(), title2.Data(), 200, -9., 1., 200, -9., 1.);
+
+      title1 = "xi_mc_total_reco_full_h["; title1+=i; title1+="]";
+      title2 = title1; title2+=" ; #xi_{MCtruth_total}; #xi_{RECO_full}";
+      xi_mc_total_reco_full_h[i] = new TH2F(title1.Data(), title2.Data(), 200, -9., 1., 200, -9., 1.);
+
+      title1 = "xi_calo_mc_reco_h["; title1+=i; title1+="]";
+      title2 = title1; title2+="; MCtruth; RECO";
+      xi_calo_mc_reco_h[i] = new TH2F(title1.Data(), title2.Data(), 200, -9., 1., 200, -9., 1.);
+
+      title1 = "xi_pf_mc_reco_h["; title1+=i; title1+="]";
+      title2 = title1; title2+="; MCtruth; RECO";
+      xi_pf_mc_reco_h[i] = new TH2F(title1.Data(), title2.Data(), 200, -9., 1., 200, -9., 1.);
+      
+      title1 = "xi_cas_mc_reco_h["; title1+=i; title1+="]";
+      title2 = title1; title2+="; MCtruth; RECO";
+      xi_cas_mc_reco_h[i] = new TH2F(title1.Data(), title2.Data(), 200, -9., 1., 200, -9., 1.);
+  
+      title1 = "xi_zdc_mc_reco_h["; title1+=i; title1+="]";
+      title2 = title1; title2+="; MCtruth; RECO";
+      xi_zdc_mc_reco_h[i] = new TH2F(title1.Data(), title2.Data(), 200, -9., 1., 200, -9., 1.);
+
+    };
+    
+    h2D->push_back(diff_flag_mc_full_reco_central_h);
+    h2D->push_back(diff_flag_mc_full_reco_full_h);
+    h2D->push_back(diff_flag_mc_full_mc_central_h);
+    h2D->push_back(diff_flag_mc_total_mc_central_h);
+    h2D->push_back(n_sd_minus_bins_mc_reco_h);
+    h2D->push_back(n_sd_plus_bins_mc_reco_h);    
+    h2D->push_back(xi_mc_p_mc_total_h);
+    h2D->push_back(xi_mc_p_reco_full_h);
+    h2D->push_back(xi_mc_total_mc_full_h);
+    h2D->push_back(xi_mc_total_reco_full_h);
+    h2D->push_back(xi_calo_mc_reco_h);
+    h2D->push_back(xi_pf_mc_reco_h);
+    h2D->push_back(xi_cas_mc_reco_h);
+    h2D->push_back(xi_zdc_mc_reco_h);    
+  }; // end if mc *******************************************************************
+
+  
+  xi_p_reco_full_h       = new TH2F * [n_each_h2D];
+  zdcM_vs_castor_h       = new TH2F * [n_each_h2D];
+  zdcM_vs_T2primM_h      = new TH2F * [n_each_h2D];
+
+  ZDCm_vs_xiRP_h      = new TH2F * [n_each_h2D];
+  ZDCp_vs_xiRP_h      = new TH2F * [n_each_h2D];
+  FSCmSi8_vs_xiRP_h   = new TH2F * [n_each_h2D];
+  FSCmN_vs_xiRP_h     = new TH2F * [n_each_h2D];
+  FSCmN_vs_castor_h     = new TH2F * [n_each_h2D]; 
+
+  for(unsigned int i=0; i<n_each_h2D; i++){
+    title1 = "xi_p_reco_full_h["; title1+=i; title1+="]";
+    title2 = title1; title2+=" ;#xi_{p}; #xi_{RECO_full}";
+    xi_p_reco_full_h[i]    = new TH2F(title1.Data(), title2.Data(), 2200, -1.1, 1.1, 2200, -1.1, 1.1); 
+
+    title1 = "zdcM_vs_castor_h["; title1+=i; title1+="]";
+    title2 = title1; title2+=";CASTOR E [GeV]; ZDC- E [a.u.]";
+    zdcM_vs_castor_h[i] = new TH2F(title1.Data(), title2.Data(), 6500, -500,6000, 4200, -2000, 40000);
+
+    title1 = "zdcM_vs_T2primM_h["; title1+=i; title1+="]";
+    title2 = title1; title2+=";N_{tr}(T2-); ZDC- E [a.u.]";
+    zdcM_vs_T2primM_h[i] = new TH2F(title1.Data(), title2.Data(), 110, -10., 100., 4200, -2000, 40000);
+
+    title1 = "ZDCm_vs_xiRP_h["; title1+=i; title1+="]";
+    title2 = title1; title2+=";#xi_{p}; ZDC- E [a.u.]";
+    ZDCm_vs_xiRP_h[i] = new TH2F(title1.Data(), title2.Data(), 2200, -1.1, 1.1, 420, -2000, 40000);
+
+    title1 = "ZDCp_vs_xiRP_h["; title1+=i; title1+="]";
+    title2 = title1; title2+=";#xi_{p}; ZDC+ E [a.u.]";
+    ZDCp_vs_xiRP_h[i] = new TH2F(title1.Data(), title2.Data(), 2200, -1.1, 1.1, 420, -20000, 400000);
+
+    title1 = "FSCmSi8_vs_xiRP_h["; title1+=i; title1+="]";
+    title2 = title1; title2+=";#xi_{p};q6(FSC-) [fC]";
+    FSCmSi8_vs_xiRP_h[i] = new TH2F(title1.Data(), title2.Data(), 2200, -1.1, 1.1, 200, -3000, 197000);
+
+    title1 = "FSCmN_vs_xiRP_h["; title1+=i; title1+="]";
+    title2 = title1; title2+=";#xi_{p};number of FSC channels";
+    FSCmN_vs_xiRP_h[i] = new TH2F(title1.Data(), title2.Data(),2200, -1.1, 1.1,  10, -1, 9);
+
+    title1 = "FSCmN_vs_castor_h["; title1+=i; title1+="]";
+    title2 = title1; title2+=";CASTOR E [GeV];;number of FSC channels";
+    FSCmN_vs_castor_h[i] = new TH2F(title1.Data(), title2.Data(), 6500, -500,6000, 10, -1, 9);    
+  };
+  h2D->push_back(xi_p_reco_full_h);
+  h2D->push_back(zdcM_vs_castor_h);
+  h2D->push_back(zdcM_vs_T2primM_h);
+  h2D->push_back(ZDCm_vs_xiRP_h   );
+  h2D->push_back(ZDCp_vs_xiRP_h   );
+  h2D->push_back(FSCmSi8_vs_xiRP_h);
+  h2D->push_back(FSCmN_vs_xiRP_h  );
+  h2D->push_back(FSCmN_vs_castor_h);
+  
+  n_sd_minus_bins_h         = new TH1F * [n_each_h1D];
+  n_sd_plus_bins_h          = new TH1F * [n_each_h1D];
+  central_activity_h        = new TH1F * [n_each_h1D];
+  central_activity_mc_h     = new TH1F * [n_each_h1D];
+  xi_reco_full_h            = new TH1F * [n_each_h1D];
+  for(unsigned int i=0; i<n_each_h1D; i++){
+    title1 = "n_sd_minus_bins_h["; title1+=i; title1+="]";
+    title2 = title1; title2+=" ; n_sd_minus_bins";
+    n_sd_minus_bins_h[i] = new TH1F(title1.Data(), title2.Data(), 30, -1, 29);
+
+    title1 = "n_sd_plus_bins_h["; title1+=i; title1+="]";
+    title2 = title1; title2+=" ; n_sd_plus_bins";
+    n_sd_plus_bins_h[i] = new TH1F(title1.Data(), title2.Data(), 30, -1, 29);
+    
+    title1 = "central_activity_h["; title1+=i; title1+="]";
+    title2 = title1; title2+=" ; #eta";
+    central_activity_h[i] = new TH1F(title1.Data(), title2.Data(), 28, -7, 7);
+
+    title1 = "central_activity_mc_h["; title1+=i; title1+="]";
+    title2 = title1; title2+=" ; #eta";
+    central_activity_mc_h[i] = new TH1F(title1.Data(), title2.Data(), 28, -7, 7);
+    
+    title1 = "xi_reco_full_h["; title1+=i; title1+="]";
+    title2 = title1; title2+="#xi_{RECO_full}";
+    xi_reco_full_h[i] = new TH1F(title1.Data(), title2.Data(), 100, -7, 0);
+  };
+  h1D->push_back(n_sd_minus_bins_h);
+  h1D->push_back(n_sd_plus_bins_h);
+  h1D->push_back(central_activity_h);
+  h1D->push_back(central_activity_mc_h);
+  h1D->push_back(xi_reco_full_h);
+}

@@ -1,0 +1,89 @@
+100 k pPb  p->Loop(100000,53)
+Acceptance: [-5,5]
+Total evts in chain       : 1035588
+Proceeded evts            : 100000
+Triggered evts            : 60901
+T2 active (not selecting) : 38334
+Active (!bptx quiet)      : 60901
+No PU vertices            : 58234
+	sd- candidates          : 4100		sd+ candidates      : 5347
+0<= |deta| < 1		720		744
+1<= |deta| < 2		175		257
+2<= |deta| < 3		93		172
+3<= |deta| < 4		85		249
+4<= |deta| < 5		64		236
+5<= |deta| < 6		61		261
+6<= |deta| < 7		85		326
+7<= |deta| < 8		39		187
+8<= |deta| < 9		165		707
+9<= |deta| < 10		296		692
+10<= |deta| < 11		2317		1516
+(int)100000
+
+uaplot_output_histos_data_pPb_2.5eta_100k.root
+const float CENT_ETA_ACC   = 2.5; // 16Feb15 - test 
+Acceptance: [-5,5]
+Total evts in chain       : 1035588
+Proceeded evts            : 100000
+Triggered evts            : 60901
+T2 active (not selecting) : 38334
+Active (!bptx quiet)      : 60901
+No PU vertices            : 58234
+	sd- candidates          : 4100		sd+ candidates      : 5347
+0<= |deta| < 1		720		744
+1<= |deta| < 2		175		257
+2<= |deta| < 3		96		171
+3<= |deta| < 4		84		247
+4<= |deta| < 5		64		236
+5<= |deta| < 6		61		261
+6<= |deta| < 7		85		325
+7<= |deta| < 8		44		191
+8<= |deta| < 9		164		706
+9<= |deta| < 10		297		691
+10<= |deta| < 11		2310		1518
+(int)100000
+root [3] delete p
+
+const float CENT_ETA_ACC   = 3.0; // 16Feb15 - test 
+Acceptance: [-5,5]
+Total evts in chain       : 1035588
+Proceeded evts            : 100000
+Triggered evts            : 60901
+T2 active (not selecting) : 38334
+Active (!bptx quiet)      : 60901
+No PU vertices            : 58234
+	sd- candidates          : 4100		sd+ candidates      : 5347
+0<= |deta| < 1		720		744
+1<= |deta| < 2		175		257
+2<= |deta| < 3		94		168
+3<= |deta| < 4		85		247
+4<= |deta| < 5		64		235
+5<= |deta| < 6		61		261
+6<= |deta| < 7		85		325
+7<= |deta| < 8		44		192
+8<= |deta| < 9		164		705
+9<= |deta| < 10		297		691
+10<= |deta| < 11		2311		1522
+
+
+HF 
+
+Acceptance: [-5,5]
+Total evts in chain       : 1035588
+Proceeded evts            : 100000
+Triggered evts            : 60901
+T2 active (not selecting) : 38334
+Active (!bptx quiet)      : 60901
+No PU vertices            : 58234
+	sd- candidates          : 4404		sd+ candidates      : 5378
+0<= |deta| < 1		834		908
+1<= |deta| < 2		298		376
+2<= |deta| < 3		76		126
+3<= |deta| < 4		78		223
+4<= |deta| < 5		60		220
+5<= |deta| < 6		60		245
+6<= |deta| < 7		82		308
+7<= |deta| < 8		42		182
+8<= |deta| < 9		349		845
+9<= |deta| < 10		605		625
+10<= |deta| < 11		1920		1320

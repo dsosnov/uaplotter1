@@ -1,0 +1,1 @@
+run on all events (Loop(-1,-1)) for common studies (compare to Frici)

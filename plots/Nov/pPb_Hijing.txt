@@ -1,0 +1,44 @@
+Total stat = 150400
+uaplotter1::Loop(53) for 150400 events
+Acceptance: [-5,5]
+Total evts in chain : 150400
+Proceeded evts      : 150400
+Triggered evts      : 149246
+T2 active (no trigg): 149246
+Active (!bptx quiet): 149246
+No PU vertices      : 149246
+	sd- candidates      : 5336		sd+ candidates      : 6182
+0<= |deta| < 1		2913		3172
+1<= |deta| < 2		484		618
+2<= |deta| < 3		364		508
+3<= |deta| < 4		444		501
+4<= |deta| < 5		329		357
+5<= |deta| < 6		383		303
+6<= |deta| < 7		229		361
+7<= |deta| < 8		68		121
+8<= |deta| < 9		81		159
+9<= |deta| < 10		32		62
+10<= |deta| < 11		9		20
+(int)150400
+
+old
+Acceptance: [-5,5]
+Total evts in chain : 150400
+Proceeded evts      : 150400
+Triggered evts      : 149246
+Active (!bptx quiet): 149246
+No PU vertices      : 149246
+        sd- candidates      : 5336              sd+ candidates      : 6182
+0<= |deta| < 1          2913            3192
+1<= |deta| < 2          484             618
+2<= |deta| < 3          364             508
+3<= |deta| < 4          444             501
+4<= |deta| < 5          329             357
+5<= |deta| < 6          383             303
+6<= |deta| < 7          229             361
+7<= |deta| < 8          68              121
+8<= |deta| < 9          81              159
+9<= |deta| < 10         32              62
+10<= |deta| < 11        9               0
+(int)150400
+

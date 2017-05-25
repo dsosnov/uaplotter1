@@ -1,0 +1,24 @@
+uaplotter1::DefineTrigger: trigger selection on tech bit # 53
+Total stat = 1035588
+uaplotter1::Loop(53) for 1035588 events
+Acceptance: [-5,5]
+Total evts in chain : 1035588
+Proceeded evts      : 1035588
+Triggered evts      : 661847
+T2 active (no trigg): 414552
+Active (!bptx quiet): 661847
+No PU vertices      : 637112
+	sd- candidates      : 48035		sd+ candidates      : 56823
+0<= |deta| < 1		7154		7899
+1<= |deta| < 2		1747		2322
+2<= |deta| < 3		926		1747
+3<= |deta| < 4		979		2647
+4<= |deta| < 5		805		2517
+5<= |deta| < 6		720		2769
+6<= |deta| < 7		773		3354
+7<= |deta| < 8		401		1923
+8<= |deta| < 9		1953		7527
+9<= |deta| < 10		3168		7199
+10<= |deta| < 11		29409		16919
+(int)1035588
+

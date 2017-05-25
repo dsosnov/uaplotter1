@@ -1,0 +1,12 @@
+PROJECT_NAME      = "C++"
+INPUT             = "src"
+OUTPUT_DIRECTORY  = doc
+GENERATE_LATEX    = NO
+GENERATE_MAN      = NO
+GENERATE_RTF      = NO
+OPTIMIZE_OUTPUT_JAVA = YES
+QUIET             = YES
+JAVADOC_AUTOBRIEF = YES
+SEARCHENGINE      = NO
+EXTRACT_ALL = YES # for x-references
+

@@ -1,0 +1,43 @@
+Acceptance: [-5,5]
+Total evts in chain : 132480
+Proceeded evts      : 132480
+Triggered evts      : 128019
+T2 active (no trigg): 128019
+Active (!bptx quiet): 128019
+No PU vertices      : 128019
+	sd- candidates      : 5477		sd+ candidates      : 4839
+0<= |deta| < 1		2330		2152
+1<= |deta| < 2		568		596
+2<= |deta| < 3		331		360
+3<= |deta| < 4		426		366
+4<= |deta| < 5		226		238
+5<= |deta| < 6		158		159
+6<= |deta| < 7		161		120
+7<= |deta| < 8		100		73
+8<= |deta| < 9		213		178
+9<= |deta| < 10		276		213
+10<= |deta| < 11		688		384
+(int)132480
+
+
+old
+Acceptance: [-5,5]
+Total evts in chain : 132480
+Proceeded evts      : 132480
+Triggered evts      : 128019
+Active (!bptx quiet): 128019
+No PU vertices      : 128019
+        sd- candidates      : 5477              sd+ candidates      : 4839
+0<= |deta| < 1          2330            2536
+1<= |deta| < 2          568             596
+2<= |deta| < 3          331             360
+3<= |deta| < 4          426             366
+4<= |deta| < 5          226             238
+5<= |deta| < 6          158             159
+6<= |deta| < 7          161             120
+7<= |deta| < 8          100             73
+8<= |deta| < 9          213             178
+9<= |deta| < 10         276             213
+10<= |deta| < 11        688             0
+(int)132480
+

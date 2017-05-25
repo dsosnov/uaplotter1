@@ -1,0 +1,64 @@
+Acceptance: [-5,5]
+Total evts in chain : 111100
+Proceeded evts      : 111100
+Triggered evts      : 107484
+T2 active (no trigg): 107484
+Active (!bptx quiet): 107484
+No PU vertices      : 107484
+	sd- candidates      : 3944		sd+ candidates      : 4562
+0<= |deta| < 1		1802		1920
+1<= |deta| < 2		454		448
+2<= |deta| < 3		282		319
+3<= |deta| < 4		286		355
+4<= |deta| < 5		157		204
+5<= |deta| < 6		142		158
+6<= |deta| < 7		110		126
+7<= |deta| < 8		54		71
+8<= |deta| < 9		144		189
+9<= |deta| < 10		158		238
+10<= |deta| < 11		355		534
+(int)111100
+
+old
+Acceptance: [-5,5]
+Total evts in chain : 111100
+Proceeded evts      : 111100
+Triggered evts      : 107484
+T2 active (no trigg): 107484
+Active (!bptx quiet): 107484
+No PU vertices      : 107484
+        sd- candidates      : 3944              sd+ candidates      : 4562
+0<= |deta| < 1          1802            1920
+1<= |deta| < 2          454             448
+2<= |deta| < 3          282             319
+3<= |deta| < 4          286             355
+4<= |deta| < 5          157             204
+5<= |deta| < 6          142             158
+6<= |deta| < 7          110             126
+7<= |deta| < 8          54              71
+8<= |deta| < 9          144             189
+9<= |deta| < 10         158             238
+10<= |deta| < 11                355             534
+(int)111100
+
+old
+Acceptance: [-5,5]
+Total evts in chain : 111100
+Proceeded evts      : 111100
+Triggered evts      : 107484
+Active (!bptx quiet): 107484
+No PU vertices      : 107484
+        sd- candidates      : 3944              sd+ candidates      : 4562
+0<= |deta| < 1          1802            2454
+1<= |deta| < 2          454             448
+2<= |deta| < 3          282             319
+3<= |deta| < 4          286             355
+4<= |deta| < 5          157             204
+5<= |deta| < 6          142             158
+6<= |deta| < 7          110             126
+7<= |deta| < 8          54              71
+8<= |deta| < 9          144             189
+9<= |deta| < 10         158             238
+10<= |deta| < 11        355             0
+(int)111100
+
