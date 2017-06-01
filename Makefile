@@ -1,21 +1,19 @@
 SRC=src
 OBJ=lib
-CMS=/home/kkuzn/pA13/CMSTotem/CMSdataFormat
-TOT=/home/kkuzn/pA13/CMSTotem/TOTEMdataFormat
-RD=/data/SWnew/FairSoft/tools/root/bin
-export LD_LIBRARY_PATH=/data/SWnew/FairSoftInst/lib/root
-CXXFLAGS+=$(shell $(RD)/root-config --cflags) -Wall -I$(SRC) -I$(CMS)/src -I$(TOT)/src -ggdb3 -fPIC
-LDFLAGS+=$(shell $(RD)/root-config --glibs)  -ggdb3 
+CMS=../UATree/UADataFormat
+TOT=../TOTEMdataFormat
+CXXFLAGS+=$(shell root-config --cflags) -Wall -I../ -I$(SRC) -I$(CMS)/src -I$(CMS)/interface -I$(TOT)/src -ggdb3 -fPIC
+LDFLAGS+=$(shell root-config --glibs)  -ggdb3 
 LINKD=uaplot_LinkDef.h
 HEAD=$(filter-out $(SRC)/$(LINKD) $(SRC)/uaplot_dict.h, $(wildcard $(SRC)/*.h))
 CODE=$(wildcard $(SRC)/ua*.cc)
 OBJS=$(subst $(SRC),$(OBJ),$(CODE:.cc=.o))
 
+all: $(OBJ)/libuaplotter.so $(CMS)/lib/libUADataFormat.so $(TOT)/lib/libTOTEMdataFormat.so
 
-
-all: $(OBJ) $(OBJ)/libuaplotter.so 
-$(OBJ)/libuaplotter.so: $(OBJS) $(OBJ)/uaplot_dict.o 
+$(OBJ)/libuaplotter.so: $(OBJ) $(OBJS) $(OBJ)/uaplot_dict.o 
 	$(CXX) -shared -o $@ $^ $(LDFLAGS) #order important for Ubuntu 
+	if [ ! -s $(OBJ)/uaplot_dict_rdict.pcm ] ; then ln -s $(SRC)/uaplot_dict_rdict.pcm $(OBJ)/ ; fi
 	@echo ""
 
 $(OBJ)/%.o: $(SRC)/%.cc $(HEAD)
@@ -24,7 +22,7 @@ $(OBJ)/%.o: $(SRC)/%.cc $(HEAD)
 
 $(SRC)/uaplot_dict.cc: $(HEAD)
 	@echo LD_LIBRARY_PATH: ${LD_LIBRARY_PATH}
-	cd $(SRC);$(RD)/rootcint -f uaplot_dict.cc -c -p  -I$(CMS)/src -I$(TOT)/src $(subst $(SRC)/,,$(HEAD)) $(LINKD)
+	cd $(SRC); rootcint -f uaplot_dict.cc -c -p -I../../ -I../$(CMS)/src -I../$(CMS)/interface -I../$(TOT)/src -D_POSIX_C_SOURCE=200809L $(subst $(SRC)/,,$(HEAD)) $(LINKD)
 	@echo ""
 # 
 # $(LINKD).h:
@@ -38,4 +36,12 @@ info:
 	@echo SOURCES: $(CODE)
 	@echo OBJECTS: $(OBJS)
 clean:
-	rm -rf $(OBJS) $(OBJ)/libuaplotter.so $(SRC)/uaplot_dict.cc $(SRC)/uaplot_dict.h
+	rm -rf $(OBJ) $(SRC)/uaplot_dict*
+	cd $(CMS)/utilities; make clean
+	cd $(TOT)/utilities; make clean
+
+$(CMS)/lib/libUADataFormat.so:
+	cd $(CMS)/utilities; $(MAKE)
+
+$(TOT)/lib/libTOTEMdataFormat.so:
+	cd $(TOT)/utilities; $(MAKE)

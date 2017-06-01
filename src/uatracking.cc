@@ -125,7 +125,7 @@ bool uatracking::ProceedEvent(const short unsigned int cut, const bool fill, con
   
   
   for(std::vector<MyTracks>::iterator t = Tracks->begin(); t!=Tracks->end(); ++t){
-    int bin = find_eta_bin((*t).PseudoRapidity());
+    int bin = find_eta_bin((*t).eta());
     n_tracks_bin_all[bin]++;
     nTracks++;
     if( (*t).quality[1] ) { // tight tracks
@@ -140,7 +140,7 @@ bool uatracking::ProceedEvent(const short unsigned int cut, const bool fill, con
       std::cout << "trck# " << i++ << " ";
       for(int b=0; b<5; b++)
 	std::cout << (*t).quality[b];
-      std::cout << " " << (*t).chi2n << " \t\teta: " << (*t).Eta() << "\tphi: " << (*t).Phi()*TMath::RadToDeg()<< "\tpt: " << (*t).Pt() << "\tE:" << (*t).Energy() 
+      std::cout << " " << (*t).chi2n << " \t\teta: " << (*t).Eta() << "\tphi: " << (*t).Phi()*TMath::RadToDeg()<< "\tpt: " << (*t).Pt() << "\tE:" << (*t).energy() 
 		<< "\t charge:" << (*t).charge;
       std::cout << std::endl;
     }; // end info

@@ -113,8 +113,8 @@ bool uamc::ProceedEvent(const short unsigned int cut, const bool fill, const boo
   bool outer, zdc;
   
   for(std::vector<MyGenPart>::iterator part=MCthuth->begin(); part!=MCthuth->end(); ++part){
-    double e = (*part).Energy();
-    float eta    = (*part).PseudoRapidity();
+    double e = (*part).energy();
+    float eta    = (*part).eta();
     float abseta = fabs(eta);
     outer = false;
     zdc   = false;
@@ -169,7 +169,7 @@ bool uamc::ProceedEvent(const short unsigned int cut, const bool fill, const boo
       totalE +=e;
       totalPz+=(*part).Pz();
       
-      int bin = find_eta_bin((*part).PseudoRapidity());
+      int bin = find_eta_bin((*part).eta());
       if(bin>=0){
 	energy[bin] += e;
 	pz[bin]     += (*part).Pz();
@@ -186,8 +186,8 @@ bool uamc::ProceedEvent(const short unsigned int cut, const bool fill, const boo
     if(info){
       std::cout << n << "  id: " << (*part).pdgId << " q: " << (*part).charge << " stat: " << (*part).status 
 		<< "\teta: " << (*part).Eta() << "\tphi: " << (*part).Phi() << "\tPz: " << (*part).Pz() 
-		<< "\tPt: " << (*part).Pt() << "\tE:" << (*part).Energy() 
-		<< "\t" << (*part).Energy()-(*part).Pz() << "\t" << (*part).Energy()+(*part).Pz() << "\touter: " << outer << "\tzdc: " << zdc << std::endl;
+		<< "\tPt: " << (*part).Pt() << "\tE:" << (*part).energy() 
+		<< "\t" << (*part).energy()-(*part).Pz() << "\t" << (*part).energy()+(*part).Pz() << "\touter: " << outer << "\tzdc: " << zdc << std::endl;
     };
   }; // end loop
   

@@ -110,22 +110,22 @@ bool uacalo::ProceedEvent(const short unsigned int cut, const bool fill, const b
   
   for(std::vector<MyCaloTower>::iterator it=Towers->begin(); it!=Towers->end(); ++it){
       if( (*it).Pt()>0 ){
-	int bin = find_eta_bin((*it).PseudoRapidity());
+	int bin = find_eta_bin((*it).eta());
 	if(bin>=0){
-	  energy[bin] += (*it).Energy();
+	  energy[bin] += (*it).energy();
 	  pz[bin]     += (*it).Pz();
 	  pt[bin]     += (*it).Pt();
 	  if((*it).hasHF){
-	    if((*it).Energy()>HF_TOWER_THR)
+	    if((*it).energy()>HF_TOWER_THR)
 		calotowers[bin]++;
 	  }else{
-	    if((*it).Energy()>CENT_TOWER_THR)
+	    if((*it).energy()>CENT_TOWER_THR)
 		calotowers[bin]++;   
 	  };
 	}; // end if bin
 	
 	//___________________________________________________________________
-	if(((*it).hasHF) && (fabs((*it).PseudoRapidity())<=CALO_ETA_ACC) ){
+	if(((*it).hasHF) && (fabs((*it).eta())<=CALO_ETA_ACC) ){
 	  bool minus = (bin<10);
 	  short unsigned int indx = 10;
 	  if(minus){
@@ -135,15 +135,15 @@ bool uacalo::ProceedEvent(const short unsigned int cut, const bool fill, const b
 	  };
 	  short unsigned int side = int( not(minus)); // 0 - minus, 1 - plus
 	  //std::cout << (*it).PseudoRapidity() << "\t" << bin << "\t" << indx << std::endl;
-	  if( (*it).Energy()>hf_max_energy_tower[side][indx]){
-	    hf_max_energy_tower[side][indx]=(*it).Energy();
+	  if( (*it).energy()>hf_max_energy_tower[side][indx]){
+	    hf_max_energy_tower[side][indx]=(*it).energy();
 	    //std::cout << (*it).PseudoRapidity() << "\t" <<bin << "\t" << side << " " << indx << "\t" << hf_max_energy_tower[side][indx] << std::endl;
 	  };
 	  // here HF "trigger" only 
-	  if(fabs((*it).PseudoRapidity())<HF_ETA_MAX){
+	  if(fabs((*it).eta())<HF_ETA_MAX){
 	    short unsigned ind = int((*it).zside>0);
-	    hf_total_energy_tower[ind]+=(*it).Energy();
-	    if(!hf_trigger_tower[ind] && ((*it).Energy()>HF_TOWER_THR))
+	    hf_total_energy_tower[ind]+=(*it).energy();
+	    if(!hf_trigger_tower[ind] && ((*it).energy()>HF_TOWER_THR))
 	      hf_trigger_tower[ind] = true;
 	  };
 	}; // end HF

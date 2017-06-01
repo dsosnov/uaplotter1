@@ -88,19 +88,19 @@ bool uapf::ProceedEvent(const short unsigned int cut, const bool fill, const boo
   for(std::vector<MyPFCand>::iterator pf=PFCand->begin(); pf!=PFCand->end(); ++pf){  
     nPfCand++;
     if(info)
-	std::cout << "\tpf#"<< nPfCand << "  " << (*pf).particleId << " eta: " << (*pf).Eta() << "\tphi: " << (*pf).Phi() << "\tPt: " << (*pf).Pt() << "\tE:" << (*pf).Energy() << std::endl;
-    int bin = find_eta_bin((*pf).PseudoRapidity());
+	std::cout << "\tpf#"<< nPfCand << "  " << (*pf).particleId << " eta: " << (*pf).Eta() << "\tphi: " << (*pf).Phi() << "\tPt: " << (*pf).Pt() << "\tE:" << (*pf).energy() << std::endl;
+    int bin = find_eta_bin((*pf).eta());
     if(bin>=0){
-      energy[bin] += (*pf).Energy();
+      energy[bin] += (*pf).energy();
       pt[bin]     += (*pf).Pt();
       pz[bin]     += (*pf).Pz();
       if(mc<0){//noise studies
-	if( ((*pf).particleId==5) || ((*pf).particleId==6) || ((*pf).particleId==0) ) energyH0[bin]+=(*pf).Energy(); // h0 and h_HF and unknown
-	if(  (*pf).particleId==1 ) energyHch[bin]+=(*pf).Energy(); // charged hadron
-	if( ((*pf).particleId==4) || ((*pf).particleId==7) )  energyEM0[bin]+=(*pf).Energy(); // gamma and egamma_HF
+	if( ((*pf).particleId==5) || ((*pf).particleId==6) || ((*pf).particleId==0) ) energyH0[bin]+=(*pf).energy(); // h0 and h_HF and unknown
+	if(  (*pf).particleId==1 ) energyHch[bin]+=(*pf).energy(); // charged hadron
+	if( ((*pf).particleId==4) || ((*pf).particleId==7) )  energyEM0[bin]+=(*pf).energy(); // gamma and egamma_HF
 	if( ((*pf).particleId==2) || ((*pf).particleId==3) )  {
 	  std::cout << "lepton???\n";
-	  std::cout << "\tpf#"<< nPfCand << "  " << (*pf).particleId << " eta: " << (*pf).Eta() << "\tphi: " << (*pf).Phi() << "\tPt: " << (*pf).Pt() << "\tE:" << (*pf).Energy() << std::endl;
+	  std::cout << "\tpf#"<< nPfCand << "  " << (*pf).particleId << " eta: " << (*pf).Eta() << "\tphi: " << (*pf).Phi() << "\tPt: " << (*pf).Pt() << "\tE:" << (*pf).energy() << std::endl;
 	}
       };
     }; // end bin >=0
