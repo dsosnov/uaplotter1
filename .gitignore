@@ -1,6 +1,3 @@
-#.gitignore
-
-*.o
 *.so
 *.a
 *.pyc
@@ -9,10 +6,8 @@
 .#*
 #*#
 
-.kdev4/
-*.kdev4
-
-test.root
 *.root
 *.screenlog
 *.png
+src/uaplot_dict*
+lib/
