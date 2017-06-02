@@ -9,9 +9,9 @@ HEAD=$(filter-out $(SRC)/$(LINKD) $(SRC)/uaplot_dict.h, $(wildcard $(SRC)/*.h))
 CODE=$(wildcard $(SRC)/ua*.cc)
 OBJS=$(subst $(SRC),$(OBJ),$(CODE:.cc=.o))
 
-all: $(OBJ)/libuaplotter.so $(CMS)/lib/libUADataFormat.so $(TOT)/lib/libTOTEMdataFormat.so
+all: $(OBJ) $(OBJ)/libuaplotter.so $(CMS)/lib/libUADataFormat.so $(TOT)/lib/libTOTEMdataFormat.so
 
-$(OBJ)/libuaplotter.so: $(OBJ) $(OBJS) $(OBJ)/uaplot_dict.o 
+$(OBJ)/libuaplotter.so: $(OBJS) $(OBJ)/uaplot_dict.o 
 	$(CXX) -shared -o $@ $^ $(LDFLAGS) #order important for Ubuntu 
 	if [ ! -s $(OBJ)/uaplot_dict_rdict.pcm ] ; then ln -s $(SRC)/uaplot_dict_rdict.pcm $(OBJ)/ ; fi
 	@echo ""
