@@ -13,7 +13,7 @@ all: $(OBJ) $(OBJ)/libuaplotter.so $(CMS)/lib/libUADataFormat.so $(TOT)/lib/libT
 
 $(OBJ)/libuaplotter.so: $(OBJS) $(OBJ)/uaplot_dict.o 
 	$(CXX) -shared -o $@ $^ $(LDFLAGS) #order important for Ubuntu 
-	if [ ! -s $(OBJ)/uaplot_dict_rdict.pcm ] ; then ln -s $(SRC)/uaplot_dict_rdict.pcm $(OBJ)/ ; fi
+	if [ ! -s $(OBJ)/uaplot_dict_rdict.pcm ] ; then ln -s ../$(SRC)/uaplot_dict_rdict.pcm $(OBJ)/ ; fi
 	@echo ""
 
 $(OBJ)/%.o: $(SRC)/%.cc $(HEAD)
