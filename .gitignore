@@ -9,7 +9,10 @@
 lib/
 doc/
 
+.kdev_include_paths
+
 *.root
 *.screenlog
 *.png
 src/uaplot_dict*
+.fuse_hidden*
