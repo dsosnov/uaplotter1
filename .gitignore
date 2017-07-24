@@ -6,8 +6,10 @@
 .#*
 #*#
 
+lib/
+doc/
+
 *.root
 *.screenlog
 *.png
 src/uaplot_dict*
-lib/
