@@ -50,9 +50,9 @@ int uaplotter1::noiseLoop(const int evts){
     // THIS WILL BE VALID FOR NEW NOISE DATA ONLY! (mc=-2)
     //if(CMSevtinfo->CheckHLT("HLT_PARandom_v1")){ they are not set :(
     rndHLT++;
-    if(!CMSevtinfo->GetTechBit(53)){
+    if(true /*!CMSevtinfo->GetTechBit(53)*/){
       not53++;
-      if(CMSevtinfo->GetTechBit(7)){
+      if(CMSevtinfo->GetL1Bit(9)){
 	not53notBPTX++;
 	ProceedEvent(0, false, false);
 	FillLastEvent(0);

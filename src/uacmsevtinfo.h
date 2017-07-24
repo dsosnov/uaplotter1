@@ -4,17 +4,30 @@
 #include "uabase.h"
 
 #include "MyEvtId.h"
-#include "MyL1TrigOld.h"
+#include "MyL1TrigRun2.h"
+#include "MyL1MenuRun2.h"
 #include "MyHLTrig.h"
 
-const unsigned int ALGO_TRIGGER_ARRAY[3] = {99,  // L1_CastorEm_TotemLowMultiplicity
-					    105, // L1_DoubleJet20_TotemDiffractive
-					    122};// L1_HcalHfSingleChannel_BptxAND_Instance1 (passive)
-const unsigned int TT_TRIGGER_ARRAY[5]   ={ 0, //	L1Tech_BPTX_plus_AND_minus.v0 (passive)
-					    7, //	L1Tech_BPTX_quiet.v0 (passive)
-					    9, // 	L1Tech_HCAL_HF_coincidence_PM.v2 (passive)
-					    52, // L1Tech_TOTEM_Diffractive.v0 (passive)
-					    53};
+const std::vector<unsigned int>L1_TRIGGER_ARRAY = {
+  0,   // L1_ZeroBias
+  1,   // L1_BptxPlus_NotBptxMinus
+  2,   // L1_BptxMinus_NotBptxPlus
+  8,   // L1_ZeroBias_copy
+  9,   // L1_NotBptxOR
+  10,  // L1_BptxPlus
+  11,  // L1_BptxMinus
+  209, // L1_BptxOR
+  220  // L1_BptxXOR
+};
+
+// const unsigned int ALGO_TRIGGER_ARRAY[3] = {99,  // L1_CastorEm_TotemLowMultiplicity
+// 					    105, // L1_DoubleJet20_TotemDiffractive
+// 					    122};// L1_HcalHfSingleChannel_BptxAND_Instance1 (passive)
+// const unsigned int TT_TRIGGER_ARRAY[5]   ={ 0, //	L1Tech_BPTX_plus_AND_minus.v0 (passive) //Run2: 10 && 11 or Or anything else
+// 					    7, //	L1Tech_BPTX_quiet.v0 (passive) // Run2: 9
+// 					    9, // 	L1Tech_HCAL_HF_coincidence_PM.v2 (passive)
+// 					    52, // L1Tech_TOTEM_Diffractive.v0 (passive)
+// 					    53}; 	// L1Tech_TOTEM_MinBias.v0
 class uacmsevtinfo :  public uabase
 {
 public:
@@ -25,8 +38,7 @@ public:
 		  const short unsigned int Ncuts //!< number of cuts);
 		  );
     ~uacmsevtinfo();
-    bool GetTechBit(short unsigned int b){return CMStrigInfo->TechTrigWord[b];};
-    bool GetAlgoBit(short unsigned int b){return CMStrigInfo->PhysTrigWord[b];};
+    bool GetL1Bit(short unsigned int b){return CMStrigInfo->triggerResults.at(b);};
     bool CheckHLT(const char * path);
     void PrintEventInfo(const bool detailed);
     bool FillLastEvent(const short unsigned int cut);
@@ -36,7 +48,8 @@ private:
     void create_histos();
     
     MyEvtId*      CMSevtInfo;
-    MyL1TrigOld*  CMStrigInfo;
+    MyL1TrigRun2* CMStrigInfo;
+    MyL1MenuRun2* CMSmenuInfo;
     MyHLTrig*     CMSHLT;
     
     TH1F ** triggers_h;

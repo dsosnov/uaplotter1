@@ -63,7 +63,7 @@ int uaplotter1::Loop(const int evts, const int trigger){
     if(ProceedTrigger(trigger_bit, tech_bit)){
       trigger_evts++;
       
-      if( !CMSevtinfo->GetTechBit(7)){ //<=== !bptx quiet 
+      if( !CMSevtinfo->GetL1Bit(9)){ //<=== !bptx quiet 
 	bptx_active++;
 	CMStracking->ProceedEvent(dummy_cut, false, false);
 	if(CMStracking->NverticesGood()<2){

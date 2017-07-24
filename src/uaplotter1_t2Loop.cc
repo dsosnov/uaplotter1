@@ -67,7 +67,7 @@ int uaplotter1::t2Loop(const int evts){
     if(ProceedTrigger(53, true)){
       if( MB ) ttBOTH++;
       //al99++;
-      if( !CMSevtinfo->GetTechBit(7)){ //<=== !bptx quiet 
+      if( !CMSevtinfo->GetL1Bit(9)){ //<=== !bptx quiet 
 	BPTX++;
 	
 	CMStracking->ProceedEvent(dummy_cut, false, false);

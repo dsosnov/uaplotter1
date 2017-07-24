@@ -27,7 +27,8 @@ uacmsevtinfo::uacmsevtinfo(TChain * tree,
     tree->SetBranchAddress("cmsHLTTrigUA",           &CMSHLT);  
   }else{
     tree->SetBranchAddress("evtId",                  &CMSevtInfo);  
-    tree->SetBranchAddress("L1TrigOld",              &CMStrigInfo);  
+    tree->SetBranchAddress("L1TrigRun2",             &CMStrigInfo);  
+    tree->SetBranchAddress("L1MenuRun2",             &CMSmenuInfo);  
     tree->SetBranchAddress("HLTrig",                 &CMSHLT);  
   };
   create_histos();
@@ -52,27 +53,19 @@ void uacmsevtinfo::PrintEventInfo(const bool detailed)
 { 
   if(detailed){
     std::cout << "uacmsevtinfo::PrintEventInfo: L1:\n\t";
-    for(short unsigned int b=0; b<128; b++)
-      if(CMStrigInfo->PhysTrigWord[b])
-	std::cout << b << "   ";
-    std::cout << "\nuacmsevtinfo::PrintEventInfo: tt:\n\t";
-    for(short unsigned int b=0; b<64; b++)
-      if(CMStrigInfo->TechTrigWord[b])
-	std::cout << b << "   ";
+    for( short unsigned int b = 0; b < CMStrigInfo->triggerResults.size(); b++ )
+      if( CMStrigInfo->triggerResults.at( b ) )
+        std::cout << b << "   ";
     std::cout << std::endl;
   }else{
     std::cout << "\nuacmsevtinfo::PrintEventInfo: L1 and tt of interest:\n\t";
-    for(short unsigned int b=0; b<3; b++)
-      std::cout << ALGO_TRIGGER_ARRAY[b] << "\t";
-    for(short unsigned int b=0; b<5; b++)
-      std::cout << "\t" << TT_TRIGGER_ARRAY[b] ;
-    std::cout << "\n\t";
-    for(short unsigned int b=0; b<3; b++)
-      std::cout << CMStrigInfo->PhysTrigWord[ALGO_TRIGGER_ARRAY[b]] << "\t";
-    for(short unsigned int b=0; b<5; b++)
-      std::cout << "\t" << CMStrigInfo->TechTrigWord[TT_TRIGGER_ARRAY[b]] ;    
+    for( short unsigned int b = 0; b < L1_TRIGGER_ARRAY.size(); b++ )
+      std::cout << L1_TRIGGER_ARRAY[b] << "\t";
     std::cout << std::endl;
-  };
+    for( short unsigned int b = 0; b < L1_TRIGGER_ARRAY.size(); b++ )
+      std::cout << CMStrigInfo->triggerResults.at( L1_TRIGGER_ARRAY.at( b ) ) << "\t";
+    std::cout << std::endl;
+  }
 }
 
 
@@ -88,13 +81,10 @@ bool uacmsevtinfo::FillLastEvent(const short unsigned int cut)
   run_vs_bx_h[cut]->Fill(CMSevtInfo->Bunch,    CMSevtInfo->Run);
   run_vs_ls_h[cut]->Fill(CMSevtInfo->LumiSect, CMSevtInfo->Run);
   
-  for(unsigned int tb=0; tb<3; tb++)
-    if(CMStrigInfo->PhysTrigWord[ALGO_TRIGGER_ARRAY[tb]])
+  for(unsigned int tb=0; tb<L1_TRIGGER_ARRAY.size(); tb++)
+    if(CMStrigInfo->triggerResults.at(L1_TRIGGER_ARRAY.at(tb)))
       triggers_h[cut]->Fill(tb);
 
-  for(unsigned int tb=0; tb<5; tb++)
-    if(CMStrigInfo->TechTrigWord[TT_TRIGGER_ARRAY[tb]])
-      triggers_h[cut]->Fill(tb+5);
   return true;
 }
 
@@ -148,14 +138,10 @@ void uacmsevtinfo::create_histos()
     title1 = "triggers_h["; title1+=i; title1+="]";
     title2 = title1; title2+="; trigger xxx";
     triggers_h[i] = new TH1F(title1.Data(),title2.Data(), 12, 0,12); 
-    for(short unsigned int b=1; b<11; b++){
+    for(short unsigned int b=1; b<L1_TRIGGER_ARRAY.size(); b++){
       TString label="";
-      if(b<4) {
-	label = "L1_"; label+=ALGO_TRIGGER_ARRAY[b-1];
-      }else if (b>5){
-	label = "tt_"; label+=TT_TRIGGER_ARRAY[b-6];
-      };
-      triggers_h[i]->GetXaxis()->SetBinLabel(b,label.Data());
+      label = "L1_"; label+=L1_TRIGGER_ARRAY.at(b);
+      triggers_h[i]->GetXaxis()->SetBinLabel(b+1,label.Data());
     };
     triggers_h[i]->SetDirectory(directory);     
   };
