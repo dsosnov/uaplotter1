@@ -14,8 +14,8 @@ int uaplotter1::Loop(const int evts, const int trigger){
 
   if(mc<0)
     return noiseLoop(evts);
-    
-  
+
+
   bool tech_bit   = true;
   int trigger_bit = DefineTrigger(trigger, tech_bit); // just translate initial trigger value
 
@@ -29,7 +29,7 @@ int uaplotter1::Loop(const int evts, const int trigger){
 
   unsigned int selected_evts[n_cuts];
   memset(selected_evts, 0, sizeof(selected_evts));
-  
+
   unsigned int trigger_evts =0;
   unsigned int t2prim_evts  =0;
   unsigned int bptx_active  =0;
@@ -41,7 +41,7 @@ int uaplotter1::Loop(const int evts, const int trigger){
   unsigned int goodFSC      =0;
   memset(sd_minus_eta, 0, sizeof(sd_minus_eta));
   memset(sd_plus_eta,  0, sizeof(sd_plus_eta));
-  
+
   unsigned int kevt = 0;
   for(long unsigned int i = 0; i<nevts; i++){  
     unsigned int kevt_current = i/1000;
@@ -54,12 +54,12 @@ int uaplotter1::Loop(const int evts, const int trigger){
 
     memset(sd_flag_central, 0, sizeof(sd_flag_central));
     memset(sd_flag_total,   0, sizeof(sd_flag_total));
-    
+
     if(mc>0){    // <============================  do MC loop here
       CMSmc->ProceedEvent(dummy_cut, false, false);
     };
-    
-    
+
+
     if(ProceedTrigger(trigger_bit, tech_bit)){
       trigger_evts++;
       
@@ -171,7 +171,7 @@ int uaplotter1::Loop(const int evts, const int trigger){
 	}; // end vertices<2
       }; // end !bptx quiet
     }; // end trigger
-    
+
   };// end loop
   std::cout << "Acceptance: [" << ETA_BIN_L[first_central_bin] << "," << ETA_BIN_L[last_central_bin]+ETA_BIN_W << "]\n";
   std::cout << "Total evts in chain       : " << stat << std::endl;

@@ -71,7 +71,7 @@ void uatracking::PrintEventInfo(const bool detailed)
   std::cout << "Nvtx = " << nVtx    << " ( "<< nVtxGoog    << " good)\n\t";
   std::cout << "Ntrk = " << nTracks << " ( "<< nTracksGood << " tight)\n";
   PrintActivity(false);
-  
+
   if(detailed){
     std::cout << "\ttracks per eta bin:\n";
     for(unsigned short int bin=0; bin<N_ETA_BINS; bin++){
@@ -122,8 +122,8 @@ bool uatracking::ProceedEvent(const short unsigned int cut, const bool fill, con
 //       };
     };
   }; // end vertex loop  
-  
-  
+
+
   for(std::vector<MyTracks>::iterator t = Tracks->begin(); t!=Tracks->end(); ++t){
     int bin = find_eta_bin((*t).eta());
     n_tracks_bin_all[bin]++;
@@ -145,7 +145,7 @@ bool uatracking::ProceedEvent(const short unsigned int cut, const bool fill, con
       std::cout << std::endl;
     }; // end info
   }; // end track loop 
-  
+
   for(unsigned short int bin=0; bin<N_ETA_BINS; bin++){
      if(n_tracks_bin_all[bin]>0)  activity_loose[bin] = true;
      if(n_tracks_bin_good[bin]>0) activity_tight[bin] = true;
@@ -154,7 +154,7 @@ bool uatracking::ProceedEvent(const short unsigned int cut, const bool fill, con
     PrintEventInfo(true);
   if(fill)
     FillLastEvent(cut);
-  
+
   return true;  
 }
 
@@ -168,7 +168,7 @@ void uatracking::create_histos()
   n_each_h1D = 2*n_cuts;
   n_each_h2D = 2*n_cuts;
   TString title1, title2;
-  
+
   // vertices
   vertices_h   = new TH1F * [2*n_cuts];
   //vertices_X_h = new TH1F * [2*n_cuts];
@@ -194,7 +194,7 @@ void uatracking::create_histos()
     title2 = title1; title2+=" good; X [cm]";
     vertices_X_h[i+n_cuts] = new TH1F(title1.Data(), title2.Data(), 100,  -1, 1);
     vertices_h[i+n_cuts]->SetDirectory(directory); 
-    
+
     title1 = "vertices_Y_h["; title1+=i; title1+="]";
     title2 = title1; title2+=" all; Y [cm]";
     vertices_Y_h[i] = new TH1F(title1.Data(), title2.Data(), 100,  -1, 1);
@@ -203,7 +203,7 @@ void uatracking::create_histos()
     title2 = title1; title2+=" good; Y [cm]";
     vertices_Y_h[i+n_cuts] = new TH1F(title1.Data(), title2.Data(), 100,  -1, 1);
     vertices_Y_h[i+n_cuts]->SetDirectory(directory); 
-    
+
     title1 = "vertices_Z_h["; title1+=i; title1+="]";
     title2 = title1; title2+=" all; Z [cm]";
     vertices_Z_h[i] = new TH1F(title1.Data(), title2.Data(), 400,  -20, 20);
@@ -213,7 +213,7 @@ void uatracking::create_histos()
     vertices_Z_h[i+n_cuts] = new TH1F(title1.Data(), title2.Data(), 400,  -20, 20);
     vertices_Z_h[i+n_cuts]->SetDirectory(directory); 
   */
-    
+
   };
   h1D->push_back(vertices_h);
   //h1D->push_back(vertices_X_h);
@@ -232,7 +232,7 @@ void uatracking::create_histos()
   title2 = "vertices_beamZ_h; Z [cm]";
   vertices_beamZ_h = new TH1F(title1.Data(), title2.Data(), 400,  -5, 5);
   */
-  
+
   tracks_h     = new TH1F * [n_each_h1D];
   tracks_eta_h = new TH2F * [n_each_h2D];
   for(unsigned int i = 0; i<n_cuts; i++){
@@ -240,7 +240,7 @@ void uatracking::create_histos()
     title2      = title1; title2+="; ntrcks";
     tracks_h[i] = new TH1F(title1.Data(), title2.Data(), 201, -1, 200);
     tracks_h[i]->SetDirectory(directory);
-    
+
     title1      = "tracks_h["; title1+=(i+n_cuts); title1+="]";
     title2      = title1; title2+=" good; ntrcks";
     tracks_h[i+n_cuts] = new TH1F(title1.Data(), title2.Data(), 201, -1, 200);
@@ -250,7 +250,7 @@ void uatracking::create_histos()
     title2      = title1; title2+="; #eta; N_{all}";
     tracks_eta_h[i] = new TH2F(title1.Data(), title2.Data(), 28, -7,7, 201, -1, 200);
     tracks_eta_h[i]->SetDirectory(directory);
-    
+
     title1      = "tracks_eta_h["; title1+=(i+n_cuts); title1+="]";
     title2      = title1; title2+=" good; #eta; N_{good}";
     tracks_eta_h[i+n_cuts] = new TH2F(title1.Data(), title2.Data(), 28, -7,7, 201, -1, 200);

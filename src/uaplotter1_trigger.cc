@@ -22,14 +22,14 @@ int uaplotter1::DefineTrigger(int trigger_bit_common, bool &tech_bit){
   // ramdom trigger
   if(mc<0)
     return RNDT;
-  
+
   int trigger_bit = trigger_bit_common;
   if(trigger_bit>64){
     tech_bit = false;
     trigger_bit-=100;    
   };
   if(trigger_bit<0 || trigger_bit>127) trigger_bit = -1;
-  
+
   std::cout << "uaplotter1::DefineTrigger: trigger selection on ";
   if(trigger_bit!=-1){
     if(tech_bit) {
@@ -56,7 +56,7 @@ int uaplotter1::DefineTrigger(int trigger_bit_common, bool &tech_bit){
 bool uaplotter1::ProceedTrigger(int trigger_bit, bool tech_bit) //TODO find invocations and disable work with bit 53
 {
   bool proceed = true;
-  
+
   if(mc<0){/////////////////// random trigger                                          
     proceed = ( (!CMSevtinfo->CheckHLT("HLT_L1Tech53_MB")) // TODO check
 	     && (!CMSevtinfo->GetL1Bit(10)) // ! L1Tech_BPTX_plus.v0

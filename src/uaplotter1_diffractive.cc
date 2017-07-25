@@ -23,13 +23,13 @@ void uaplotter1::IniRapGapRange()
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 bool uaplotter1::FindRapGap(bool RECO){
- 
+
   bool rg = false;
-  
+
   int ind = int(!RECO);
   if(RECO)
     memset(combined_central_activity, false, sizeof(combined_central_activity));
-  
+
   n_sd_minus_bins[ind] = 0; // [0]-RECO, [1]-MCtruth
   n_sd_plus_bins[ind]  = 0;
   n_dd_rg_bins[ind]    = 0;
@@ -38,9 +38,9 @@ bool uaplotter1::FindRapGap(bool RECO){
   short unsigned int rg_bins[3]   = {0,   0,   0};     // 
   short unsigned int max_central_rgbins = 0;
   short unsigned int n_active_bins   = 0;
-  
+
   for(unsigned int bin = first_central_bin; bin<=last_central_bin; bin++){
-    
+
     bool binactivity;
     if(RECO){ //<====================== RG on RECO
       if( (ETA_BIN_L[bin] >= -1*CENT_ETA_ACC) && ((ETA_BIN_L[bin]+ETA_BIN_W)<=CENT_ETA_ACC) ){
@@ -79,9 +79,9 @@ bool uaplotter1::FindRapGap(bool RECO){
       };
     }
 
-    
+
   };//end loop
-  
+
   if(n_active_bins==0){ // "~elastic"
     sd_flag_central[ind]=4;       
     rg_bins[2] = rg_bins[0];
@@ -100,12 +100,12 @@ bool uaplotter1::FindRapGap(bool RECO){
       sd_flag_central[ind]=2;        // DD candidate
     };
   };
-  
+
   n_sd_minus_bins[ind] = rg_bins[0];
   n_sd_plus_bins[ind]  = rg_bins[2];
   n_dd_rg_bins[ind]    = max_central_rgbins;
-  
-  
+
+
   ///////////////////////////////////////////////
   // take into account also sides
   bool outer_activity_minus; 
@@ -130,20 +130,20 @@ bool uaplotter1::FindRapGap(bool RECO){
     for(unsigned int bin = N_ETA_BINS-1; bin>last_central_bin; bin--)
 	outer_activity_plus = (outer_activity_plus || CMSmc->GetActivityLoose(bin));
     TotalRapGap(1, outer_activity_minus, outer_activity_plus);
-    
+
     outer_activity_minus = (outer_activity_minus || CMSmc->GetOuterE(false));
     outer_activity_plus = (outer_activity_plus || CMSmc->GetOuterE(true));
     TotalRapGap(2, outer_activity_minus, outer_activity_plus);
   };
-  
-  
+
+
   // below is just to prepare values for diff mass calculation and make sure the values are ok.
   memset(xi_pf,   0, sizeof(xi_pf));
   memset(xi_calo, 0, sizeof(xi_calo));
   memset(xi_cas,  0, sizeof(xi_cas));
   memset(xi_zdc,  0, sizeof(xi_zdc));
   memset(xi_full, 0, sizeof(xi_full));
-  
+
   xi_mc_out   =0;  // this includes ZDC and CASTOR also!
   xi_mc_total =0;  // everything from first active bin in reco
 
@@ -274,19 +274,19 @@ void uaplotter1::PrintRapGap(){
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 void uaplotter1::CalculateSDdiffMass(bool info){
-  
+
   memset(xi_pf,   0, sizeof(xi_pf));
   memset(xi_calo, 0, sizeof(xi_calo));
   memset(xi_cas,  0, sizeof(xi_cas));
   memset(xi_zdc,  0, sizeof(xi_zdc));
   memset(xi_full, 0, sizeof(xi_full));
-  
+
   xi_mc_out   =0;  // this includes ZDC and CASTOR also!
   xi_mc_total =0;  // everything from first active bin in reco
-  
+
   //==================================
   // ZDC contribution
-  
+
   // -1=> rg at -side, X @ +Z => sign -; considered ZDC+: plus = true
   // +1=> rg at +side, X @ -Z => sign +; considered ZDC-: plus = false
   int sign_  = sd_flag_total[0];
@@ -301,14 +301,14 @@ void uaplotter1::CalculateSDdiffMass(bool info){
   }else{
     xi_zdc[0] = 0;//2*CMSforward->GetZDCEtotal(Xplus);
   };
-  
+
   //==================================
   // castor  
   // if SD = -1 => makes no sense!
   // if SD = +1
   if(sign_>0)
     xi_cas[0] = CMScastor->GetE() * (1+sign_*CAS_TANH_AVE);
-  
+
   if(mc>0) xi_cas[1] = CMSmc->GetCastorE() + sign_*CMSmc->GetCastorPz();
 
   //==================================
@@ -320,7 +320,7 @@ void uaplotter1::CalculateSDdiffMass(bool info){
   }else{      // SD+
     stop  = last_central_bin  - n_sd_plus_bins[0];  // based on RECO RG!
   };
-  
+
   for(unsigned int bin = start; bin<=stop; bin++){
     if( (ETA_BIN_L[bin] >= -1*CENT_ETA_ACC) && ((ETA_BIN_L[bin]+ETA_BIN_W)<=CENT_ETA_ACC) ){
       xi_pf[0] += ( CMSpf->GetE(bin) + sign_*CMSpf->GetPz(bin) );
@@ -332,7 +332,7 @@ void uaplotter1::CalculateSDdiffMass(bool info){
 	xi_calo[1] += (CMSmc->GetE(bin) + sign_*CMSmc->GetPz(bin) );
     };
   };
-  
+
   if(mc>0){
     //std::cout << "1)" << xi_mc_out/(4000.*2) << std::endl;
     float eee = 0; float pzzz = 0;
@@ -355,8 +355,8 @@ void uaplotter1::CalculateSDdiffMass(bool info){
       xi_mc_out+=(CMSmc->IntactProtonE() + sign_*CMSmc->IntactProtonPz());
     };
   };
-  
-  
+
+
   if(info){
     std::cout << "uaplotter1::CalculateSDdiffMass: sign_, Xplus : " << sign_ << " " << Xplus;
     if(mc>0) {
@@ -377,7 +377,7 @@ void uaplotter1::CalculateSDdiffMass(bool info){
 //   }else{
 //     denom = 2*4000.; // 2*Z(Pb)*Ep
 //   };
-  
+
   for(short unsigned int ii = 0; ii<2; ii++){
     xi_pf[ii]/=denom;     
     xi_calo[ii]/=denom;   
@@ -387,7 +387,7 @@ void uaplotter1::CalculateSDdiffMass(bool info){
   };  
   xi_mc_out/=denom;
   xi_mc_total = xi_pf[1]+xi_calo[1]+xi_mc_out;
-  
+
   /*
   if(fill){
     diffmass_pf_h[current_cut]->Fill(xsi_pf, xsi_mc_pf);

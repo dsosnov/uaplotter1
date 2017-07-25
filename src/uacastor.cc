@@ -28,7 +28,7 @@ uacastor::uacastor(TChain* tree,
       if(digi){
       };
   };
-  
+
   // threshold values
   // igor : ch_thr - bare fC; tower_thr - abs intercalibrated val
   // only individual threshold are from Igor
@@ -90,36 +90,36 @@ bool uacastor::ProceedEvent(const short unsigned int cut, const bool fill, const
     std::cout << "uacastor::ProceedEvent: required cut number is larger that possible, please define larger uaforward::n_cut!\n"; 
     return false;
   }; 
-    
+
   total_energy = 0;
   total_em_energy    = 0;
   n_ch_fired   = 0;
   n_towers     = 0;
   n_towers_5   = 0;
   n_towers_em  = 0;
-  
+
   memset(em_energy,     0, sizeof(em_energy));
   memset(tower_energy,  0, sizeof(tower_energy));
   memset(tower_energy5, 0, sizeof(tower_energy5));
-  
+
   memset(channel_above_threshold,   false, sizeof(channel_above_threshold));
   memset(tower_above_threshold,     false, sizeof(tower_above_threshold));
   memset(tower_above_threshold_5,   false, sizeof(tower_above_threshold_5));  
   memset(tower_above_threshold_em,  false, sizeof(tower_above_threshold_em));  
   memset(towers_modules_above_threshold, 0, sizeof(towers_modules_above_threshold));
- 
+
     unsigned int ch = 0;
     for(std::vector<MyCastorRecHit>::iterator it=Castor->begin(); it!=Castor->end(); ++it){
       unsigned int m = (*it).mod-1;
       unsigned int s = (*it).sec-1;
       if(m<0 || m>=castor::CModules || s<0 || s>=castor::CSectors)
 	break;
-      
+
       if(castor::channelQuality[s][m]){
 	double energy = (*it).energy;
 	if(mc<=0) //data 
 	  energy*= castor::channelGainQE[s][m]*castor::absCasEscaleFactor; // GeV
-      
+
 	total_energy   +=energy;
 	tower_energy[s]+=energy;
 	if(m<2){
@@ -142,14 +142,14 @@ bool uacastor::ProceedEvent(const short unsigned int cut, const bool fill, const
     }; // end loop reco
   if(digi){      
   };
-  
+
   if(ch!=castor::CChannels){
     std::cout << "uacastor::ProceedEvent: wrong number of good channels!\n"; 
     return 0;
   };
-        
+
   for(unsigned int s = 0; s<castor::CSectors; s++){
-  
+
     if(tower_energy[s]>castor::tower_threshold[s]){
       tower_above_threshold[s] = 1;
       n_towers++;
@@ -158,12 +158,12 @@ bool uacastor::ProceedEvent(const short unsigned int cut, const bool fill, const
       tower_above_threshold_5[s] = 1;
       n_towers_5++;
     };
-    
+
     // here we need to check HAD later
     if(em_energy[s]>castor::tower_threshold_em[s]){
       tower_above_threshold_em[s] = 1;
     };
-    
+
     // loop over modules
     bool hadveto = true;
     for(unsigned int m = 0; m<castor::CModules; m++){
@@ -175,13 +175,13 @@ bool uacastor::ProceedEvent(const short unsigned int cut, const bool fill, const
       if(m>2 && m<12)
 	hadveto = (hadveto && (!channel_above_threshold[s][m]));
     }; // end module loop
-    
+
     // finish em
     tower_above_threshold_em[s] = (tower_above_threshold_em && hadveto);
     if(tower_above_threshold_em[s])
       n_towers_em++;      
   };// end sector loop
-    
+
   if(info) PrintEventInfo(true);
   if(fill) FillLastEvent(cut);
   return true;
@@ -199,20 +199,20 @@ void uacastor::create_histos()
   castor_towers_h    = new TH1F*[n_each_h1D];
   castor_towers5_h   = new TH1F*[n_each_h1D];
   castor_towersEM_h  = new TH1F*[n_each_h1D];
-  
+
   for(unsigned int i=0; i<n_each_h1D; i++){
     // total energy [GeV]
     title1 = "castor_etotal_h["; title1+=i; title1+="]";
     title2 = "castor_etotal_h["; title2+=i; title2+="]; E_{tot} [GeV]";
     castor_etotal_h[i] = new TH1F(title1.Data(), title2.Data(), 6500, -500,6000);
     castor_etotal_h[i]->SetDirectory(directory);
-    
+
     // em fraction
     title1 = "castor_emfract_h["; title1+=i; title1+="]";
     title2 = "castor_emfract_h["; title2+=i; title2+="]; E_{EM}/E_{tot}";
     castor_emfract_h[i] = new TH1F(title1.Data(), title2.Data(), 200, -1,2);
     castor_emfract_h[i]->SetDirectory(directory);
-    
+
     // n towers above threshold - totel, 5 modules and EM only
     title1 = "castor_towers_h["; title1+=i; title1+="]";
     title2 = "castor_towers_h["; title2+=i; title2+="] total towers; N_{towers}";
@@ -224,7 +224,7 @@ void uacastor::create_histos()
     title2 = "castor_towers5_h["; title2+=i; title2+="] 5-mod towers; N_{towers}";
     castor_towers5_h[i] = new TH1F(title1.Data(), title2.Data(), 18, -1,17);
     castor_towers5_h[i]->SetDirectory(directory);
-    
+
     // n towers above threshold - totel, 5 modules and EM only
     title1 = "castor_towersEM_h["; title1+=i; title1+="]";
     title2 = "castor_towersEM_h["; title2+=i; title2+="] EM towers; N_{towers}";

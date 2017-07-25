@@ -41,7 +41,7 @@ private:
   void resete_histos(const unsigned int cut); //!<resets histos (TBD)
 
   virtual void create_histos()=0;
-  
+
   ClassDef(uabase,2);
 };
 

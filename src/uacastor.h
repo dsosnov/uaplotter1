@@ -27,14 +27,14 @@ public:
     bool FillLastEvent(const short unsigned int cut);
     bool ProceedEvent(const short unsigned int cut, const bool fill, const bool info);
     double GetE(){return total_em_energy;};
-    
+
 private:
   const bool digi;
   std::vector<MyCastorRecHit>*     Castor;
-  
+
   double total_energy;
   double total_em_energy;
-  
+
   unsigned int n_ch_fired;
   unsigned int n_towers; // above tower threshold
   unsigned int n_towers_5; // -- " -- for 5 mod
@@ -71,11 +71,11 @@ namespace castor {
     const double tower_threshold_em[CSectors] = {
       0.8, 0.6, 0.8, 0.4, 0.4, 0.6, 0.4, 0.4, 0.4, 0.8, 1.2, 1., 0.8, 0.6, 1., 0.8
     };
-  
+
     // later on from Igor
   const double absCasEscaleFactor = 1.49475628341732545e+02/3.38945322418397409e+04 * 7.82961248095532028e+02/1.33096168279108213e+02; 
 //calibration in units of GeV
-  
+
 //using for Katerina's value's (some correction values seem too big (for me big is all >3), some are zeros)
   const bool channelQuality[CSectors][CModules] =                                          // sector
     //mod 1   2     3     4     5      6    7     8     9    10     11    12   13    14
@@ -134,7 +134,7 @@ namespace castor {
  0.0131637, 
  0.00956398,
  0.0137566};
- 
+
  const double noise_tower_gausigma[CSectors] = {
  0.304648,
  0.258378,
@@ -191,6 +191,6 @@ const double noise_channel_gausigma[CSectors][CModules] =                       
 {       8.934894,      5.957733,      5.687293,      4.248122,      4.121817,      0.000000,      0.000000,      0.000000,      3.973794,      3.249533,      3.858845,      3.812492,      3.818567,      3.836645 }};
 
 
-  
+
 }
 #endif // UACASTOR_H

@@ -59,20 +59,20 @@ bool uaforward::ProceedEvent(short unsigned int cut, const bool fill, const bool
     std::cout << "uaforward::ProceedEvent: required cut number is larger that possible, please define larger uaforward::n_cut!\n"; 
     return false;
   }; 
-  
+
   memset(Etotal, 0, sizeof(Etotal));
   memset(EEM,    0, sizeof(EEM));
 
   if(mc>0)
     return false;
-  
+
   // ZDC is configured to have firstSample be TS5 in runs 210498-210676, and TS4 in runs 210737-211831 
   for(std::vector<MyZDCDigi>::iterator it=ZDCdigis->begin(); it!=ZDCdigis->end(); ++it){      
     float            sig = 0;
     unsigned int minsize = 6;
     if(zdc56)
       minsize = 7;
-    
+
     std::vector<float> q = (*it).digifC;
     if(q.size()<minsize){
       std::cout << "uaforward::ProceedEvent: number of ZDC digi timeslices < " << minsize << "; doing nothing\n";
@@ -84,19 +84,19 @@ bool uaforward::ProceedEvent(short unsigned int cut, const bool fill, const bool
 // 	std::cout << q.at(ts) << "  ";
 //       std::cout << std::endl;
     };
- 
+
     // EM section
     if( (*it).section==1 ) sig*=0.1;
-    
+
     short unsigned int ind = int((*it).side<0); // side = -1 for +Z! true side=-1=>1 +z=1, -z=0
     Etotal[ind] += sig;
     if((*it).section==1) 
       EEM[ind]  += sig;    
   }; // end zdc digy loop
-  
-  
-  
-  
+
+
+
+
   memset(FSCm_TS, 0, sizeof(FSCm_TS));
   memset(FSCm_No, 0, sizeof(FSCm_No));
   memset(FSCm_Si, 0, sizeof(FSCm_Si));
@@ -146,7 +146,7 @@ bool uaforward::ProceedEvent(short unsigned int cut, const bool fill, const bool
 	};
       };
     };
-        
+
   }; // end FSC digi loop
 
   if(info) PrintEventInfo(true);
@@ -228,7 +228,7 @@ bool uaforward::FillLastEvent(const short unsigned int cut)
   ZDCd_Etot_plus_h[cut] ->Fill(Etotal[1]);
   ZDCd_EM_minus_h[cut]->Fill(EEM[0]);
   ZDCd_EM_plus_h[cut] ->Fill(EEM[1]);
-  
+
   if(mc<=0 and goodFSC){ // TBD check for MC and noise
     short unsigned int fsc_novthr = 0;
     for(short unsigned int fscch=0; fscch<8; fscch++){
@@ -273,7 +273,7 @@ void uaforward::NormalizeFSCts()
       h[hn]->Scale(1./h[hn]->GetEntries());
     };
   };
-  
+
   for(short unsigned int hn=0; hn<n_each_h1D; hn++){
     FSCm_No8_h[hn]->Sumw2();
     FSCm_No8_h[hn]->Scale(1./FSCm_No8_h[hn]->GetEntries());
@@ -304,15 +304,15 @@ void uaforward::FillZDCWithMCtruth(const short unsigned int cut, const double E[
 void uaforward::create_histos()
 {
   TString title1, title2;
-  
+
   n_each_h1D = n_cuts;
   n_each_h2D = n_cuts;
-  
+
   ZDCd_Etot_minus_h = new TH1F * [n_each_h1D];
   ZDCd_Etot_plus_h  = new TH1F * [n_each_h1D];
   ZDCd_EM_minus_h   = new TH1F * [n_each_h1D];
   ZDCd_EM_plus_h    = new TH1F * [n_each_h1D];
-  
+
   for(short unsigned int i=0; i<n_each_h1D; i++){
     title1 = "ZDCd_Etot_minus_h["; title1+=i; title1+="]";
     title2 = title1; title2+="; E^{-}_{tot} [GeV]";
@@ -323,12 +323,12 @@ void uaforward::create_histos()
     title2 = title1; title2+="; E^{+}_{tot} [GeV]";
     ZDCd_Etot_plus_h[i] = new TH1F(title1.Data(), title2.Data(), 4200, -20000, 400000);
     ZDCd_Etot_plus_h[i]->SetDirectory(directory);
-    
+
     title1 = "ZDCd_EM_minus_h["; title1+=i; title1+="]";
     title2 = title1; title2+="; E^{-}_{tot} [GeV]";
     ZDCd_EM_minus_h[i] = new TH1F(title1.Data(), title2.Data(), 4200, -2000, 40000);
     ZDCd_EM_minus_h[i]->SetDirectory(directory);
-    
+
     title1 = "ZDCd_EM_plus_h["; title1+=i; title1+="]";
     title2 = title1; title2+="; E^{+}_{tot} [GeV]";
     ZDCd_EM_plus_h[i] = new TH1F(title1.Data(), title2.Data(), 4200, -20000, 400000);  
@@ -368,7 +368,7 @@ void uaforward::create_histos()
     FSCm_N_h = new TH1F * [n_each_h1D];  
     FSCm_No8_h = new TH1F * [n_each_h1D];  
     FSCm_Si8_h = new TH1F * [n_each_h1D];  
-    
+
     ZDCm_FSCmSi8_h = new TH2F * [n_each_h2D];
     ZDCm_FSCmN_h   = new TH2F * [n_each_h2D];
     for(short unsigned int i=0; i<n_each_h1D; i++){
@@ -386,7 +386,7 @@ void uaforward::create_histos()
       title2 = title1; title2+=";q6 [fC]";
       FSCm_Si8_h[i] = new TH1F(title1.Data(), title2.Data(), 400, 0, 240000);
       FSCm_Si8_h[i]->SetDirectory(directory); 
-      
+
       title1 = "ZDCm_FSCmSi8_h["; title1+=i; title1+="]";
       title2 = title1; title2+=";q6(FSC-) [fC];E^{-}_{tot}(ZDC) [GeV]";
       ZDCm_FSCmSi8_h[i] = new TH2F(title1.Data(), title2.Data(), 200, -3000, 197000, 420, -2000, 40000);

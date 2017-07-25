@@ -21,7 +21,7 @@ public:
 private:
   std::vector<MyPFCand>*     PFCand;
   unsigned int nPfCand;
-  
+
   void create_histos();
   TH1F ** pfcand_h;
   TH2F ** pf_e_eta_h;
@@ -32,7 +32,7 @@ private:
   double energyH0[N_ETA_BINS];
   double energyHch[N_ETA_BINS];
   double energyEM0[N_ETA_BINS];
-  
+
   ClassDef(uapf,2);
 };
 

@@ -33,7 +33,7 @@ public:
   double    IntactProtonPz(){return protonPz;};
   double    IntactProtonXi(){return protonXi;};
   double    IntactProtonPt(){return protonPt;};
-  
+
   double GetZDCEn(bool plus){return eZDCn[int(plus)];};
   double GetZDCEg(bool plus){return eZDCg[int(plus)];};
   double GetZDCPzn(bool plus){return pzZDCn[int(plus)];;};
@@ -41,12 +41,12 @@ public:
 
   double GetCastorE(){return castorE;};
   double GetCastorPz(){return castorPz;};
-  
+
 private:
   const bool ppb;
-  
+
   std::vector<MyGenPart>*  MCthuth;
-    
+
   unsigned int trksT2[2];
 
   double castorE;
@@ -56,21 +56,21 @@ private:
   double eZDCg[2];
   double pzZDCn[2];
   double pzZDCg[2];
-  
+
   short int protonSign;
   double    protonXi;
   double    protonEta;
   double    protonPt;
   double    protonPz;
   double    protonE;
-  
+
   double totalE;
   double totalPz;
   double totalXi;
-  
+
   double outRangeE[2];
   double outRangePz[2];
-  
+
   void create_histos();
   TH1F ** proton_pt2_h;    //!< pt^2 = -t2 (pt of p`)
   TH1F ** proton_e_h;      //!< E(p`)

@@ -135,13 +135,13 @@ void uapf::create_histos()
     pf_e_hch_h = new TH2F*[n_each_h2D];
     pf_e_em0_h = new TH2F*[n_each_h2D];
   };
-  
+
   for(unsigned int i = 0; i<n_cuts; i++){  
     title1 = "pfcand_h["; title1+=i; title1+="]";
     title2 = title1; title2+="; N_{pfcand}";
     pfcand_h[i] = new TH1F(title1.Data(), title2.Data(), 201,  -1, 200);
     pfcand_h[i]->SetDirectory(directory);
-    
+
     title1 = "pf_e_eta_h["; title1+=i; title1+="]";
     title2 = title1; title2+="; #eta; E [GeV]";
     pf_e_eta_h[i] = new TH2F(title1.Data(), title2.Data(), 28, -7,7, 21000, -100, 2000);

@@ -57,7 +57,7 @@ bool uacalo::FillLastEvent(const short unsigned int cut)
   for(unsigned int bin = 0; bin<N_ETA_BINS; bin++)
     if( (bin>=BINMIN) && (bin<=BINMAX) )
       calotower_e_eta_h[cut]->Fill(ETA_BIN_L[bin], energy[bin]);
-  
+
   double MaxHFtow[2] = {0,0};
   for(short unsigned int side=0; side<2; side++)
     for(short unsigned int indx=0; indx<4; indx++){
@@ -101,13 +101,13 @@ void uacalo::PrintEventInfo(const bool detailed)
 
 bool uacalo::ProceedEvent(const short unsigned int cut, const bool fill, const bool info)
 {
-  
+
   memset(hf_total_energy_tower,  0, sizeof(hf_total_energy_tower));
   memset(hf_max_energy_tower, 0, sizeof(hf_max_energy_tower));
   memset(hf_trigger_tower,   false, sizeof(hf_trigger_tower));
   memset(calotowers,             0, sizeof(calotowers));
   PrepareArrays(); // cleans eta arrays
-  
+
   for(std::vector<MyCaloTower>::iterator it=Towers->begin(); it!=Towers->end(); ++it){
       if( (*it).Pt()>0 ){
 	int bin = find_eta_bin((*it).eta());
@@ -150,14 +150,14 @@ bool uacalo::ProceedEvent(const short unsigned int cut, const bool fill, const b
 	//___________________________________________________________________
       };    
   };// end tower loop
-  
+
   // <===================================================compare to threshold
   for(unsigned int bin = 0; bin<N_ETA_BINS; bin++)
     if( (THR_CALO[bin]>0) && (energy[bin]>THR_CALO[bin]) ){
       activity_loose[bin]=true;
       activity_tight[bin]=true;
     };
-  
+
   if(info)
     PrintEventInfo(true);
   if(fill)  
@@ -173,7 +173,7 @@ bool uacalo::ProceedEvent(const short unsigned int cut, const bool fill, const b
 void uacalo::create_histos()
 {
   TString title1, title2;
-  
+
   n_each_h1D = n_cuts;
   n_each_h2D = n_cuts;
 
@@ -190,27 +190,27 @@ void uacalo::create_histos()
     title2 = title1; title2+="; E_{HFtowers} [GeV]";
     hf_etotal_minus_h[i] = new TH1F(title1.Data(), title2.Data(), 7100, -100, 7000);
     hf_etotal_minus_h[i]->SetDirectory(directory);
-    
+
     title1 = "hf_max_towerE_minus_h["; title1+=i; title1+="]";
     title2 = title1; title2+="; E^{max}_{HFtower} [GeV]";
     hf_max_towerE_minus_h[i] = new TH1F(title1.Data(), title2.Data(), 7100, -100, 7000);
     hf_max_towerE_minus_h[i]->SetDirectory(directory);
-    
+
     title1 = "hf_etotal_plus_h["; title1+=i; title1+="]";
     title2 = title1; title2+="; E_{HFtowers} [GeV]";
     hf_etotal_plus_h[i] = new TH1F(title1.Data(), title2.Data(), 7100, -100, 7000);
     hf_etotal_plus_h[i]->SetDirectory(directory);
-    
+
     title1 = "hf_max_towerE_plus_h["; title1+=i; title1+="]";
     title2 = title1; title2+="; E^{max}_{HFtower} [GeV]";
     hf_max_towerE_plus_h[i] = new TH1F(title1.Data(), title2.Data(), 7100, -100, 7000);
     hf_max_towerE_plus_h[i]->SetDirectory(directory);
-    
+
 //     title1 = "hf_towers_vs_rechits_h["; title1+=i; title1+="]";
 //     title2 = title1; title2+="; E_{HFrechits} [GeV]; E_{HFtowers}";
 //     hf_towers_vs_rechits_h[i] = new TH2F(title1.Data(), title2.Data(), 2100, -100, 2000, 2100, -100, 2000);    
 //     hf_towers_vs_rechits_h[i]->SetDirectory(directory);
-    
+
     title1 = "calotower_e_eta_h["; title1+=i; title1+="]";
     title2 = title1; title2+="; #eta; E_{towers}";
     calotower_e_eta_h[i] = new TH2F(title1.Data(), title2.Data(), 28, -7,7, 21000, -100, 2000);    

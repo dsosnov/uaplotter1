@@ -73,7 +73,7 @@ void uamc::PrintEventInfo(const bool detailed)
     std::cout << "\tZDC-: " << (eZDCn[0]+eZDCg[0]) << " (" << eZDCg[0] 
 	    << "); ZDC+: " << (eZDCn[1]+eZDCg[1]) << " (" << eZDCg[1] << ")"<< std::endl;
     PrintProtonInfo();
-    
+
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -90,13 +90,13 @@ bool uamc::ProceedEvent(const short unsigned int cut, const bool fill, const boo
 {
   castorE    = 0;
   castorPz   = 0;
-  
+
   protonSign = 0;
   protonXi   = 1;
   protonPt   = 0;
   protonE    = 0;
   protonPz   = 0;
-  
+
   PrepareArrays();
   memset(trksT2,     0,     sizeof(trksT2));
   memset(outRangeE,  0,     sizeof(outRangeE));
@@ -105,13 +105,13 @@ bool uamc::ProceedEvent(const short unsigned int cut, const bool fill, const boo
   memset(eZDCg,      0,     sizeof(eZDCg));
   memset(pzZDCn,     0,     sizeof(pzZDCn));
   memset(pzZDCg,     0,     sizeof(pzZDCg));
-  
+
   totalE  = 0;
   totalPz = 0;
-  
+
   unsigned int n=0;
   bool outer, zdc;
-  
+
   for(std::vector<MyGenPart>::iterator part=MCthuth->begin(); part!=MCthuth->end(); ++part){
     double e = (*part).energy();
     float eta    = (*part).eta();
@@ -125,7 +125,7 @@ bool uamc::ProceedEvent(const short unsigned int cut, const bool fill, const boo
 	trksT2[ind]++;
       };
     };//========
-    
+
     if( (eta<CAS_ETA_MAX) && (eta>CAS_ETA_MIN) ){//<=============== Castor 
       castorE  +=e;
       castorPz +=(*part).Pz();
@@ -144,22 +144,22 @@ bool uamc::ProceedEvent(const short unsigned int cut, const bool fill, const boo
 	pzZDCg[ind]+=(*part).Pz();
       };
     };  
-    
-    
+
+
     bool intact_pcandidate = false;
     if(ppb){
       intact_pcandidate = (eta<-7);
     }else{
       intact_pcandidate = (eta>7);
     };
-    
+
     if( ((*part).pdgId==2212) && intact_pcandidate && (e>1500.) ){ //<===== intact proton
       if(eta>0){
 	protonSign = 1;
       }else{
 	protonSign = -1;
       };
-    
+
       protonXi = ( MOMBEAM - fabs((*part).Pz()) ) / MOMBEAM;
       protonPt = (*part).Pt();
       protonEta= (*part).Eta();
@@ -168,7 +168,7 @@ bool uamc::ProceedEvent(const short unsigned int cut, const bool fill, const boo
     }else{ //<==================================================== all other particles                                              
       totalE +=e;
       totalPz+=(*part).Pz();
-      
+
       int bin = find_eta_bin((*part).eta());
       if(bin>=0){
 	energy[bin] += e;
@@ -181,7 +181,7 @@ bool uamc::ProceedEvent(const short unsigned int cut, const bool fill, const boo
 	outRangePz[ind]+=(*part).Pz();
       };
     };
-    
+
     n++;
     if(info){
       std::cout << n << "  id: " << (*part).pdgId << " q: " << (*part).charge << " stat: " << (*part).status 
@@ -190,11 +190,11 @@ bool uamc::ProceedEvent(const short unsigned int cut, const bool fill, const boo
 		<< "\t" << (*part).energy()-(*part).Pz() << "\t" << (*part).energy()+(*part).Pz() << "\touter: " << outer << "\tzdc: " << zdc << std::endl;
     };
   }; // end loop
-  
+
   short int sgn =  1;
   if(ppb)   sgn = -1;
   totalXi = (totalE + sgn*totalPz)/(2*MOMBEAM); // TBD check it!
-  
+
   for(unsigned int bin=0; bin<N_ETA_BINS; bin++)
     if(energy[bin]>0) {
       activity_loose[bin]=true;
@@ -219,7 +219,7 @@ void uamc::create_histos()
   //proton_e_pt2_h  = new TH2F * [n_each_h2D];
   proton_pt2_xi_h = new TH2F * [n_each_h2D];
   proton_xi_mc_h  = new TH2F * [n_each_h2D];
-  
+
   TString title1, title2;
   for(unsigned int i=0; i<n_cuts; i++){
     title1 = "proton_pt2_h["; title1+=i; title1+="]";

@@ -24,7 +24,7 @@ int uaplotter1::t2Loop(const int evts){
     std::cout << "can't run t2Loop on CMS-only files...\n";
     return 0;    
   };
-  
+
   int stat = chainTree->GetEntries(); 
   unsigned int nevts = evts;
   if(evts==-1 || evts>stat) nevts=stat;
@@ -41,9 +41,9 @@ int uaplotter1::t2Loop(const int evts){
   unsigned int EL           =0;
   unsigned int SDm          =0;
   unsigned int SDp          =0;
-  
+
   unsigned int kevt = 0;
-  
+
   //==============================================================================
   for(long unsigned int i = 0; i<nevts; i++){  
     unsigned int kevt_current = i/1000;
@@ -53,8 +53,8 @@ int uaplotter1::t2Loop(const int evts){
     };
     chainTree->GetEntry(i);
     current_event = i;
-    
-    
+
+
     memset(sd_flag_central, 0, sizeof(sd_flag_central));
     memset(sd_flag_total,   0, sizeof(sd_flag_total));
     bool MB = false;
@@ -63,7 +63,7 @@ int uaplotter1::t2Loop(const int evts){
       MB = true;
       tt53++;
     };
-    
+
     if(ProceedTrigger(53, true)){
       if( MB ) ttBOTH++;
       //al99++;
@@ -138,6 +138,6 @@ int uaplotter1::t2Loop(const int evts){
   std::cout << "SD-         " << SDm  << std::endl;
   std::cout << "SD+         " << SDp  << std::endl;
   std::cout << "EL          " << EL   << std::endl;
-  
+
   return noPU;
 }

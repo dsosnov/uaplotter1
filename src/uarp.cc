@@ -84,15 +84,15 @@ bool uarp::ProceedEvent(short unsigned int cut, const bool fill, const bool info
   proton_y     = 0;
   memset(y, 0, sizeof(y));
   memset(track_valid, false, sizeof(track_valid));
-  
+
   if(mc>0 || !tree_combined_flag) 
     return false;
-  
+
   proton_valid = RPproton->valid;
   proton_xi    = RPproton->xi;
   proton_t     = RPproton->t;
   proton_y     = RPproton->y0;
-  
+
   //double y[2][2]; // [F,N][U,D]
   if(RPtrackFU->valid){
     y[0][0] = RPtrackFU->y;
@@ -106,7 +106,7 @@ bool uarp::ProceedEvent(short unsigned int cut, const bool fill, const bool info
   if(RPtrackND->valid){
     y[1][1] = RPtrackND->y;
   };
-  
+
   for (short unsigned int ud = 0; ud<2; ud++){
     if( (y[0][ud]!=0) && (y[1][ud]!=0) ){
 	track_valid[ud] = true;
@@ -191,13 +191,13 @@ void uarp::FillRPWithMCtruth(const short unsigned int cut, const double xi, cons
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  
 void uarp::create_histos(){
   TString title1, title2;
-  
+
   n_each_h1D = n_cuts;
   n_each_h2D = n_cuts;
   xi_valid_h      = new TH1F * [n_each_h1D];
   t_valid_h       = new TH1F * [n_each_h1D];
   xi_vs_t_valid_h = new TH2F * [n_each_h2D];
-  
+
   friciU_h = new TH2F * [n_each_h2D];
   friciD_h = new TH2F * [n_each_h2D];
   yp_vs_yN = new TH2F * [n_each_h2D];

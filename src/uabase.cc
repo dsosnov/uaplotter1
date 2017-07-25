@@ -45,7 +45,7 @@ uabase::~uabase()
     delete h2D;
   };
   if(h1Da!=0){
-    
+
   }
   if(directory!=0)
     delete directory;

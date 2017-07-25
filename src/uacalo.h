@@ -39,22 +39,22 @@ private:
   double hf_total_energy_tower[2];  
   double hf_max_energy_tower[2][4];  
   bool   hf_trigger_tower[2];
-  
+
   unsigned int calotowers[N_ETA_BINS];
-  
+
   void create_histos();
 
   TH1F** hf_etotal_minus_h;
   TH1F** hf_etotal_plus_h;
-  
+
   TH1F** hf_max_towerE_minus_h;
   TH1F** hf_max_towerE_plus_h;
 
   TH2F** hf_towers_vs_rechits_h;
   TH2F** calotower_e_eta_h;
-  
+
   double EHF[2];
-  
+
   ClassDef(uacalo,2);
 };
 

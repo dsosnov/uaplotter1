@@ -22,7 +22,7 @@ protected:
     double energy[N_ETA_BINS];
     double pz[N_ETA_BINS];
     double pt[N_ETA_BINS];
-    
+
     ClassDef(uabasecentral,2);
 };
 

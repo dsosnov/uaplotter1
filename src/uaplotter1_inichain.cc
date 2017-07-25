@@ -5,9 +5,9 @@
 
 // also sets zdc56
 TString uaplotter1::initializeChain(){
-  
+
   TString str="";
-  
+
   switch (mc){
     // NOISE ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     case -2:{
@@ -84,7 +84,7 @@ TString uaplotter1::initializeChain(){
       };
       break;
     };
-    
+
     case 1:{ // Hijing ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
       zdc56 = false;
       if(ppb){
@@ -117,7 +117,7 @@ TString uaplotter1::initializeChain(){
       };
       break;
     };
-    
+
     case 2:{ // EPOS ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
       zdc56 = false;
       if(ppb){
@@ -149,7 +149,7 @@ TString uaplotter1::initializeChain(){
       };
       break;
     };
-    
+
     default:{
       zdc56 = false;
       std::cout << "uaplotter1::initializeChain(): unknown value for MC type = " << mc << std::endl;

@@ -29,7 +29,7 @@ public :
        const short unsigned int Ncuts //!< number of cuts
       );
   ~uarp();
-  
+
   double  Xi()   {return proton_xi;};
   double  t()    {return proton_t;};
   bool    Valid(){return proton_valid;};
@@ -53,7 +53,7 @@ private:
   RPRootDumpTrackInfo*               RPtrackND;
   RPRootDumpTrackInfo*               RPtrackFU;
   RPRootDumpTrackInfo*               RPtrackFD;
-  
+
   void create_histos();
   TH1F ** xi_valid_h; 
   TH1F ** t_valid_h; 
@@ -61,9 +61,9 @@ private:
   TH2F ** friciU_h;
   TH2F ** friciD_h;
   TH2F ** yp_vs_yN;
-  
+
   ClassDef(uarp,2);
-  
+
 };
 
 #endif

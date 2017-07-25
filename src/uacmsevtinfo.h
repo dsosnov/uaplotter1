@@ -46,12 +46,12 @@ public:
 
 private:
     void create_histos();
-    
+
     MyEvtId*      CMSevtInfo;
     MyL1TrigRun2* CMStrigInfo;
     MyL1MenuRun2* CMSmenuInfo;
     MyHLTrig*     CMSHLT;
-    
+
     TH1F ** triggers_h;
     TH2F ** run_vs_bx_h;
     TH2F ** run_vs_ls_h;

@@ -76,7 +76,7 @@ void uat2::resethistos(unsigned int cut){
       trigger_h[i][j]->Clear();//TBD to be moved outside
     };
   };
-    
+
 };
 
 
@@ -94,7 +94,7 @@ uat2::uat2(TChain* tree, TDirectory * dir, const bool combined, const int ncuts)
 
   T2primaryMinus = new T2Event();
   T2primaryPlus  = new T2Event();
-  
+
   // vertices
   n_t2_h          = n_cuts;
   n_tracks_plus_h  = new TH1F * [n_t2_h];
@@ -105,7 +105,7 @@ uat2::uat2(TChain* tree, TDirectory * dir, const bool combined, const int ncuts)
   z_impact_plus_h     = new TH1F * [n_t2_h];
   z_impact_prim_minus_h    = new TH1F * [n_t2_h];
   z_impact_prim_plus_h     = new TH1F * [n_t2_h];
-  
+
   n_clusters_minus_h  = new TH1F ** [n_t2_h];
   n_clusters_plus_h   = new TH1F ** [n_t2_h];
   n_clusters_minusF_h = new TH1F ** [n_t2_h];
@@ -114,20 +114,20 @@ uat2::uat2(TChain* tree, TDirectory * dir, const bool combined, const int ncuts)
   n_clusters_plusN_h  = new TH1F ** [n_t2_h];
   n_cluster_2h        = new TH2F ** [n_t2_h];
   n_qtracks_2h        = new TH2F ** [n_t2_h];
-  
+
   trigger_h          = new TH1F ** [n_t2_h];// TBD to be moved outside, other TH1 type
-  
+
   for(unsigned int i = 0; i<n_cuts; i++){
     TString title1 = "n_tracks_plus_h["; title1+=i; title1+="]";
     TString title2 = "n_tracks_plus_h["; title2+=i; title2+="]; t2 tracks +";
     n_tracks_plus_h[i] = new TH1F(title1.Data(), title2.Data(), 51,  -1, 50);
     n_tracks_plus_h[i]->SetDirectory(directory);
-    
+
     title1 = "n_tracks_minus_h["; title1+=i; title1+="]";
     title2 = "n_tracks_minus_h["; title2+=i; title2+="]; t2 tracks -";
     n_tracks_minus_h[i] = new TH1F(title1.Data(), title2.Data(), 51,  -1, 50);
     n_tracks_minus_h[i]->SetDirectory(directory);
-    
+
     title1 = "n_tracks_prim_plus_h["; title1+=i; title1+="]";
     title2 = "n_tracks_prim_plus_h["; title2+=i; title2+="]; t2 primary tracks +";
     n_tracks_prim_plus_h[i] = new TH1F(title1.Data(), title2.Data(), 51,  -1, 50);
@@ -157,7 +157,7 @@ uat2::uat2(TChain* tree, TDirectory * dir, const bool combined, const int ncuts)
     title2 = "z_impact_prim_plus_h["; title2+=i; title2+="]; Z imp prim -";
     z_impact_prim_minus_h[i] = new TH1F(title1.Data(), title2.Data(), 5000,  -500000, 500000);
     z_impact_prim_minus_h[i]->SetDirectory(directory);
-    
+
     n_clusters_minus_h[i] =  new TH1F * [NTCASES];
     n_clusters_plus_h[i]  =  new TH1F * [NTCASES];
     n_clusters_minusF_h[i] =  new TH1F * [NTCASES];
@@ -167,7 +167,7 @@ uat2::uat2(TChain* tree, TDirectory * dir, const bool combined, const int ncuts)
     n_cluster_2h[i]        =  new TH2F * [NTCASES];
     n_qtracks_2h[i]        =  new TH2F * [NTCASES];
     std::string qlabel[6] = { "NM", "FM", "NP", "FP", "1NM10FM", "1NP10FP"};
-    
+
     trigger_h[i] = new TH1F * [NTCASES];
     //https://twiki.cern.ch/twiki/bin/view/TOTEM/PArun
     std::string label[16] = { "RP220_V",
@@ -186,13 +186,13 @@ uat2::uat2(TChain* tree, TDirectory * dir, const bool combined, const int ncuts)
 			"T2 & CMS",
 			"T1 & T2 & CMS",
 			"CMS"};   
-    
+
     for (unsigned short int j=0; j<NTCASES; j++){
       title1 = "n_clusters_minus_h["; title1+=i; title1+="]["; title1+=j; title1+="]";
       title2 = "n_clusters_minus_h["; title2+=i; title2+="]["; title2+=j; title2+="]; t2 pad clusters -";
       n_clusters_minus_h[i][j] = new TH1F(title1.Data(), title2.Data(), 51,  -1, 50);
       n_clusters_minus_h[i][j]->SetDirectory(directory);
-      
+
       title1 = "n_clusters_plus_h["; title1+=i; title1+="]["; title1+=j; title1+="]";
       title2 = "n_clusters_plus_h["; title2+=i; title2+="]["; title2+=j; title2+="]; t2 pad clusters +";
       n_clusters_plus_h[i][j] = new TH1F(title1.Data(), title2.Data(), 51,  -1, 50);
@@ -202,7 +202,7 @@ uat2::uat2(TChain* tree, TDirectory * dir, const bool combined, const int ncuts)
       title2 = "n_clusters_minusF_h["; title2+=i; title2+="]["; title2+=j; title2+="]; t2 pad clusters -F";
       n_clusters_minusF_h[i][j] = new TH1F(title1.Data(), title2.Data(), 51,  -1, 50);
       n_clusters_minusF_h[i][j]->SetDirectory(directory);
-      
+
       title1 = "n_clusters_plusF_h["; title1+=i; title1+="]["; title1+=j; title1+="]";
       title2 = "n_clusters_plusF_h["; title2+=i; title2+="]["; title2+=j; title2+="]; t2 pad clusters +F";
       n_clusters_plusF_h[i][j] = new TH1F(title1.Data(), title2.Data(), 51,  -1, 50);
@@ -212,7 +212,7 @@ uat2::uat2(TChain* tree, TDirectory * dir, const bool combined, const int ncuts)
       title2 = "n_clusters_minusN_h["; title2+=i; title2+="]["; title2+=j; title2+="]; t2 pad clusters -N";
       n_clusters_minusN_h[i][j] = new TH1F(title1.Data(), title2.Data(), 51,  -1, 50);
       n_clusters_minusN_h[i][j]->SetDirectory(directory);
-      
+
       title1 = "n_clusters_plusN_h["; title1+=i; title1+="]["; title1+=j; title1+="]";
       title2 = "n_clusters_plusN_h["; title2+=i; title2+="]["; title2+=j; title2+="]; t2 pad clusters +N";
       n_clusters_plusN_h[i][j] = new TH1F(title1.Data(), title2.Data(), 51,  -1, 50);
@@ -229,7 +229,7 @@ uat2::uat2(TChain* tree, TDirectory * dir, const bool combined, const int ncuts)
       n_qtracks_2h[i][j] = new TH2F(title1.Data(), title2.Data(), 6, 0,6, 52,  -2, 50);
       for(unsigned int bin=1; bin<7; bin++) n_qtracks_2h[i][j]->GetXaxis()->SetBinLabel(bin,qlabel[bin-1].data());
       n_qtracks_2h[i][j]->SetDirectory(directory);
-    
+
       // TBD to be moved outside---------->
       title1 = "trigger_h["; title1+=i; title1+="]["; title1+=j; title1+="]";
       title2 = "trigger_h["; title2+=i; title2+="]["; title2+=j; title2+="]; input_status_bits";
@@ -279,7 +279,7 @@ int uat2::ProceedEvent(unsigned int cut, const bool fill, const bool info){
   if((cut>=n_cuts) && fill){
     std::cout << "uat2::ProceedEvent - too large cat number\n";
   };
-  
+
   // TBD to be moved outside---------->
   //std::cout << TOTtrig->input_status_bits << "\t" << (std::bitset<16>)TOTtrig->input_status_bits << std::endl;
   for (short unsigned int b=0; b<16; b++){
@@ -289,13 +289,13 @@ int uat2::ProceedEvent(unsigned int cut, const bool fill, const bool info){
   T2oneArm = trigger[5];
   T2trig   = trigger[6];
   //<----------------------------------
-  
+
   int NofT2M = 0;
   int NofT2P = 0;
-  
+
   resetT2primary(true); // Plus
   resetT2primary(false); // Minus
-  
+
   memset(n_clust_minus,  0, sizeof(n_clust_minus));
   memset(n_clust_plus,   0, sizeof(n_clust_plus));
   memset(n_qtracks_minus,0, sizeof(n_qtracks_minus));
@@ -314,7 +314,7 @@ int uat2::ProceedEvent(unsigned int cut, const bool fill, const bool info){
 
   for(unsigned int i_t2=0; i_t2<Ntrks; i_t2++){
     double Z0impact = T2tracks->TrkZImpact.at(i_t2);    
-    
+
     double phi = T2tracks->TrkPhi_RZFit.at(i_t2);
     short unsigned int sideIndx = 0;
     if( (phi<90) || (phi>270) ){ // Near Side
@@ -322,14 +322,14 @@ int uat2::ProceedEvent(unsigned int cut, const bool fill, const bool info){
     }else{
       sideIndx = 2;
     };
-    
+
     if(T2tracks->TrkEntryZ.at(i_t2)<0){
       NofT2M++;       
       n_qtracks_minus[sideIndx]++;
       if(fill)
 	z_impact_minus_h[cut]->Fill(Z0impact);       
     }else{
-      
+
       NofT2P++;
       n_qtracks_plus[sideIndx]++;
       if(fill) 
@@ -340,8 +340,8 @@ int uat2::ProceedEvent(unsigned int cut, const bool fill, const bool info){
       addT2primaryTrack(i_t2, cut, fill, info);
     };  
   }; // end track loop
-  
-  
+
+
   n_prim_tracks_minus = T2primaryMinus->TrkEta2.size();
   n_prim_tracks_plus  = T2primaryPlus->TrkEta2.size();
   n_tracks_minus      = NofT2M;
@@ -413,7 +413,7 @@ int uat2::ProceedEvent(unsigned int cut, const bool fill, const bool info){
       }; // end if (j[theCase]>=0)
     }; // end trigger case loop
   }; // end if(fill)
-  
+
   return n_prim_tracks_minus + n_prim_tracks_plus;
 };
 
@@ -645,21 +645,21 @@ void uat2::addT2primaryTrack(unsigned int i, unsigned int cut, const bool fill, 
     };
   }; 
 
- 
+
 //  T2primptr->Pad_row.push_back(T2tracks->Pad_row.at(i));             //strip row   
 //  T2primptr->Pad_col.push_back(T2tracks->Pad_col.at(i));             //strip column   
 //  T2primptr->Pad_det.push_back(T2tracks->Pad_det.at(i));             //symbolic id of the detector containind the pad
-    
+
 //  (T2primptr->Strip_row).push_back(T2tracks->Strip_row.at(i));           //strip row
 //  (T2primptr->Strip_col).push_back(T2tracks->Strip_col.at(i));           //strip column
 //  (T2primptr->Strip_det).push_back(T2tracks->Strip_det.at(i));           //symbolic id of the detector containind the strip
-  
+
 //(T2primptr->TrkPrimaryGeneratorEta).push_back(T2tracks->TrkPrimaryGeneratorEta);
   (T2primptr->TrkEta_XY ).push_back(T2tracks->TrkEta_XY .at(i));            
   (T2primptr->TrkZmin_XY).push_back(T2tracks->TrkZmin_XY.at(i));  
   (T2primptr->TrkRmin_XY).push_back(T2tracks->TrkRmin_XY.at(i));  
   (T2primptr->TrkZImpact).push_back(T2tracks->TrkZImpact.at(i));
-  
+
   (T2primptr->TrkAx).push_back(T2tracks->TrkAx.at(i));            // slope of the track projection in the XZ plane
   (T2primptr->TrkAy).push_back(T2tracks->TrkAy.at(i));            // slope of the track projection in the YZ plane
   (T2primptr->TrkX0).push_back(T2tracks->TrkX0.at(i));            // X at Z=0 for the XZ projected track  
@@ -671,23 +671,23 @@ void uat2::addT2primaryTrack(unsigned int i, unsigned int cut, const bool fill, 
 
   (T2primptr->TrkClass1HitCounter).push_back(T2tracks->TrkClass1HitCounter.at(i));   //Number of class1 Hit in the Trk
   (T2primptr->TrkHitCounter).push_back(T2tracks->TrkHitCounter.at(i));    //Number of class1 + cluster Pad hits in the Trk
-  
-                    
+
+
   (T2primptr->TrkThetaR_RZFit).push_back(T2tracks->TrkThetaR_RZFit.at(i));// Trk Polar angle obtained tracking in the Rz plane
   (T2primptr->TrkEta_RZFit).push_back(T2tracks->TrkEta_RZFit.at(i));   // Trk Eta obtained tracking in the Rz plane 
   (T2primptr->TrkPhi_RZFit).push_back(T2tracks->TrkPhi_RZFit.at(i));   // Trk Phi obtained with a constant fit.
   (T2primptr->TrkZ0_RZFit ).push_back(T2tracks->TrkZ0_RZFit .at(i));    // Crossing Point between Trk and Z Axis obtained tracking in the Rz plane 
   (T2primptr->TrkBX_RZFit ).push_back(T2tracks->TrkBX_RZFit .at(i));    // X0 @ Z=0 obtained tracking in the Rz plane 
   (T2primptr->TrkBY_RZFit ).push_back(T2tracks->TrkBY_RZFit .at(i));    // X0 @ Z=0 obtained tracking in the Rz plane 
-  
+
   T2primptr->NumPadCluH0 = T2tracks->NumPadCluH0;
   T2primptr->NumPadCluH1 = T2tracks->NumPadCluH1;
   T2primptr->NumPadCluH2 = T2tracks->NumPadCluH2;
   T2primptr->NumPadCluH3 = T2tracks->NumPadCluH3;
-  
+
   (T2primptr->TrkEta2).push_back(T2tracks->TrkEta2.at(i));
-  
-  
+
+
 
   (T2primptr->TrkChiProb).push_back(T2tracks->TrkChiProb.at(i));             //Make sense only with T2TrackProducer3
 /*
@@ -715,14 +715,14 @@ void uat2::addT2primaryTrack(unsigned int i, unsigned int cut, const bool fill, 
   (T2primptr->TrkExitX).push_back(T2tracks->TrkExitX.at(i));    //Trk Exit point X
   (T2primptr->TrkExitY).push_back(T2tracks->TrkExitY.at(i));    //Trk Exit point Y  
   (T2primptr->TrkExitZ).push_back(T2tracks->TrkExitZ.at(i));    //Trk Exit point Z
-  
- 
-   
+
+
+
   //T2primptr->run_no = T2tracks->run_no; 
   //T2primptr->ev_no  = T2tracks->ev_no;
   //T2primptr->timestamp = T2tracks->timestamp;
-  
-  
+
+
   //(T2primptr->Pad_noise).push_back(T2tracks->Pad_noise.at(i));
 };
 
@@ -735,11 +735,11 @@ void uat2::resetT2primary(bool plus){
   }else{
     T2primptr = T2primaryMinus;
   }; 
-  
+
  (T2primptr->Pad_row).clear();             //strip row   
  (T2primptr->Pad_col).clear();             //strip column   
  (T2primptr->Pad_det).clear();             //symbolic id of the detector containind the pad
- 
+
  (T2primptr->Strip_row).clear();           //strip row
  (T2primptr->Strip_col).clear();           //strip column
  (T2primptr->Strip_det).clear();           //symbolic id of the detector containind the strip
@@ -755,20 +755,20 @@ void uat2::resetT2primary(bool plus){
   (T2primptr->TrkX0).clear();            // X at Z=0 for the XZ projected track  
   (T2primptr->TrkY0 ).clear();            // Y at Z=0 for the XZ projected track
   (T2primptr->TrkPhi).clear();           // Trk Phi (XY fit)
-                           
+
   (T2primptr->TrkChi2XProb).clear();          //Chi2-X probability (goodness of the XZ projection fit)
   (T2primptr->TrkChi2YProb).clear();          //Chi2-Y probability (goodness of the YZ projection fit)
   (T2primptr->TrkClass1HitCounter).clear();   //Number of class1 Hit in the Trk
   (T2primptr->TrkHitCounter).clear();    //Number of class1 + cluster Pad hits in the Trk
-                              
-                              
+
+
   (T2primptr->TrkThetaR_RZFit).clear();// Trk Polar angle obtained tracking in the Rz plane
   (T2primptr->TrkEta_RZFit).clear();   // Trk Eta obtained tracking in the Rz plane 
   (T2primptr->TrkPhi_RZFit).clear();   // Trk Phi obtained with a constant fit.
   (T2primptr->TrkZ0_RZFit ).clear();    // Crossing Point between Trk and Z Axis obtained tracking in the Rz plane 
   (T2primptr->TrkBX_RZFit ).clear();    // X0 @ Z=0 obtained tracking in the Rz plane 
   (T2primptr->TrkBY_RZFit ).clear();    // X0 @ Z=0 obtained tracking in the Rz plane 
-                           
+
   (T2primptr->NumPadCluH0) = 0;
   (T2primptr->NumPadCluH1) = 0;
   (T2primptr->NumPadCluH2) = 0;
@@ -779,7 +779,7 @@ void uat2::resetT2primary(bool plus){
   (T2primptr->TrkNumHitInH2).clear();
   (T2primptr->TrkNumHitInH3).clear();
   (T2primptr->TrkEta2).clear();
-  
+
  (T2primptr->TrkChiProb).clear();             //Make sense only with T2TrackProducer3
  (T2primptr->Trknumpadonly).clear();   
  (T2primptr->Trknumstriponly).clear();   
@@ -787,7 +787,7 @@ void uat2::resetT2primary(bool plus){
  (T2primptr->Trknumhitacl1).clear();   
  (T2primptr->ProbChi2R_rz).clear(); 
   (T2primptr->Chi2Rreduced_rz).clear();
-  
+
  (T2primptr->HitPhi).clear();      // Phi position of all the Hits (deg)
  (T2primptr->HitR).clear();        // R position of all the Hits (mm)
  (T2primptr->HitType).clear();     // 0-> only pad; 1-> only strip 2->Class 1 Hit (superimposition Pad/Strip)
@@ -808,7 +808,7 @@ void uat2::resetT2primary(bool plus){
  T2primptr->ev_no  = 0;
  T2primptr->timestamp = 0;
 
- 
+
  (T2primptr->Pad_noise).clear();
 };
 

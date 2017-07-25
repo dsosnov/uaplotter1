@@ -21,7 +21,7 @@ int uaplotter1::noiseLoop(const int evts){
     std::cout << "can't run noiseLoop on MC/data files...\n";
     return 0;
   };
-  
+
   int stat = chainTree->GetEntries(); 
   unsigned int nevts = evts;
   if(evts==-1 || evts>stat) nevts=stat;
@@ -31,9 +31,9 @@ int uaplotter1::noiseLoop(const int evts){
   unsigned int rndHLT       =0;
   unsigned int not53        =0;
   unsigned int not53notBPTX =0;
-  
+
   unsigned int kevt = 0;
-  
+
   for(long unsigned int i = 0; i<nevts; i++){  
     unsigned int kevt_current = i/1000;
     if(kevt_current>kevt){
@@ -42,8 +42,8 @@ int uaplotter1::noiseLoop(const int evts){
     };
     chainTree->GetEntry(i);
     current_event = i;
-    
-    
+
+
     memset(sd_flag_central, 0, sizeof(sd_flag_central));
     memset(sd_flag_total,   0, sizeof(sd_flag_total));
 
@@ -59,7 +59,7 @@ int uaplotter1::noiseLoop(const int evts){
       }
     };
     //};
-    
+
   }; // end loop
   std::cout << "total number of events         " << stat   << std::endl;
   std::cout << "worked over                    " << nevts  << std::endl;

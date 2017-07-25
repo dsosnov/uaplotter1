@@ -35,21 +35,21 @@ private:
   unsigned int nVtxGoog;
   unsigned int nTracks;
   unsigned int nTracksGood;
-  
+
   unsigned int n_tracks_bin_all [N_ETA_BINS];
   unsigned int n_tracks_bin_good[N_ETA_BINS];
 
   void create_histos();
-  
+
   TH1F ** vertices_h;
   //TH1F ** vertices_X_h;
   //TH1F ** vertices_Y_h;
   //TH1F ** vertices_Z_h;
   TH1F ** tracks_h;
   TH2F ** tracks_eta_h;
-  
+
   ClassDef(uatracking,2);
-    
+
 };
 
 #endif // UATRACKING_H
