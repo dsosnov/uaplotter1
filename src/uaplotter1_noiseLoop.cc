@@ -10,33 +10,34 @@
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- //! noise studies on rnd trigger
+//! noise studies on rnd trigger
 /*!
 \param evts number of events to be prodused
 \return number of events of the quiet BPTX
 */
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-int uaplotter1::noiseLoop(const int evts){ 
-  if (mc>=0){
+int uaplotter1::noiseLoop(const int evts)
+{
+  if (mc >= 0) {
     std::cout << "can't run noiseLoop on MC/data files...\n";
     return 0;
   };
 
-  int stat = chainTree->GetEntries(); 
+  int stat = chainTree->GetEntries();
   unsigned int nevts = evts;
-  if(evts==-1 || evts>stat) nevts=stat;
+  if (evts == -1 || evts > stat) nevts = stat;
   std::cout << "Total stat = " << stat << std::endl;
   std::cout << "uaplotter1::noiseLoop() for " << nevts << " events\n";
 
-  unsigned int rndHLT       =0;
-  unsigned int not53        =0;
-  unsigned int not53notBPTX =0;
+  unsigned int rndHLT       = 0;
+  unsigned int not53        = 0;
+  unsigned int not53notBPTX = 0;
 
   unsigned int kevt = 0;
 
-  for(long unsigned int i = 0; i<nevts; i++){  
-    unsigned int kevt_current = i/1000;
-    if(kevt_current>kevt){
+  for (long unsigned int i = 0; i < nevts; i++) {
+    unsigned int kevt_current = i / 1000;
+    if (kevt_current > kevt) {
       kevt = kevt_current;
       std::cout << ">>> proceeding " << kevt << std::endl;
     };

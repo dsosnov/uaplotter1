@@ -14,71 +14,71 @@ ClassImp(uaplotter1)
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-uaplotter1::uaplotter1(const bool               cmstotem, 
-		       const bool               cmsdigis,
-		       const bool               CASTORp,
-		       const short int          MC, 
-		       const short unsigned int Ncuts
-		      ):
-		      uabase(cmstotem, MC, Ncuts), 
-		      tree_digi_flag(cmsdigis), 
-		      ppb(CASTORp),
-		      dummy_cut(Ncuts+1),
-		      current_event(0)
+uaplotter1::uaplotter1(const bool               cmstotem,
+                       const bool               cmsdigis,
+                       const bool               CASTORp,
+                       const short int          MC,
+                       const short unsigned int Ncuts
+                      ):
+  uabase(cmstotem, MC, Ncuts),
+  tree_digi_flag(cmsdigis),
+  ppb(CASTORp),
+  dummy_cut(Ncuts + 1),
+  current_event(0)
 {
   first_central_bin = 0;
   last_central_bin  = 0;
   IniRapGapRange();
-  if(tree_combined_flag){
-    chainTree = new TChain("cms_totem");    
-  }else{
+  if (tree_combined_flag) {
+    chainTree = new TChain("cms_totem");
+  } else {
     chainTree = new TChain("evt");
   };
   TString str = initializeChain();
-  str.Prepend("uaplot_output_histos_"); str+=".root";
+  str.Prepend("uaplot_output_histos_"); str += ".root";
 
-  outputFile = TFile::Open(str.Data(),"RECREATE");
+  outputFile = TFile::Open(str.Data(), "RECREATE");
 
-  CMSmc      = 0;
-  if(mc>0){
-    TDirectory * dirMC = outputFile->mkdir("MC");
+  CMSmc = 0;
+  if (mc > 0) {
+    TDirectory *dirMC = outputFile->mkdir("MC");
     CMSmc              = new uamc(chainTree, dirMC, tree_combined_flag, ppb, mc, n_cuts);
   };
 
   CMSevtinfo  = 0;
-  TDirectory * dirEVT = outputFile->mkdir("CMSinfo");
+  TDirectory *dirEVT = outputFile->mkdir("CMSinfo");
   CMSevtinfo          = new uacmsevtinfo(chainTree, dirEVT, tree_combined_flag, mc, n_cuts);
 
   CMStracking = 0;
-  TDirectory * dirTRK = outputFile->mkdir("CMStracking");
+  TDirectory *dirTRK = outputFile->mkdir("CMStracking");
   CMStracking         = new uatracking(chainTree, dirTRK, tree_combined_flag, mc, n_cuts);
 
   CMScalo    = 0;
-  TDirectory * dirCAL = outputFile->mkdir("CMScalo");
+  TDirectory *dirCAL = outputFile->mkdir("CMScalo");
   CMScalo             = new uacalo(chainTree, dirCAL, tree_combined_flag, mc, n_cuts);
 
   CMSpf    = 0;
-  TDirectory * dirPF  = outputFile->mkdir("CMSpf");
+  TDirectory *dirPF  = outputFile->mkdir("CMSpf");
   CMSpf               = new uapf(chainTree, dirPF, tree_combined_flag, mc, n_cuts);
 
   CMScastor = 0;
-  TDirectory * dirCAS = outputFile->mkdir("CMScastor");
+  TDirectory *dirCAS = outputFile->mkdir("CMScastor");
   CMScastor           = new uacastor(chainTree, dirCAS, tree_combined_flag, tree_digi_flag, mc, n_cuts);
 
   CMSforward = 0;
-  if(tree_digi_flag || (mc>0)){
-    TDirectory * dirZDC = outputFile->mkdir("ZDC");
+  if (tree_digi_flag || (mc > 0)) {
+    TDirectory *dirZDC = outputFile->mkdir("ZDC");
     CMSforward          = new uaforward(chainTree, dirZDC, tree_combined_flag, zdc56, mc, n_cuts);
   };
 
   T2        = 0;
-  if(tree_combined_flag){
+  if (tree_combined_flag) {
     TDirectory *dirT2   = outputFile->mkdir("T2");
     T2                  = new uat2(chainTree, dirT2, tree_combined_flag, n_cuts);
   };
 
-  if(tree_combined_flag || (mc>0)){
-    TDirectory * dirRP  = outputFile->mkdir("RP");
+  if (tree_combined_flag || (mc > 0)) {
+    TDirectory *dirRP  = outputFile->mkdir("RP");
     RP                  = new uarp(chainTree, dirRP, tree_combined_flag, ppb, mc, n_cuts);
   };
 
@@ -96,24 +96,24 @@ uaplotter1::uaplotter1(const bool               cmstotem,
 uaplotter1::~uaplotter1()
 {
   std::cout << "uaplotter1::~uaplotter1()\n";
-  if(tree_digi_flag || (mc>0)){
+  if (tree_digi_flag || (mc > 0)) {
     CMSforward->NormalizeFSCts();
   };
   outputFile->Write();
   chainTree->Delete();
-  if(mc>0)
+  if (mc > 0)
     delete CMSmc;
   delete CMSevtinfo;
   delete CMStracking;
   delete CMSpf;
   delete CMScalo;
   delete CMScastor;
-  if(tree_digi_flag || (mc>0)){
+  if (tree_digi_flag || (mc > 0)) {
     delete CMSforward;
   };
-  if(tree_combined_flag)
+  if (tree_combined_flag)
     delete T2;
-  if(tree_combined_flag || (mc>0))
+  if (tree_combined_flag || (mc > 0))
     delete RP;
 }
 
@@ -121,76 +121,77 @@ uaplotter1::~uaplotter1()
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 bool uaplotter1::ProceedEvent(const short unsigned int cut, const bool fill, const bool info)
-{ bool proceed_mc = (mc>0);
+{
+  bool proceed_mc = (mc > 0);
 
-  if(proceed_mc)
+  if (proceed_mc)
     CMSmc->ProceedEvent(cut, fill, false);
 
-  if(fill) 
+  if (fill)
     CMSevtinfo->ProceedEvent(cut, fill, false); // does nothing except for fill
 
-  CMStracking->ProceedEvent(cut, fill, false); 
+  CMStracking->ProceedEvent(cut, fill, false);
   CMSpf->ProceedEvent(cut, fill, false);
-  CMScalo->ProceedEvent(cut, fill, false); 
-  CMScastor->ProceedEvent(cut, fill, false); 
+  CMScalo->ProceedEvent(cut, fill, false);
+  CMScastor->ProceedEvent(cut, fill, false);
 
   // ********** ZDC/FSC ******************
-  if(tree_digi_flag){
+  if (tree_digi_flag) {
     CMSforward->ProceedEvent(cut, fill, false);
-  }else if(proceed_mc && fill){
-    double E[2]  = {0,0};
-    double EM[2] = {0,0};
-    EM[0] = CMSmc->GetZDCEg(false);       EM[1] = CMSmc->GetZDCEg(true); 
-    E[0]  = EM[0]+CMSmc->GetZDCEn(false); E[1]  = EM[1]+CMSmc->GetZDCEn(true);
+  } else if (proceed_mc && fill) {
+    double E[2]  = {0, 0};
+    double EM[2] = {0, 0};
+    EM[0] = CMSmc->GetZDCEg(false);         EM[1] = CMSmc->GetZDCEg(true);
+    E[0]  = EM[0] + CMSmc->GetZDCEn(false); E[1]  = EM[1] + CMSmc->GetZDCEn(true);
     CMSforward->FillZDCWithMCtruth(cut, E, EM);
   };
 
   // ************** T2 ********************
-  if(tree_combined_flag && fill)// here to be optimized 
+  if (tree_combined_flag && fill) // here to be optimized
     T2->ProceedEvent(cut, fill, false);
 
   // ************* forward dependencies ****************
-  if(fill){
-    if( tree_digi_flag ){
+  if (fill) {
+    if (tree_digi_flag) {
       zdcM_vs_castor_h[cut]->Fill(CMScastor->GetE(),       CMSforward->GetZDCEtotal(false));
       zdcM_vs_T2primM_h[cut]->Fill(T2->NPrimtracksMinus(), CMSforward->GetZDCEtotal(false));
-    }else if (proceed_mc){
-      zdcM_vs_castor_h[cut]->Fill(CMScastor->GetE(), CMSmc->GetZDCEg(false)+CMSmc->GetZDCEn(false));
-      zdcM_vs_T2primM_h[cut]->Fill(CMSmc->GetNT2trk(false), CMSmc->GetZDCEg(false)+CMSmc->GetZDCEn(false));
+    } else if (proceed_mc) {
+      zdcM_vs_castor_h[cut]->Fill(CMScastor->GetE(), CMSmc->GetZDCEg(false) + CMSmc->GetZDCEn(false));
+      zdcM_vs_T2primM_h[cut]->Fill(CMSmc->GetNT2trk(false), CMSmc->GetZDCEg(false) + CMSmc->GetZDCEn(false));
     };
   };
   // ************** RP ********************
-  if(tree_combined_flag || proceed_mc){
+  if (tree_combined_flag || proceed_mc) {
     RP->ProceedEvent(cut, fill, false); // if MC does nothing
-    if(fill && proceed_mc){
-      if(CMSmc->IntactProton()!=0){
-	double protonpt = CMSmc->IntactProtonPt();
-	RP->FillRPWithMCtruth(cut, CMSmc->IntactProtonXi(), -protonpt*protonpt);
+    if (fill && proceed_mc) {
+      if (CMSmc->IntactProton() != 0) {
+        double protonpt = CMSmc->IntactProtonPt();
+        RP->FillRPWithMCtruth(cut, CMSmc->IntactProtonXi(), -protonpt * protonpt);
       };
     };
   };
 
   // ********** RapGap ******************
   FindRapGap(true); // RG in RECO
-  if(proceed_mc)
+  if (proceed_mc)
     FindRapGap(false); // RG in MCtruth
 
   // ************* SD ******************************************************
-  if( sd_flag_central[0]!=0 && (sd_flag_total[0]==1 || sd_flag_total[0]==-1) ){
+  if (sd_flag_central[0] != 0 && (sd_flag_total[0] == 1 || sd_flag_total[0] == -1)) {
     CalculateSDdiffMass();
 
-    if(fill){
-      if(tree_combined_flag){ 
-	if(RP->Valid())
-	  xi_p_reco_full_h[cut]->Fill(RP->Xi(), xi_full[0]);              // DATA -> X: RP xi, Y: xi reco full
-      }else if ( proceed_mc && (CMSmc->IntactProton()!=0) ){
-	xi_p_reco_full_h[cut]->Fill(CMSmc->IntactProtonXi(), xi_full[0]); // MC   -> X: proton xi, Y: xi reco full
+    if (fill) {
+      if (tree_combined_flag) {
+        if (RP->Valid())
+          xi_p_reco_full_h[cut]->Fill(RP->Xi(), xi_full[0]);              // DATA -> X: RP xi, Y: xi reco full
+      } else if (proceed_mc && (CMSmc->IntactProton() != 0)) {
+        xi_p_reco_full_h[cut]->Fill(CMSmc->IntactProtonXi(), xi_full[0]); // MC   -> X: proton xi, Y: xi reco full
       };
     };
   };
 
   // ***********************************************************************
-  if(info)
+  if (info)
     PrintEventInfo(true);
   return true;
 }
@@ -198,43 +199,44 @@ bool uaplotter1::ProceedEvent(const short unsigned int cut, const bool fill, con
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-bool uaplotter1::FillLastEvent(const short unsigned int cut){ 
+bool uaplotter1::FillLastEvent(const short unsigned int cut)
+{
   bool ok = true;
-  if(mc>0)
-    ok*=CMSmc->FillLastEvent(cut);
-  ok*=CMSevtinfo->FillLastEvent(cut);
-  ok*=CMStracking->FillLastEvent(cut);
-  ok*=CMSpf->FillLastEvent(cut);
-  ok*=CMScalo->FillLastEvent(cut);
-  ok*=CMScastor->FillLastEvent(cut);
-  if(tree_digi_flag){
-    ok*=CMSforward->FillLastEvent(cut);
-  }else if (mc>0){
-    double E[2]  = {0,0};
-    double EM[2] = {0,0};
-    EM[0] = CMSmc->GetZDCEg(false);       EM[1] = CMSmc->GetZDCEg(true); 
-    E[0]  = EM[0]+CMSmc->GetZDCEn(false); E[1]  = EM[1]+CMSmc->GetZDCEn(true);
-    CMSforward->FillZDCWithMCtruth(cut, E, EM);    
+  if (mc > 0)
+    ok *= CMSmc->FillLastEvent(cut);
+  ok *= CMSevtinfo->FillLastEvent(cut);
+  ok *= CMStracking->FillLastEvent(cut);
+  ok *= CMSpf->FillLastEvent(cut);
+  ok *= CMScalo->FillLastEvent(cut);
+  ok *= CMScastor->FillLastEvent(cut);
+  if (tree_digi_flag) {
+    ok *= CMSforward->FillLastEvent(cut);
+  } else if (mc > 0) {
+    double E[2]  = {0, 0};
+    double EM[2] = {0, 0};
+    EM[0] = CMSmc->GetZDCEg(false);       EM[1] = CMSmc->GetZDCEg(true);
+    E[0]  = EM[0] + CMSmc->GetZDCEn(false); E[1]  = EM[1] + CMSmc->GetZDCEn(true);
+    CMSforward->FillZDCWithMCtruth(cut, E, EM);
   };
-  if(mc>0){
+  if (mc > 0) {
     diff_flag_mc_full_reco_central_h[cut]->Fill(sd_flag_total[1], sd_flag_central[0]);
     diff_flag_mc_full_reco_full_h[cut]->Fill(sd_flag_total[1], sd_flag_total[0]);
     diff_flag_mc_full_mc_central_h[cut]->Fill(sd_flag_total[1], sd_flag_central[1]);
     diff_flag_mc_total_mc_central_h[cut]->Fill(sd_flag_total[2], sd_flag_central[1]);
     n_sd_minus_bins_mc_reco_h[cut]->Fill(n_sd_minus_bins[1], n_sd_minus_bins[0]);
     n_sd_plus_bins_mc_reco_h[cut]->Fill(n_sd_plus_bins[1], n_sd_plus_bins[0]);
-    for(short unsigned int bin=0; bin<N_ETA_BINS; bin++)
-      if(CMSmc->GetActivityLoose(bin))
-	central_activity_mc_h[cut]->Fill(find_eta(bin));
+    for (short unsigned int bin = 0; bin < N_ETA_BINS; bin++)
+      if (CMSmc->GetActivityLoose(bin))
+        central_activity_mc_h[cut]->Fill(find_eta(bin));
   };
   n_sd_minus_bins_h[cut]->Fill(n_sd_minus_bins[0]);
   n_sd_plus_bins_h[cut]->Fill(n_sd_plus_bins[0]);
-  for(short unsigned int bin=0; bin<N_ETA_BINS; bin++)
-    if(combined_central_activity[bin])
+  for (short unsigned int bin = 0; bin < N_ETA_BINS; bin++)
+    if (combined_central_activity[bin])
       central_activity_h[cut]->Fill(find_eta(bin));
 
-  if(mc>0){
-    if(CMSmc->IntactProton()!=0){
+  if (mc > 0) {
+    if (CMSmc->IntactProton() != 0) {
       xi_mc_p_mc_total_h[cut]->Fill(TMath::Log10(CMSmc->IntactProtonXi()), TMath::Log10(xi_mc_total));
       xi_mc_p_reco_full_h[cut]->Fill(TMath::Log10(CMSmc->IntactProtonXi()), TMath::Log10(xi_full[0]));
     };
@@ -247,34 +249,34 @@ bool uaplotter1::FillLastEvent(const short unsigned int cut){
   };
   xi_reco_full_h[cut]->Fill(TMath::Log10(xi_full[0]));
 
-  if(tree_combined_flag) {
+  if (tree_combined_flag) {
     T2->ProceedEvent(cut, true, false); // to be optimized later!
     RP->FillLastEvent(cut);
-  }else if (mc>0){
-    if(CMSmc->IntactProton()!=0){
+  } else if (mc > 0) {
+    if (CMSmc->IntactProton() != 0) {
       double ptp = CMSmc->IntactProtonPt();
-      RP->FillRPWithMCtruth(cut, CMSmc->IntactProtonXi(), -ptp*ptp);
+      RP->FillRPWithMCtruth(cut, CMSmc->IntactProtonXi(), -ptp * ptp);
     };
   };
-  if( tree_digi_flag ){
+  if (tree_digi_flag) {
     zdcM_vs_castor_h[cut]->Fill(CMScastor->GetE(),       CMSforward->GetZDCEtotal(false));
     zdcM_vs_T2primM_h[cut]->Fill(T2->NPrimtracksMinus(), CMSforward->GetZDCEtotal(false));
     FSCmN_vs_castor_h[cut]->Fill(CMScastor->GetE(), CMSforward->GetFSCmN());
-  }else if (mc>0){
-    zdcM_vs_castor_h[cut]->Fill(CMScastor->GetE(), CMSmc->GetZDCEg(false)+CMSmc->GetZDCEn(false));
-    zdcM_vs_T2primM_h[cut]->Fill(CMSmc->GetNT2trk(false), CMSmc->GetZDCEg(false)+CMSmc->GetZDCEn(false));
+  } else if (mc > 0) {
+    zdcM_vs_castor_h[cut]->Fill(CMScastor->GetE(), CMSmc->GetZDCEg(false) + CMSmc->GetZDCEn(false));
+    zdcM_vs_T2primM_h[cut]->Fill(CMSmc->GetNT2trk(false), CMSmc->GetZDCEg(false) + CMSmc->GetZDCEn(false));
   };
 
-  if( sd_flag_central!=0 && (sd_flag_total[0]==1 || sd_flag_total[0]==-1) ){
-    if(tree_combined_flag){ 
-      if( RP->Valid() && ( RP->trackValidUp() || RP->trackValidDn()))
-	xi_p_reco_full_h[cut]->Fill(RP->Xi(), xi_full[0]);              // DATA -> X: RP xi, Y: xi reco full
-    }else if ( (mc>0) && (CMSmc->IntactProton()!=0) ){
+  if (sd_flag_central != 0 && (sd_flag_total[0] == 1 || sd_flag_total[0] == -1)) {
+    if (tree_combined_flag) {
+      if (RP->Valid() && (RP->trackValidUp() || RP->trackValidDn()))
+        xi_p_reco_full_h[cut]->Fill(RP->Xi(), xi_full[0]);              // DATA -> X: RP xi, Y: xi reco full
+    } else if ((mc > 0) && (CMSmc->IntactProton() != 0)) {
       xi_p_reco_full_h[cut]->Fill(CMSmc->IntactProtonXi(), xi_full[0]); // MC   -> X: proton xi, Y: xi reco full
     };
   };
 
-  if( tree_digi_flag && RP->Valid() && ( RP->trackValidUp() || RP->trackValidDn())){
+  if (tree_digi_flag && RP->Valid() && (RP->trackValidUp() || RP->trackValidDn())) {
     ZDCm_vs_xiRP_h[cut]->Fill(RP->Xi(), CMSforward->GetZDCEtotal(false));
     ZDCp_vs_xiRP_h[cut]->Fill(RP->Xi(), CMSforward->GetZDCEtotal(true));
     FSCmSi8_vs_xiRP_h[cut]->Fill(RP->Xi(), CMSforward->GetFSCmSignal8());
@@ -287,28 +289,28 @@ bool uaplotter1::FillLastEvent(const short unsigned int cut){
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 void uaplotter1::PrintEventInfo(const bool detailed)
-{	
-  std::cout << "\n\n" << current_event 
-	    << "\t=====================================================\n";
-  if(mc>0)
+{
+  std::cout << "\n\n" << current_event
+            << "\t=====================================================\n";
+  if (mc > 0)
     CMSmc->PrintEventInfo(detailed);
   CMSevtinfo->PrintEventInfo(detailed);
   CMStracking->PrintEventInfo(detailed);
   CMSpf->PrintEventInfo(detailed);
   CMScalo->PrintEventInfo(detailed);
-  if(tree_digi_flag)
+  if (tree_digi_flag)
     CMSforward->PrintEventInfo(detailed);
   CMScastor->PrintEventInfo(detailed);
-  if(mc==0 && tree_combined_flag)
-    std::cout << "T2 info : T2-: " << T2->NPrimtracksMinus() <<  "(" << T2->NtracksMinus() 
-	      << ");\tT2+: " << T2->NPrimtracksPlus() << "(" << T2->NtracksPlus() << ")\n";
-  if(tree_combined_flag){
+  if (mc == 0 && tree_combined_flag)
+    std::cout << "T2 info : T2-: " << T2->NPrimtracksMinus() <<  "(" << T2->NtracksMinus()
+              << ");\tT2+: " << T2->NPrimtracksPlus() << "(" << T2->NtracksPlus() << ")\n";
+  if (tree_combined_flag) {
     RP->PrintEventInfo(detailed);
   };
   PrintRapGap();
-  if( sd_flag_total[0]!=0 && (sd_flag_total[0]==1 || sd_flag_total[0]==-1) ){
+  if (sd_flag_total[0] != 0 && (sd_flag_total[0] == 1 || sd_flag_total[0] == -1)) {
     PrintSDdiffMass(detailed);
-    if(mc>0)
+    if (mc > 0)
       CMSmc->PrintProtonInfo();
   };
 }
@@ -322,7 +324,7 @@ void uaplotter1::create_histos()
   n_each_h1D = n_cuts;
   TString title1, title2;
 
-  if(mc>0){//******************************************************************************************
+  if (mc > 0) { //******************************************************************************************
     diff_flag_mc_full_reco_central_h  = new TH2F * [n_each_h2D];
     diff_flag_mc_full_reco_full_h     = new TH2F * [n_each_h2D];
     diff_flag_mc_total_mc_central_h   = new TH2F * [n_each_h2D];
@@ -331,70 +333,70 @@ void uaplotter1::create_histos()
     n_sd_plus_bins_mc_reco_h          = new TH2F * [n_each_h2D];
 
     xi_mc_p_mc_total_h     = new TH2F * [n_each_h2D];
-    xi_mc_p_reco_full_h    = new TH2F * [n_each_h2D]; 
+    xi_mc_p_reco_full_h    = new TH2F * [n_each_h2D];
     xi_mc_total_mc_full_h  = new TH2F * [n_each_h2D];
-    xi_mc_total_reco_full_h= new TH2F * [n_each_h2D]; 
+    xi_mc_total_reco_full_h = new TH2F * [n_each_h2D];
 
     xi_calo_mc_reco_h      = new TH2F * [n_each_h2D];
     xi_pf_mc_reco_h        = new TH2F * [n_each_h2D];
     xi_cas_mc_reco_h       = new TH2F * [n_each_h2D];
-    xi_zdc_mc_reco_h       = new TH2F * [n_each_h2D]; 
+    xi_zdc_mc_reco_h       = new TH2F * [n_each_h2D];
 
-    for(unsigned int i=0; i<n_each_h2D; i++){
-      title1 = "diff_flag_mc_full_reco_central_h["; title1+=i; title1+="]";
-      title2 = title1; title2+=" ; diff_flag_full_MCtruth; diff_flag_central_RECO";
+    for (unsigned int i = 0; i < n_each_h2D; i++) {
+      title1 = "diff_flag_mc_full_reco_central_h["; title1 += i; title1 += "]";
+      title2 = title1; title2 += " ; diff_flag_full_MCtruth; diff_flag_central_RECO";
       diff_flag_mc_full_reco_central_h[i] = new TH2F(title1.Data(), title2.Data(), 8, -2.5, 5.5, 8, -2.5, 5.5);
 
-      title1 = "diff_flag_mc_full_reco_full_h["; title1+=i; title1+="]";
-      title2 = title1; title2+=" ; diff_flag_full_MCtruth; diff_flag_full_RECO";
+      title1 = "diff_flag_mc_full_reco_full_h["; title1 += i; title1 += "]";
+      title2 = title1; title2 += " ; diff_flag_full_MCtruth; diff_flag_full_RECO";
       diff_flag_mc_full_reco_full_h[i] = new TH2F(title1.Data(), title2.Data(), 8, -2.5, 5.5, 8, -2.5, 5.5);
 
-      title1 = "diff_flag_mc_total_mc_central_h["; title1+=i; title1+="]";
-      title2 = title1; title2+=" ; diff_flag_total_MCtruth; diff_flag_central_MCtruth";
+      title1 = "diff_flag_mc_total_mc_central_h["; title1 += i; title1 += "]";
+      title2 = title1; title2 += " ; diff_flag_total_MCtruth; diff_flag_central_MCtruth";
       diff_flag_mc_total_mc_central_h[i] = new TH2F(title1.Data(), title2.Data(), 8, -2.5, 5.5, 8, -2.5, 5.5);
 
-      title1 = "diff_flag_mc_full_mc_central_h["; title1+=i; title1+="]";
-      title2 = title1; title2+=" ; diff_flag_full_MCtruth; diff_flag_central_MCtruth";
+      title1 = "diff_flag_mc_full_mc_central_h["; title1 += i; title1 += "]";
+      title2 = title1; title2 += " ; diff_flag_full_MCtruth; diff_flag_central_MCtruth";
       diff_flag_mc_full_mc_central_h[i] = new TH2F(title1.Data(), title2.Data(), 8, -2.5, 5.5, 8, -2.5, 5.5);
 
-      title1 = "n_sd_minus_bins_mc_reco_h["; title1+=i; title1+="]";
-      title2 = title1; title2+=" ; MCtruth sd- bins; RECO sd- bins";
+      title1 = "n_sd_minus_bins_mc_reco_h["; title1 += i; title1 += "]";
+      title2 = title1; title2 += " ; MCtruth sd- bins; RECO sd- bins";
       n_sd_minus_bins_mc_reco_h[i] = new TH2F(title1.Data(), title2.Data(), 30, -1, 29, 30, -1, 29);
 
-      title1 = "n_sd_plus_bins_mc_reco_h["; title1+=i; title1+="]";
-      title2 = title1; title2+=" ; MCtruth sd+ bins; RECO sd+ bins";
+      title1 = "n_sd_plus_bins_mc_reco_h["; title1 += i; title1 += "]";
+      title2 = title1; title2 += " ; MCtruth sd+ bins; RECO sd+ bins";
       n_sd_plus_bins_mc_reco_h[i] = new TH2F(title1.Data(), title2.Data(), 30, -1, 29, 30, -1, 29);
 
-      title1 = "xi_mc_p_mc_total_h["; title1+=i; title1+="]";
-      title2 = title1; title2+=" ; #xi_{p}; #xi_{MCtruth_total}";
+      title1 = "xi_mc_p_mc_total_h["; title1 += i; title1 += "]";
+      title2 = title1; title2 += " ; #xi_{p}; #xi_{MCtruth_total}";
       xi_mc_p_mc_total_h[i] = new TH2F(title1.Data(), title2.Data(), 200, -9., 1., 200, -9., 1.);
 
-      title1 = "xi_mc_p_reco_full_h["; title1+=i; title1+="]";
-      title2 = title1; title2+=" ; #xi_{p}; #xi_{RECO_full}";
+      title1 = "xi_mc_p_reco_full_h["; title1 += i; title1 += "]";
+      title2 = title1; title2 += " ; #xi_{p}; #xi_{RECO_full}";
       xi_mc_p_reco_full_h[i] = new TH2F(title1.Data(), title2.Data(), 200, -9., 1., 200, -9., 1.);
 
-      title1 = "xi_mc_total_mc_full_h["; title1+=i; title1+="]";
-      title2 = title1; title2+=" ; #xi_{MCtruth_total}; #xi_{MCtruth_full}";
+      title1 = "xi_mc_total_mc_full_h["; title1 += i; title1 += "]";
+      title2 = title1; title2 += " ; #xi_{MCtruth_total}; #xi_{MCtruth_full}";
       xi_mc_total_mc_full_h[i] = new TH2F(title1.Data(), title2.Data(), 200, -9., 1., 200, -9., 1.);
 
-      title1 = "xi_mc_total_reco_full_h["; title1+=i; title1+="]";
-      title2 = title1; title2+=" ; #xi_{MCtruth_total}; #xi_{RECO_full}";
+      title1 = "xi_mc_total_reco_full_h["; title1 += i; title1 += "]";
+      title2 = title1; title2 += " ; #xi_{MCtruth_total}; #xi_{RECO_full}";
       xi_mc_total_reco_full_h[i] = new TH2F(title1.Data(), title2.Data(), 200, -9., 1., 200, -9., 1.);
 
-      title1 = "xi_calo_mc_reco_h["; title1+=i; title1+="]";
-      title2 = title1; title2+="; MCtruth; RECO";
+      title1 = "xi_calo_mc_reco_h["; title1 += i; title1 += "]";
+      title2 = title1; title2 += "; MCtruth; RECO";
       xi_calo_mc_reco_h[i] = new TH2F(title1.Data(), title2.Data(), 200, -9., 1., 200, -9., 1.);
 
-      title1 = "xi_pf_mc_reco_h["; title1+=i; title1+="]";
-      title2 = title1; title2+="; MCtruth; RECO";
+      title1 = "xi_pf_mc_reco_h["; title1 += i; title1 += "]";
+      title2 = title1; title2 += "; MCtruth; RECO";
       xi_pf_mc_reco_h[i] = new TH2F(title1.Data(), title2.Data(), 200, -9., 1., 200, -9., 1.);
 
-      title1 = "xi_cas_mc_reco_h["; title1+=i; title1+="]";
-      title2 = title1; title2+="; MCtruth; RECO";
+      title1 = "xi_cas_mc_reco_h["; title1 += i; title1 += "]";
+      title2 = title1; title2 += "; MCtruth; RECO";
       xi_cas_mc_reco_h[i] = new TH2F(title1.Data(), title2.Data(), 200, -9., 1., 200, -9., 1.);
 
-      title1 = "xi_zdc_mc_reco_h["; title1+=i; title1+="]";
-      title2 = title1; title2+="; MCtruth; RECO";
+      title1 = "xi_zdc_mc_reco_h["; title1 += i; title1 += "]";
+      title2 = title1; title2 += "; MCtruth; RECO";
       xi_zdc_mc_reco_h[i] = new TH2F(title1.Data(), title2.Data(), 200, -9., 1., 200, -9., 1.);
 
     };
@@ -404,7 +406,7 @@ void uaplotter1::create_histos()
     h2D->push_back(diff_flag_mc_full_mc_central_h);
     h2D->push_back(diff_flag_mc_total_mc_central_h);
     h2D->push_back(n_sd_minus_bins_mc_reco_h);
-    h2D->push_back(n_sd_plus_bins_mc_reco_h);    
+    h2D->push_back(n_sd_plus_bins_mc_reco_h);
     h2D->push_back(xi_mc_p_mc_total_h);
     h2D->push_back(xi_mc_p_reco_full_h);
     h2D->push_back(xi_mc_total_mc_full_h);
@@ -412,7 +414,7 @@ void uaplotter1::create_histos()
     h2D->push_back(xi_calo_mc_reco_h);
     h2D->push_back(xi_pf_mc_reco_h);
     h2D->push_back(xi_cas_mc_reco_h);
-    h2D->push_back(xi_zdc_mc_reco_h);    
+    h2D->push_back(xi_zdc_mc_reco_h);
   }; // end if mc *******************************************************************
 
 
@@ -424,48 +426,48 @@ void uaplotter1::create_histos()
   ZDCp_vs_xiRP_h      = new TH2F * [n_each_h2D];
   FSCmSi8_vs_xiRP_h   = new TH2F * [n_each_h2D];
   FSCmN_vs_xiRP_h     = new TH2F * [n_each_h2D];
-  FSCmN_vs_castor_h     = new TH2F * [n_each_h2D]; 
+  FSCmN_vs_castor_h     = new TH2F * [n_each_h2D];
 
-  for(unsigned int i=0; i<n_each_h2D; i++){
-    title1 = "xi_p_reco_full_h["; title1+=i; title1+="]";
-    title2 = title1; title2+=" ;#xi_{p}; #xi_{RECO_full}";
-    xi_p_reco_full_h[i]    = new TH2F(title1.Data(), title2.Data(), 2200, -1.1, 1.1, 2200, -1.1, 1.1); 
+  for (unsigned int i = 0; i < n_each_h2D; i++) {
+    title1 = "xi_p_reco_full_h["; title1 += i; title1 += "]";
+    title2 = title1; title2 += " ;#xi_{p}; #xi_{RECO_full}";
+    xi_p_reco_full_h[i]    = new TH2F(title1.Data(), title2.Data(), 2200, -1.1, 1.1, 2200, -1.1, 1.1);
 
-    title1 = "zdcM_vs_castor_h["; title1+=i; title1+="]";
-    title2 = title1; title2+=";CASTOR E [GeV]; ZDC- E [a.u.]";
-    zdcM_vs_castor_h[i] = new TH2F(title1.Data(), title2.Data(), 6500, -500,6000, 4200, -2000, 40000);
+    title1 = "zdcM_vs_castor_h["; title1 += i; title1 += "]";
+    title2 = title1; title2 += ";CASTOR E [GeV]; ZDC- E [a.u.]";
+    zdcM_vs_castor_h[i] = new TH2F(title1.Data(), title2.Data(), 6500, -500, 6000, 4200, -2000, 40000);
 
-    title1 = "zdcM_vs_T2primM_h["; title1+=i; title1+="]";
-    title2 = title1; title2+=";N_{tr}(T2-); ZDC- E [a.u.]";
+    title1 = "zdcM_vs_T2primM_h["; title1 += i; title1 += "]";
+    title2 = title1; title2 += ";N_{tr}(T2-); ZDC- E [a.u.]";
     zdcM_vs_T2primM_h[i] = new TH2F(title1.Data(), title2.Data(), 110, -10., 100., 4200, -2000, 40000);
 
-    title1 = "ZDCm_vs_xiRP_h["; title1+=i; title1+="]";
-    title2 = title1; title2+=";#xi_{p}; ZDC- E [a.u.]";
+    title1 = "ZDCm_vs_xiRP_h["; title1 += i; title1 += "]";
+    title2 = title1; title2 += ";#xi_{p}; ZDC- E [a.u.]";
     ZDCm_vs_xiRP_h[i] = new TH2F(title1.Data(), title2.Data(), 2200, -1.1, 1.1, 420, -2000, 40000);
 
-    title1 = "ZDCp_vs_xiRP_h["; title1+=i; title1+="]";
-    title2 = title1; title2+=";#xi_{p}; ZDC+ E [a.u.]";
+    title1 = "ZDCp_vs_xiRP_h["; title1 += i; title1 += "]";
+    title2 = title1; title2 += ";#xi_{p}; ZDC+ E [a.u.]";
     ZDCp_vs_xiRP_h[i] = new TH2F(title1.Data(), title2.Data(), 2200, -1.1, 1.1, 420, -20000, 400000);
 
-    title1 = "FSCmSi8_vs_xiRP_h["; title1+=i; title1+="]";
-    title2 = title1; title2+=";#xi_{p};q6(FSC-) [fC]";
+    title1 = "FSCmSi8_vs_xiRP_h["; title1 += i; title1 += "]";
+    title2 = title1; title2 += ";#xi_{p};q6(FSC-) [fC]";
     FSCmSi8_vs_xiRP_h[i] = new TH2F(title1.Data(), title2.Data(), 2200, -1.1, 1.1, 200, -3000, 197000);
 
-    title1 = "FSCmN_vs_xiRP_h["; title1+=i; title1+="]";
-    title2 = title1; title2+=";#xi_{p};number of FSC channels";
-    FSCmN_vs_xiRP_h[i] = new TH2F(title1.Data(), title2.Data(),2200, -1.1, 1.1,  10, -1, 9);
+    title1 = "FSCmN_vs_xiRP_h["; title1 += i; title1 += "]";
+    title2 = title1; title2 += ";#xi_{p};number of FSC channels";
+    FSCmN_vs_xiRP_h[i] = new TH2F(title1.Data(), title2.Data(), 2200, -1.1, 1.1,  10, -1, 9);
 
-    title1 = "FSCmN_vs_castor_h["; title1+=i; title1+="]";
-    title2 = title1; title2+=";CASTOR E [GeV];;number of FSC channels";
-    FSCmN_vs_castor_h[i] = new TH2F(title1.Data(), title2.Data(), 6500, -500,6000, 10, -1, 9);    
+    title1 = "FSCmN_vs_castor_h["; title1 += i; title1 += "]";
+    title2 = title1; title2 += ";CASTOR E [GeV];;number of FSC channels";
+    FSCmN_vs_castor_h[i] = new TH2F(title1.Data(), title2.Data(), 6500, -500, 6000, 10, -1, 9);
   };
   h2D->push_back(xi_p_reco_full_h);
   h2D->push_back(zdcM_vs_castor_h);
   h2D->push_back(zdcM_vs_T2primM_h);
-  h2D->push_back(ZDCm_vs_xiRP_h   );
-  h2D->push_back(ZDCp_vs_xiRP_h   );
+  h2D->push_back(ZDCm_vs_xiRP_h);
+  h2D->push_back(ZDCp_vs_xiRP_h);
   h2D->push_back(FSCmSi8_vs_xiRP_h);
-  h2D->push_back(FSCmN_vs_xiRP_h  );
+  h2D->push_back(FSCmN_vs_xiRP_h);
   h2D->push_back(FSCmN_vs_castor_h);
 
   n_sd_minus_bins_h         = new TH1F * [n_each_h1D];
@@ -473,25 +475,25 @@ void uaplotter1::create_histos()
   central_activity_h        = new TH1F * [n_each_h1D];
   central_activity_mc_h     = new TH1F * [n_each_h1D];
   xi_reco_full_h            = new TH1F * [n_each_h1D];
-  for(unsigned int i=0; i<n_each_h1D; i++){
-    title1 = "n_sd_minus_bins_h["; title1+=i; title1+="]";
-    title2 = title1; title2+=" ; n_sd_minus_bins";
+  for (unsigned int i = 0; i < n_each_h1D; i++) {
+    title1 = "n_sd_minus_bins_h["; title1 += i; title1 += "]";
+    title2 = title1; title2 += " ; n_sd_minus_bins";
     n_sd_minus_bins_h[i] = new TH1F(title1.Data(), title2.Data(), 30, -1, 29);
 
-    title1 = "n_sd_plus_bins_h["; title1+=i; title1+="]";
-    title2 = title1; title2+=" ; n_sd_plus_bins";
+    title1 = "n_sd_plus_bins_h["; title1 += i; title1 += "]";
+    title2 = title1; title2 += " ; n_sd_plus_bins";
     n_sd_plus_bins_h[i] = new TH1F(title1.Data(), title2.Data(), 30, -1, 29);
 
-    title1 = "central_activity_h["; title1+=i; title1+="]";
-    title2 = title1; title2+=" ; #eta";
+    title1 = "central_activity_h["; title1 += i; title1 += "]";
+    title2 = title1; title2 += " ; #eta";
     central_activity_h[i] = new TH1F(title1.Data(), title2.Data(), 28, -7, 7);
 
-    title1 = "central_activity_mc_h["; title1+=i; title1+="]";
-    title2 = title1; title2+=" ; #eta";
+    title1 = "central_activity_mc_h["; title1 += i; title1 += "]";
+    title2 = title1; title2 += " ; #eta";
     central_activity_mc_h[i] = new TH1F(title1.Data(), title2.Data(), 28, -7, 7);
 
-    title1 = "xi_reco_full_h["; title1+=i; title1+="]";
-    title2 = title1; title2+="#xi_{RECO_full}";
+    title1 = "xi_reco_full_h["; title1 += i; title1 += "]";
+    title2 = title1; title2 += "#xi_{RECO_full}";
     xi_reco_full_h[i] = new TH1F(title1.Data(), title2.Data(), 100, -7, 0);
   };
   h1D->push_back(n_sd_minus_bins_h);
