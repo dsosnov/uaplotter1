@@ -2,7 +2,7 @@ SRC=src
 OBJ=lib
 CMS=../UATree/UADataFormat
 TOT=../TOTEMdataFormat
-CXXFLAGS+=$(shell root-config --cflags) -Wall -I../ -I$(SRC) -I$(CMS)/interface -I$(TOT)/src -ggdb3 -fPIC
+CXXFLAGS+=$(shell root-config --cflags) -Wall -I../ -I$(SRC) -I$(CMS)/interface -I$(TOT)/src -ggdb3 -fPIC -std=gnu++14
 LDFLAGS+=$(shell root-config --glibs)  -ggdb3 
 LINKD=uaplot_LinkDef.h
 HEAD=$(filter-out $(SRC)/$(LINKD) $(SRC)/uaplot_dict.h, $(wildcard $(SRC)/*.h))
@@ -10,6 +10,7 @@ CODE=$(wildcard $(SRC)/ua*.cc)
 OBJS=$(subst $(SRC),$(OBJ),$(CODE:.cc=.o))
 
 all: $(OBJ) $(OBJ)/libuaplotter.so $(CMS)/lib/libUADataFormat.so $(TOT)/lib/libTOTEMdataFormat.so docs
+necessary: $(OBJ) $(OBJ)/libuaplotter.so
 
 $(OBJ)/libuaplotter.so: $(OBJS) $(OBJ)/uaplot_dict.o 
 	$(CXX) -shared -o $@ $^ $(LDFLAGS) #order important for Ubuntu 
