@@ -20,8 +20,6 @@ const float T2_ABSETA_MIN = 5.3;
 const float T2_ABSETA_MAX = 6.5;
 const float T2_PT_THR     = 0.04;
 
-const unsigned int N_ETA_BINS = 26;
-
 const float CENT_TOWER_THR = 2.0;   // energy in GeV
 const float HF_TOWER_THR   = 5.0;   // energy in GeV
 const float ZDC_PXY_THR    = 0.495;   // hernja!!!
@@ -34,11 +32,15 @@ const float CENT_ETA_ACC   = 2.0;   // eta
 
 const float CALO_ETA_ACC   = 5;   // eta *was 5
 
-const float ETA_BIN_L[N_ETA_BINS] = {-6.5, -6, -5.5, -5, -4.5, -4, -3.5, -3, -2.5, -2, -1.5, -1, -0.5, 0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6};
-const int BINMIN = 3;
-const int BINMAX = 22;
 const float ETA_BIN_W = 0.5;
 const float ETA_MAX   = 6.5;//CALO_ETA_ACC;//ETA_BIN_L[N_ETA_BINS-1]+ETA_BIN_W;
+
+const unsigned int N_ETA_BINS = ETA_MAX * 2 / ETA_BIN_W /*26*/;
+const float ETA_BIN_L[N_ETA_BINS] = {-6.5, -6, -5.5, -5, -4.5, -4, -3.5, -3, -2.5, -2, -1.5, -1, -0.5, 0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6};
+
+const int BINMIN = 3;  /* (ETA_MAX - CALO_ETA_ACC) / ETA_BIN_W / */
+const int BINMAX = 22; /* (ETA_MAX + CALO_ETA_ACC) / ETA_BIN_W - 1 */
+
 // for range [-5,5]
 //const float THR_CALO[N_ETA_BINS]  = {   0., 0.,   0., 3.,   4.,  4.,  4.,  13., 10., 12., 15., 9., 9., 9.,  9., 14.,12., 9.,12.,4.,5., 5., 4., 0., 0., 0.};    
 //new
