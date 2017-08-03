@@ -58,113 +58,113 @@ int uaplotter1::Loop(const int evts, const int trigger)
 
     if (ProceedTrigger(trigger_bit, tech_bit)) {
       trigger_evts++;
-      
-      if( !CMSevtinfo->GetL1Bit(9)){ //<=== !bptx quiet 
-	bptx_active++;
-	CMStracking->ProceedEvent(dummy_cut, false, false);
-	if(CMStracking->NverticesGood()<2){
-	  vtx_cut++;
-	 
-	  // <==================================== T2 check
-	  bool t2prim = false;
-	  if(mc>0){
-	    if( tech_bit && (trigger_bit==53) ){
-	      t2prim = true; // we already checked in the ProceedTrigger; for MC it is the same!
-	    }else{
-	      t2prim = ProceedTrigger(53, true); 
-	    };
-	  }else if(tree_combined_flag && (mc==0)){
-	    T2->ProceedEvent(dummy_cut, false, false);
-	    t2prim = ( (T2->NPrimtracksMinus()>0) || (T2->NPrimtracksPlus()>0) );
-	  };
-	  if(t2prim) t2prim_evts++;
-	  // <=====================================
-	  
-	  
-	  ProceedEvent(0, false, false);
-	  if(tree_digi_flag && CMSforward->FSCvalid())
-	    goodFSC++;
-	  
-	  FillLastEvent(0); // -------------------------------->  all triggered events
-	    
-	  if(ppb){
-	    if(RP->Valid()){
-	      PrintEventInfo(true);
-	      T2->PrintAllTracks();
-	      //RP->PrintEventInfo(true);
-	      //CMSforward->PrintEventInfo(true);
-	    };
-	  };
 
-	  
-	  bool proper_proton = false;
-	  if(mc>0){
-	    proper_proton = ( (CMSmc->IntactProton()!=0) && ( (CMSmc->IntactProton()==-1) == ppb ) );
-	    if(proper_proton){   
-	      FillLastEvent(1); // ---------------------------> all events with proton in proper direction
-	      if(CMSmc->IntactProtonE()>3950){
-		FillLastEvent(2); //--------------------------> energetic protons
-		PrintEventInfo();
-	      };
-	    }; // end proper_proton
-	  }else if (mc==0){
-	    // Near and Far are of the same sign
-	    proper_proton = ( (RP->Valid()) && ( (RP->trackValidUp()) || (RP->trackValidDn()) ) );
-	    if(proper_proton){
-	      FillLastEvent(2);
-	    };
-	  };
-	  
-	  
-	  if(sd_flag_total[0]==4){ // elastic candidate
-	    CalculateSDdiffMass(false);
-	    FillLastEvent(3); // -----------------------------> elastic
-	  };
-	  
-	  if(sd_flag_total[0]==0){ // ND
-	      FillLastEvent(17); //---------------------------> ND
-	  };
-	  
-	  if(sd_flag_total[0]==-1){
-	    CalculateSDdiffMass(false);
-	    FillLastEvent(4); // -----------------------------> all SD- events "4"
-	    
-	    /*
-	    if(proper_proton){
-	      PrintEventInfo(true);
-	      //CMSmc->ProceedEvent(dummy_cut, false, true);
-	    };*/
-	    sd_minus++;
-	    for(short unsigned int ii=0; ii<11; ii++){ // RG: [0,1)="5", [1,2)="6", ..., [10,11)="15"
-	      short unsigned int cut   = 5+ii;
-	      short unsigned int rgbin = 2*ii;     
-	      if( (n_sd_minus_bins[0]>=rgbin) && (n_sd_minus_bins[0]<(rgbin+2)) ){
-		FillLastEvent(cut);
-		sd_minus_eta[ii]++;
-	      };
-	    };
-	  }else if (sd_flag_total[0]==1){//-------------------> all SD+ events "19"
-	    CalculateSDdiffMass(false);
-	    FillLastEvent(19);
-	    
-	    /*
-	    if(proper_proton){
-	      PrintEventInfo(true);
-	      CalculateSDdiffMass(true);
-	      //CMSmc->ProceedEvent(dummy_cut, false, true);
-	    };*/
-	    sd_plus++;
-	    for(short unsigned int ii=0; ii<11; ii++){// RG: [0,1)="20", [1,2)="21", ..., [10,11)="30"
-	      short unsigned int cut   = 20+ii;
-	      short unsigned int rgbin = 2*ii;
-	      if( (n_sd_plus_bins[0]>=rgbin) && (n_sd_plus_bins[0]<(rgbin+2)) ){
-		FillLastEvent(cut);
-		sd_plus_eta[ii]++;
-	      };
-	    };
-	  }; // end SD cases
-	  
-	}; // end vertices<2
+      if (!CMSevtinfo->GetL1Bit(9)) { //<=== !bptx quiet
+        bptx_active++;
+        CMStracking->ProceedEvent(dummy_cut, false, false);
+        if (CMStracking->NverticesGood() < 2) {
+          vtx_cut++;
+
+          // <==================================== T2 check
+          bool t2prim = false;
+          if (mc > 0) {
+            if (tech_bit && (trigger_bit == 53)) {
+              t2prim = true; // we already checked in the ProceedTrigger; for MC it is the same!
+            } else {
+              t2prim = ProceedTrigger(53, true);
+            };
+          } else if (tree_combined_flag && (mc == 0)) {
+            T2->ProceedEvent(dummy_cut, false, false);
+            t2prim = ((T2->NPrimtracksMinus() > 0) || (T2->NPrimtracksPlus() > 0));
+          };
+          if (t2prim) t2prim_evts++;
+          // <=====================================
+
+
+          ProceedEvent(0, false, false);
+          if (tree_digi_flag && CMSforward->FSCvalid())
+            goodFSC++;
+
+          FillLastEvent(0); // -------------------------------->  all triggered events
+
+          if (ppb) {
+            if (RP->Valid()) {
+              PrintEventInfo(true);
+              T2->PrintAllTracks();
+              //RP->PrintEventInfo(true);
+              //CMSforward->PrintEventInfo(true);
+            };
+          };
+
+
+          bool proper_proton = false;
+          if (mc > 0) {
+            proper_proton = ((CMSmc->IntactProton() != 0) && ((CMSmc->IntactProton() == -1) == ppb));
+            if (proper_proton) {
+              FillLastEvent(1); // ---------------------------> all events with proton in proper direction
+              if (CMSmc->IntactProtonE() > 3950) {
+                FillLastEvent(2); //--------------------------> energetic protons
+                PrintEventInfo();
+              };
+            }; // end proper_proton
+          } else if (mc == 0) {
+            // Near and Far are of the same sign
+            proper_proton = ((RP->Valid()) && ((RP->trackValidUp()) || (RP->trackValidDn())));
+            if (proper_proton) {
+              FillLastEvent(2);
+            };
+          };
+
+
+          if (sd_flag_total[0] == 4) { // elastic candidate
+            CalculateSDdiffMass(false);
+            FillLastEvent(3); // -----------------------------> elastic
+          };
+
+          if (sd_flag_total[0] == 0) { // ND
+            FillLastEvent(17); //---------------------------> ND
+          };
+
+          if (sd_flag_total[0] == -1) {
+            CalculateSDdiffMass(false);
+            FillLastEvent(4); // -----------------------------> all SD- events "4"
+
+            /*
+            if(proper_proton){
+              PrintEventInfo(true);
+              //CMSmc->ProceedEvent(dummy_cut, false, true);
+            };*/
+            sd_minus++;
+            for (short unsigned int ii = 0; ii < 11; ii++) { // RG: [0,1)="5", [1,2)="6", ..., [10,11)="15"
+              short unsigned int cut   = 5 + ii;
+              short unsigned int rgbin = 2 * ii;
+              if ((n_sd_minus_bins[0] >= rgbin) && (n_sd_minus_bins[0] < (rgbin + 2))) {
+                FillLastEvent(cut);
+                sd_minus_eta[ii]++;
+              };
+            };
+          } else if (sd_flag_total[0] == 1) { //-------------------> all SD+ events "19"
+            CalculateSDdiffMass(false);
+            FillLastEvent(19);
+
+            /*
+            if(proper_proton){
+              PrintEventInfo(true);
+              CalculateSDdiffMass(true);
+              //CMSmc->ProceedEvent(dummy_cut, false, true);
+            };*/
+            sd_plus++;
+            for (short unsigned int ii = 0; ii < 11; ii++) { // RG: [0,1)="20", [1,2)="21", ..., [10,11)="30"
+              short unsigned int cut   = 20 + ii;
+              short unsigned int rgbin = 2 * ii;
+              if ((n_sd_plus_bins[0] >= rgbin) && (n_sd_plus_bins[0] < (rgbin + 2))) {
+                FillLastEvent(cut);
+                sd_plus_eta[ii]++;
+              };
+            };
+          }; // end SD cases
+
+        }; // end vertices<2
       }; // end !bptx quiet
     }; // end trigger
 
