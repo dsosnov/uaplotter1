@@ -18,7 +18,7 @@ public:
 
 protected:
   const bool               tree_combined_flag;              //!< true - with totem, false cms only
-  const short int          mc;                              //!< \li -2 — Noise \li -1 — ? \li 0 — data, \li 1 — Hijing, \li 2 — EPOS
+  const short int          mc;                              //!< \li -3 — Noise for Run2 \li -2 — Noise \li -1 — ? \li 0 — data, \li 1 — Hijing, \li 2 — EPOS
   const short unsigned int n_cuts;                          //!< total numbers of cuts supposed
   short unsigned int       n_each_h1D;                      //!< number of 1D histos per one cut
   short unsigned int       n_each_h1Da;                     //!< number of 1D histos per one cut
