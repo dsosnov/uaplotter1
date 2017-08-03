@@ -26,7 +26,7 @@ public:
             );
   ~uaplotter1();
   int Loop(const int evts, const int trigger);
-  int noiseLoop(const int evts);
+  int noiseLoop(const int evts, bool bptxQuiet = true);
   int t2Loop(const int evts);
 
 private:
@@ -41,7 +41,7 @@ private:
   TString     initializeChain();
 
   uamc          *CMSmc;
-  uacmsevtinfo *CMSevtinfo;
+  uacmsevtinfo  *CMSevtinfo;
   uatracking    *CMStracking;
   uapf          *CMSpf;
   uacalo        *CMScalo;

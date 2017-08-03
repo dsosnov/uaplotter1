@@ -13,10 +13,11 @@
 //! noise studies on rnd trigger
 /*!
 \param evts number of events to be prodused
+\param bptxQuiet True if needed no bptx and false if bptxXor needed
 \return number of events of the quiet BPTX
 */
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-int uaplotter1::noiseLoop(const int evts)
+int uaplotter1::noiseLoop(const int evts,  bool bptxQuiet)
 {
   if (mc >= 0) {
     std::cout << "can't run noiseLoop on MC/data files...\n";
@@ -32,6 +33,8 @@ int uaplotter1::noiseLoop(const int evts)
   unsigned int rndHLT       = 0;
   unsigned int not53        = 0;
   unsigned int not53notBPTX = 0;
+  unsigned int bptxXor       = 0;
+  unsigned int *usedBptxVar = bptxQuiet ? &not53notBPTX : &bptxXor;
 
   unsigned int kevt = 0;
 
@@ -51,21 +54,24 @@ int uaplotter1::noiseLoop(const int evts)
     // THIS WILL BE VALID FOR NEW NOISE DATA ONLY! (mc=-2)
     //if(CMSevtinfo->CheckHLT("HLT_PARandom_v1")){ they are not set :(
     rndHLT++;
-    if(true /*!CMSevtinfo->GetTechBit(53)*/){
+    if (true /*!CMSevtinfo->GetTechBit(53)*/) {
       not53++;
-      if(CMSevtinfo->GetL1Bit(9)){
-	not53notBPTX++;
-	ProceedEvent(0, false, false);
-	FillLastEvent(0);
+      bool isQuiet = CMSevtinfo->GetL1Bit(9);
+      bool isXor = CMSevtinfo->GetL1Bit(1) ||  CMSevtinfo->GetL1Bit(2);
+      if ((bptxQuiet && isQuiet) || ( !bptxQuiet && isXor)){
+        (*usedBptxVar)++;
+        ProceedEvent(0, false, false);
+        FillLastEvent(0);
+//         PrintEventInfo(true);
       }
-    };
-    //};
-
-  }; // end loop
+    }
+  };                                                        // end loop
   std::cout << "total number of events         " << stat   << std::endl;
   std::cout << "worked over                    " << nevts  << std::endl;
   std::cout << "number of rndHLT events        " << rndHLT << std::endl;
   std::cout << "rndHLT without tt53            " << not53  << std::endl;
   std::cout << "rndHLT without tt53 and noBPTX " << not53notBPTX << std::endl;
-  return not53notBPTX;
+  std::cout << "BPTXXOr                        " << bptxXor << std::endl;
+  PrintEventInfo(true);
+  return *usedBptxVar;
 }
