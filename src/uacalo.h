@@ -41,6 +41,7 @@ private:
   bool   hf_trigger_tower[2];
 
   unsigned int calotowers[N_ETA_BINS];
+  double energyMax[N_ETA_BINS];
 
   void create_histos();
 
@@ -52,6 +53,7 @@ private:
 
   TH2F **hf_towers_vs_rechits_h;
   TH2F **calotower_e_eta_h;
+  TH2F **calotower_eMaxTower_eta_h;
 
   double EHF[2];
 

@@ -55,8 +55,10 @@ bool uacalo::FillLastEvent(const short unsigned int cut)
   hf_etotal_minus_h[cut]->Fill(hf_total_energy_tower[0]);
   hf_etotal_plus_h [cut]->Fill(hf_total_energy_tower[1]);
   for (unsigned int bin = 0; bin < N_ETA_BINS; bin++)
-    if ((bin >= BINMIN) && (bin <= BINMAX))
+    if ((bin >= BINMIN) && (bin <= BINMAX)) {
       calotower_e_eta_h[cut]->Fill(ETA_BIN_L[bin], energy[bin]);
+      calotower_eMaxTower_eta_h[cut]->Fill(ETA_BIN_L[bin], energyMax[bin]);
+     }
 
   double MaxHFtow[2] = {0, 0};
   for (short unsigned int side = 0; side < 2; side++)
@@ -92,6 +94,8 @@ void uacalo::PrintEventInfo(const bool detailed)
     }; std::cout << std::endl;
     std::cout <<  "Energies: ";
     for (auto i: energy) std::cout << i << " "; std::cout << std::endl;
+    std::cout <<  "Energies (max): ";
+    for (auto i: energyMax) std::cout << i << " "; std::cout << std::endl;
 
    }
 }
@@ -110,6 +114,7 @@ bool uacalo::ProceedEvent(const short unsigned int cut, const bool fill, const b
   memset(hf_trigger_tower,   false, sizeof(hf_trigger_tower));
   memset(calotowers,             0, sizeof(calotowers));
   PrepareArrays();                                          // cleans eta arrays
+  memset(energyMax, 0, sizeof(energyMax));
   
   for (std::vector<MyCaloTower>::iterator it = Towers->begin(); it != Towers->end(); ++it) {
     if ((*it).Pt() > 0) {
@@ -150,6 +155,7 @@ bool uacalo::ProceedEvent(const short unsigned int cut, const bool fill, const b
             hf_trigger_tower[ind] = true;
         };
       }; // end HF
+      if ((*it).energy() > energyMax[bin]) energyMax[bin] = (*it).energy();
      //___________________________________________________________________
     };
   };// end tower loop
@@ -184,8 +190,9 @@ void uacalo::create_histos()
   hf_etotal_plus_h  = new TH1F * [n_each_h1D];
   hf_max_towerE_minus_h = new TH1F * [n_each_h1D];
   hf_max_towerE_plus_h  = new TH1F * [n_each_h1D];
-  //hf_towers_vs_rechits_h = new TH2F * [n_each_h2D];
-  calotower_e_eta_h        = new TH2F * [n_each_h2D];
+  //hf_towers_vs_rechits_h     = new TH2F * [n_each_h2D];
+  calotower_e_eta_h          = new TH2F * [n_each_h2D];
+  calotower_eMaxTower_eta_h = new TH2F * [n_each_h2D];
 
   // rechits are not done yet
   for (unsigned int i = 0; i < n_cuts; i++) {
@@ -218,11 +225,17 @@ void uacalo::create_histos()
     title2 = title1; title2 += "; #eta; E_{towers}";
     calotower_e_eta_h[i] = new TH2F(title1.Data(), title2.Data(), 28, -7, 7, 21000, -100, 2000);
     calotower_e_eta_h[i]->SetDirectory(directory);
-   };
+
+    title1 = "calotower_eMaxTower_eta_h["; title1 += i; title1 += "]";
+    title2 = title1; title2 += "; #eta; E_{Tower}";
+    calotower_eMaxTower_eta_h[i] = new TH2F(title1.Data(), title2.Data(), 28, -7, 7, 21000, -100, 2000);
+    calotower_eMaxTower_eta_h[i]->SetDirectory(directory);
+  };
   h1D->push_back(hf_etotal_minus_h);
   h1D->push_back(hf_etotal_plus_h);
   h1D->push_back(hf_max_towerE_minus_h);
   h1D->push_back(hf_max_towerE_plus_h);
   //h2D->push_back(hf_towers_vs_rechits_h);
   h2D->push_back(calotower_e_eta_h);
+  h2D->push_back(calotower_eMaxTower_eta_h);
 }

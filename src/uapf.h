@@ -33,6 +33,15 @@ private:
   double energyHch[N_ETA_BINS];
   double energyEM0[N_ETA_BINS];
 
+  TH2F ** pf_eMaxTower_eta_h;
+  TH2F ** pf_eMaxTower_hch_h;
+  TH2F ** pf_eMaxTower_h0_h;
+  TH2F ** pf_eMaxTower_em0_h;
+  double energyMax[N_ETA_BINS];
+  double energyH0Max[N_ETA_BINS];
+  double energyHchMax[N_ETA_BINS];
+  double energyEM0Max[N_ETA_BINS];
+
   ClassDef(uapf,2);
 };
 
