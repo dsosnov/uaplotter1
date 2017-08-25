@@ -8,7 +8,7 @@
 #include "iostream"
 #include "stdlib.h"
 
-
+#define L1_Run2
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  //! translates the user input (XX - tech bits; 1YY - 100+L1 trigger)
@@ -24,9 +24,10 @@ int uaplotter1::DefineTrigger(int trigger_bit_common, bool &tech_bit){
     return RNDT;
 
   int trigger_bit = trigger_bit_common;
+#ifndef L1_Run2
   if(trigger_bit>64){
     tech_bit = false;
-    trigger_bit-=100;    
+    trigger_bit-=100;
   };
   if(trigger_bit<0 || trigger_bit>127) trigger_bit = -1;
 
@@ -40,6 +41,9 @@ int uaplotter1::DefineTrigger(int trigger_bit_common, bool &tech_bit){
   }else{
     std::cout << "...NOT FOUND, running on everything!\n";
   };
+#else
+  tech_bit = false;
+#endif
   return trigger_bit;
 }
 
