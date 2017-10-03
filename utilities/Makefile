@@ -1,11 +1,12 @@
-SRC=src
-OBJ=lib
-CMS=../UATree/UADataFormat
-TOT=../TOTEMdataFormat
-CXXFLAGS+=$(shell root-config --cflags) -Wall -I../ -I$(SRC) -I$(CMS)/interface -I$(TOT)/src -ggdb3 -fPIC -std=gnu++14
+SRC=../src
+OBJ=../lib
+INTERFACE=../interface
+CMS=../../UATree/UADataFormat
+TOT=../../TOTEMdataFormat
+CXXFLAGS+=$(shell root-config --cflags) -Wall -I$(SRC) -I$(INTERFACE) -I$(CMS)/interface -I$(TOT)/interface -ggdb3 -fPIC -std=gnu++14
 LDFLAGS+=$(shell root-config --glibs)  -ggdb3 
 LINKD=uaplot_LinkDef.h
-HEAD=$(filter-out $(SRC)/$(LINKD) $(SRC)/uaplot_dict.h, $(wildcard $(SRC)/*.h))
+HEAD=$(filter-out $(INTERFACE)/$(LINKD) $(INTERFACE)/uaplot_dict.h, $(wildcard $(INTERFACE)/*.h))
 CODE=$(wildcard $(SRC)/ua*.cc)
 OBJS=$(subst $(SRC),$(OBJ),$(CODE:.cc=.o))
 
@@ -14,7 +15,7 @@ necessary: $(OBJ) $(OBJ)/libuaplotter.so
 
 $(OBJ)/libuaplotter.so: $(OBJS) $(OBJ)/uaplot_dict.o 
 	$(CXX) -shared -o $@ $^ $(LDFLAGS) #order important for Ubuntu 
-	if [ ! -s $(OBJ)/uaplot_dict_rdict.pcm ] ; then ln -s ../$(SRC)/uaplot_dict_rdict.pcm $(OBJ)/ ; fi
+	if [ ! -s $(OBJ)/uaplot_dict_rdict.pcm ] ; then ln -s $(SRC)/uaplot_dict_rdict.pcm $(OBJ)/ ; fi
 #	@echo ""
 
 $(OBJ)/%.o: $(SRC)/%.cc $(HEAD)
@@ -23,7 +24,7 @@ $(OBJ)/%.o: $(SRC)/%.cc $(HEAD)
 
 $(SRC)/uaplot_dict.cc: $(HEAD)
 	@echo LD_LIBRARY_PATH: ${LD_LIBRARY_PATH}
-	cd $(SRC); rootcint -f uaplot_dict.cc -c -p -I../../ -I../$(CMS)/interface -I../$(TOT)/src -D_POSIX_C_SOURCE=200809L $(subst $(SRC)/,,$(HEAD)) $(LINKD)
+	cd $(SRC); rootcint -f uaplot_dict.cc -c -p -I$(INTERFACE) -I$(CMS)/interface -I$(TOT)/interface -D_POSIX_C_SOURCE=200809L $(subst $(SRC)/,,$(HEAD)) $(LINKD)
 #	@echo ""
 
 # $(LINKD).h:
@@ -52,4 +53,3 @@ $(CMS)/lib/libUADataFormat.so:
 
 $(TOT)/lib/libTOTEMdataFormat.so:
 	cd $(TOT)/utilities; $(MAKE)
-
