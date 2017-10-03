@@ -1,7 +1,11 @@
+// #include <string>
+void plotThreshold(std::string additionalText = "", std::string ifilename = "uaplot.root")
 {
+  // string additionalText=""; string ifilename = "uaplot.root";
+
   gStyle->SetOptFit(1);
   gStyle->SetOptStat(0);
-  TFile *f = TFile::Open("uaplot.root","r");
+  TFile *f = TFile::Open(ifilename.c_str(),"r");
   TH1F *hcal_h, *hf_p_h, *hf_m_h;
   TString hN;
   TCanvas *c1 = new TCanvas("c1", "c1", 800, 600);
@@ -16,8 +20,8 @@
       TString histoName=std::get<0>(t);
       std::string name = std::get<1>(t);
       hN = histoName; hN+=0; hN+="]";
-    TH2F *pf_e_eta_h = (TH2F*) f->Get(hN.Data());
-      pf_e_eta_h->SetTitle(name.c_str());
+      TH2F *pf_e_eta_h = (TH2F*) f->Get(hN.Data());
+      pf_e_eta_h->SetTitle((name+additionalText).c_str());
       c1->SetLogy(); c1->SetLogz();
       pf_e_eta_h->Draw("COLZ");
       c1->SaveAs(std::get<2>(t).c_str());
@@ -44,7 +48,7 @@
       for(auto i = 0; i<histoNames.size();++i){
         hN = histoNames.at(i); hN+=0; hN+="]";
         hs.at(i) = (TH2F*) f->Get(hN.Data());
-        hs.at(i)->SetTitle(names.at(i).Data());
+        hs.at(i)->SetTitle((names.at(i)+additionalText).Data());
         auto pad = c1->cd(i+1);
         pad->SetLogy(); pad->SetLogz();
         hs.at(i)->Draw("COLZ");
@@ -56,8 +60,8 @@
       histoNames.clear(); hs.clear();
     }
   }
+  const double PERCENT_OF_ENTRIES = 99.7 / 100.0;
   { //! For definition of thresholds
-    const double PERCENT_OF_ENTRIES = 99.7 / 100;
     std::vector<std::tuple<std::vector<TString>, std::vector<TString>, std::vector<int>, std::string, double>> histogramData = {
       std::make_tuple<std::vector<TString>, std::vector<TString>, std::vector<int>, std::string, double>(
     {"CMSpf/pf_e_eta_h", "CMScalo/calotower_e_eta_h"},
@@ -108,7 +112,7 @@
               // std::cout << "::4\n";
               threshold = projection->GetBinLowEdge(currentBin) + projection->GetBinWidth(currentBin);
             }
-            std::cout << "For histogram: " << h << ", bin: " << b << " threshold at " << threshold <<" [ " << sum << " at bin " << currentBin << "; "<< sumI <<" enevts at bin ]" << std::endl;
+            std::cout << "For histogram: " << h << ", bin: " << b << " threshold at " << threshold <<" [ " << sum << " at bin " << currentBin << "; "<< sumI <<" events at bin ]" << std::endl;
             // std::printf("For histogram: %s, bin: %i threshold at %f [ %f at bin %i]\n", h.Data(), b, threshold, sum, currentBin);
             // std::printf("{ %f = %f + %i * %f }\n", threshold, projection->GetBinLowEdge(1), currentBin, projection->GetBinWidth(currentBin));
             thresholds_current.push_back(threshold);
@@ -138,7 +142,7 @@
           thresholds.push_back(thresholds_current);
           thresholds_current.clear();
         }
-      }    
+      }
       { //! printing comparing CaloTowers and PF
         TCanvas *c3 = new TCanvas("c3", "c3", 800, 600);
         THStack *stack = new THStack("Comparing thresholds",
@@ -156,7 +160,7 @@
           for(int bin = 0; bin<nbins; ++bin) threshold_h->SetBinContent(bin+1, thresholds.at(i).at(bin));
           std::cout << "Thresholds for " << namesForHisto.at(i).Data() <<": ";
           for(int bin = 0; bin<nbins; ++bin) std::cout<< threshold_h->GetBinContent(bin+1) << " ";std::cout << std::endl;
-          threshold_h->SetName(namesForHisto.at(i).Data());
+          threshold_h->SetName((namesForHisto.at(i)+additionalText).Data());
           threshold_h->SetXTitle("#eta");
           threshold_h->SetYTitle("E_{thr} [GeV]");
           threshold_h->SetLineColor(colors.at(i));
@@ -164,11 +168,11 @@
           threshold_h->SetAxisRange(0, std::get<4>(t),"Y");
           // threshold_h->Draw("H SAME");
           stack->Add(threshold_h);
-          leg->AddEntry(threshold_h, namesForHisto.at(i).Data());
+          leg->AddEntry(threshold_h, (namesForHisto.at(i)+additionalText).Data());
           // TPaveText *pt = new TPaveText(.05,.1,.95,.8);
         }
-        auto name="Comparing thresholds from CaloTowers and ParticleFlow";
-        stack->SetTitle(name); c3->SetTitle(name); c3->SetName(name);
+        string name="Comparing thresholds from CaloTowers and ParticleFlow"; name+=additionalText;
+        stack->SetTitle(name.c_str()); c3->SetTitle(name.c_str()); c3->SetName(name.c_str());
         stack->Draw("nostack");
         stack->GetXaxis()->SetTitle("#eta");
         stack->GetYaxis()->SetTitle("E_{thr} [GeV]");
@@ -179,5 +183,51 @@
       }
     }
   }
+  { //! For caloTower threshold for plus and minus side 
+    std::vector<std::tuple<TString, std::string, std::string>> histogramData = {
+      std::make_tuple("CMScalo/hf_max_towerE_minus_h[", "Calo Towers threshold for HF minus side", "hf_max_towerE_minus_h.eps"),
+      std::make_tuple("CMScalo/hf_max_towerE_plus_h[", "Calo Towers threshold for HF plus side", "hf_max_towerE_plus_h.eps"),
+      std::make_tuple("CMScalo/hf_max_towerE_minus_2_h[", "Calo Towers threshold for HF minus side", "hf_max_towerE_minus_2_h.eps"),
+      std::make_tuple("CMScalo/hf_max_towerE_plus_2_h[", "Calo Towers threshold for HF plus side", "hf_max_towerE_plus_2_h.eps"),
+      std::make_tuple("CMScalo/hf_max_towerE_minus_2_ill_h[", "Calo Towers threshold for ill tower on HF minus side", "hf_max_towerE_minus_2_ill_h.eps"),
+      std::make_tuple("CMScalo/hf_max_towerE_plus_2_ill_h[", "Calo Towers threshold for ill tower on HF plus side", "hf_max_towerE_plus_2_ill_h.eps"),
+    };
+    for(auto t: histogramData){
+      TString histoName=std::get<0>(t);
+      hN = histoName; hN+=0; hN+="]";
+      std::string name = std::get<1>(t);
+      TCanvas *c4 = new TCanvas(name.c_str(), "", 800, 200); // Canvas for printing of projections by bin
+      c4->SetLogy(); c4->SetLogx();
+      TH1F *histo = (TH1F*) f->Get(hN.Data());
+      histo->SetTitle((name+additionalText).c_str());
+      int sumI = histo->Integral(1, histo->GetNbinsX());
+      double threshold; auto currentBin = 0;
+      double sum = 0;
+      if(sumI == 0){
+        threshold=0;
+      } else {
+        histo->Scale(1.0/sumI);
+        while ( sum < PERCENT_OF_ENTRIES ){
+          sum = histo->Integral(1, ++currentBin);
+        }
+        threshold = histo->GetBinLowEdge(currentBin) + histo->GetBinWidth(currentBin);
+      }
+      std::cout << "For histogram: " << name << " threshold at " << threshold <<" [ " << sum << " at bin " << currentBin << "; "<< sumI <<" events at bin ]" << std::endl;
+
+      histo->SetAxisRange(0.5, 1000);
+      histo->Draw("H");
+      if (sumI!=0) {
+        double widthArray[3] = {0.1,threshold,7000};
+        TH1F* th = new TH1F("","",2,widthArray); th->SetBinContent(1,1);
+        // th->SetFillColorAlpha(kYellow,.35);
+        th->SetFillColor(kYellow);
+        th->SetFillStyle(3002);
+        th->SetLineWidth(0);
+        th->Draw("SAME");
+      }
+      c4->SaveAs(std::get<2>(t).c_str());
+      c4->Clear();
+    }
+  }
   f->Close();
-};
+}
