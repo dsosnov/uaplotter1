@@ -119,6 +119,9 @@ private:
   TH2F **FSCmN_vs_xiRP_h;
   TH2F **FSCmN_vs_castor_h;
 
+  struct {double hfMinus, hfPlus; int processID; std::vector<bool> l1Triggers;} hf_by_processID;
+  TTree* hf_by_processID_t;
+
   ClassDef(uaplotter1, 2);
 };
 

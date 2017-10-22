@@ -86,6 +86,14 @@ uaplotter1::uaplotter1(const bool               cmstotem,
   std::cout << "here1\n";
   create_histos();
   std::cout << "here2\n";
+
+  if(mc>0){
+    hf_by_processID_t = new TTree("hf_by_processID","hf_by_processID");
+    hf_by_processID_t->Branch("hfMinus",    &(hf_by_processID.hfMinus));
+    hf_by_processID_t->Branch("hfPlus",     &(hf_by_processID.hfPlus));
+    hf_by_processID_t->Branch("processID",  &(hf_by_processID.processID));
+    hf_by_processID_t->Branch("l1Triggers", &(hf_by_processID.l1Triggers));
+  }
 }
 
 
@@ -115,6 +123,8 @@ uaplotter1::~uaplotter1()
     delete T2;
   if (tree_combined_flag || (mc > 0))
     delete RP;
+  if(mc > 0)
+    hf_by_processID_t->Delete();
 }
 
 
@@ -189,6 +199,14 @@ bool uaplotter1::ProceedEvent(const short unsigned int cut, const bool fill, con
       };
     };
   };
+
+  // ********** Short information about MC events ******************
+  if(mc>0&&cut==0){;
+    hf_by_processID.hfMinus = CMScalo->GetHFmax(0);
+    hf_by_processID.hfPlus = CMScalo->GetHFmax(1);
+    hf_by_processID.processID = CMSmc->GetProcessID();
+    hf_by_processID.l1Triggers = CMSevtinfo->GetL1AllBits();
+  }
 
   // ***********************************************************************
   if (info)
@@ -282,6 +300,12 @@ bool uaplotter1::FillLastEvent(const short unsigned int cut)
     FSCmSi8_vs_xiRP_h[cut]->Fill(RP->Xi(), CMSforward->GetFSCmSignal8());
     FSCmN_vs_xiRP_h[cut]->Fill(RP->Xi(), CMSforward->GetFSCmN());
   };
+
+  // ********** Short information about MC events ******************
+  if(mc>0&&cut==0){;
+    hf_by_processID_t->Fill();
+  }
+
   return ok;
 }
 
