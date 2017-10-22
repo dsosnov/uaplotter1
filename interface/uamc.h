@@ -42,6 +42,8 @@ public:
   double GetCastorE(){return castorE;};
   double GetCastorPz(){return castorPz;};
 
+  int GetProcessID(){ for(auto p: *MCthuth) if(p.processID) return p.processID; return 0; }
+
 private:
   const bool ppb;
 
