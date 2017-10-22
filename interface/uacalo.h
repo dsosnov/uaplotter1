@@ -21,23 +21,29 @@ public:
   bool FillLastEvent(const short unsigned int cut);
   void PrintEventInfo(const bool detailed = false);
   bool GetHFtowerTrig(bool plus) {return hf_trigger_tower[int(plus)];};
-  double GetHFmaxTower(short unsigned int etaBin)
+  double GetHFmaxTower(unsigned short etaBin)
   {
-    bool plus = (etaBin > 10);
-    short unsigned int indx = 10;
-    if (plus) {
-      indx = 22 - etaBin;
-    } else {
-      indx = etaBin - 3;
-    };
-    return hf_max_energy_tower[int(plus)][indx];
-  };
+    double eta = find_eta(etaBin);
+    short unsigned int indx = find_eta_bin(CALO_ETA_ACC) - find_eta_bin(fabs(eta));
+    short unsigned int side = int(eta>0);
+    return hf_max_energy_tower[side][indx];
+  }
+  double GetHFmax(unsigned short side){
+    double MaxHFtow = 0;
+    for (short unsigned int indx = 0; indx < nBinsHF; indx++) {
+      if (MaxHFtow < hf_max_energy_tower[side][indx])
+        MaxHFtow = hf_max_energy_tower[side][indx];
+    }
+    return MaxHFtow;
+  }
 private:
   std::vector<MyHFRecHit>     *HF;     //!< not implemented yet
   std::vector<MyCaloTower>    *Towers;
 
   double hf_total_energy_tower[2];
-  double hf_max_energy_tower[2][4];
+  uint nBinsHF = find_eta_bin(CALO_ETA_ACC) - find_eta_bin(HF_ETA_MIN) + 1;
+  double* hf_max_energy_tower[2];
+  double hf_max_energy_tower_ill[2];
   bool   hf_trigger_tower[2];
 
   unsigned int calotowers[N_ETA_BINS];
@@ -50,10 +56,16 @@ private:
 
   TH1F **hf_max_towerE_minus_h;
   TH1F **hf_max_towerE_plus_h;
+  TH1F **hf_max_towerE_minus_ill_h;                       // Ill at tower \eta=-37 [-4.363, -4.191], \phi=9 [-1.7453, -1.5708] [-M_PI+M_PI/18*8, -M_PI+M_PI/18*9]
+  TH1F **hf_max_towerE_plus_ill_h;                        // Ill at tower \eta=35  [3.839, 4.013],   \phi=6 [-2.2689, -2.0944] [-M_PI+M_PI/18*5, -M_PI+M_PI/18*6]
 
   TH2F **hf_towers_vs_rechits_h;
   TH2F **calotower_e_eta_h;
   TH2F **calotower_eMaxTower_eta_h;
+
+  TH2F **calotower_e_eta_phi_h;
+  TH2F **calotower_e_eta_phi_minus_h;
+  TH2F **calotower_e_eta_phi_plus_h;
 
   double EHF[2];
 
