@@ -7,6 +7,8 @@
 #include "iostream"
 #include "stdlib.h"
 
+#include <regex>
+
 ClassImp(uacmsevtinfo)
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -108,16 +110,29 @@ bool uacmsevtinfo::ProceedEvent(const short unsigned int cut, const bool fill, c
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-bool uacmsevtinfo::CheckHLT(const char *path)
+bool uacmsevtinfo::CheckHLT(const char *path, int compareType) // TODO check return value
 {
   bool on = false;
-  for (std::map<string, bool>::iterator hlt = CMSHLT->HLTmap.begin(); hlt != CMSHLT->HLTmap.end(); ++hlt) {
-    //std::cout << (*hlt).first << "\t" << (*hlt).second << std::endl;
-    std::size_t found = (*hlt).first.find(path);
-    if (found != std::string::npos) {
-      on =  !((*hlt).second);
-    };
-  };
+  for (auto hlt: CMSHLT->HLTmap) {
+    switch (compareType) {
+      case 0: {
+        if (hlt.first.find(path) != std::string::npos) on =  !hlt.second;
+        break;
+      }
+      case 1: {
+        if ( hlt.first.compare(path) == 0 ) on = hlt.second;
+        break;
+      }
+      case 2: {
+        if (regex_match(hlt.first,regex(path))) on = on || hlt.second;
+        break;
+      }
+      default: {
+        cout << "CheckHLT error: unknown HLT type!" << endl;
+        return false;
+      }
+    }
+  }
   return on;
 }
 
