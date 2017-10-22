@@ -292,6 +292,9 @@ void uaforward::NormalizeFSCts()
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 void uaforward::FillZDCWithMCtruth(const short unsigned int cut, const double E[2], const double EM[2])
 {
+  if (cut >= n_cuts) {
+    std::cout << "uaforward::FillZDCWithMCtruth: required cut number is larger that possible, do nothing. Please define larger uaforward::n_cut!\n";
+  }
   ZDCd_Etot_minus_h[cut]->Fill(E[0]);
   ZDCd_Etot_plus_h[cut] ->Fill(E[1]);
   ZDCd_EM_minus_h[cut]->Fill(EM[0]);
