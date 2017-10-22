@@ -12,7 +12,10 @@ const std::vector<unsigned int>L1_TRIGGER_ARRAY = {
   0,   // L1_ZeroBias
   1,   // L1_BptxPlus_NotBptxMinus
   2,   // L1_BptxMinus_NotBptxPlus
-  8,   // L1_ZeroBias_copy
+  3,   // L1_MinimumBiasHF0_OR_BptxAND
+  4,   // L1_MinimumBiasHF0_AND_BptxAND
+  5,   // L1_MinimumBiasHF0_OR
+  6,   // L1_MinimumBiasHF0_AND
   9,   // L1_NotBptxOR
   10,  // L1_BptxPlus
   11,  // L1_BptxMinus
@@ -38,7 +41,19 @@ public:
               );
   ~uacmsevtinfo();
   bool GetL1Bit(short unsigned int b) {return CMStrigInfo->triggerResults.at(b);};
-  bool CheckHLT(const char *path);
+  bool GetL1Bit(string name) {
+    for(auto i: CMSmenuInfo->menu)
+      if(!name.compare(i.second.name))
+        return CMStrigInfo->triggerResults.at(i.first);
+    return false;
+  };
+  vector<bool> GetL1AllBits() {return CMStrigInfo->triggerResults;};
+  /*!
+   * \param path
+   * \param compareType type of comparing: \li 0 - find any occurrence \li 1 - paths should be equal \li 2 - regex compare
+   * \return if this path was in dataset
+   */
+  bool CheckHLT(const char *path, int compareType = 0);
   void PrintEventInfo(const bool detailed = false);
   bool FillLastEvent(const short unsigned int cut);
   bool ProceedEvent(const short unsigned int cut, const bool fill, const bool info);
