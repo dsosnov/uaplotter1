@@ -7,6 +7,7 @@
 #include "iostream"
 #include "stdlib.h"
 
+const bool CUT_BY_GOOD_TRACKS = true;
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -60,9 +61,12 @@ int uaplotter1::noiseLoop(const int evts,  bool bptxQuiet)
       bool isXor = CMSevtinfo->GetL1Bit(1) ||  CMSevtinfo->GetL1Bit(2);
       if ((bptxQuiet && isQuiet) || ( !bptxQuiet && isXor)){
         (*usedBptxVar)++;
-        ProceedEvent(0, false, false);
-        FillLastEvent(0);
-//         PrintEventInfo(true);
+        ProceedEvent(dummy_cut, false, true);
+        if (!CUT_BY_GOOD_TRACKS || CMStracking->NtracksGood() == 0){
+          FillLastEvent(0);
+          if(CMSevtinfo->GetL1Bit(1)) FillLastEvent(1); // L1_BptxPlus_NotBptxMinus
+          if(CMSevtinfo->GetL1Bit(2)) FillLastEvent(2); // L1_BptxMinus_NotBptxPlus
+        }
       }
     }
   };                                                        // end loop
