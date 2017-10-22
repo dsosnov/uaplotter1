@@ -57,8 +57,6 @@ private:
   bool FillLastEvent(const short unsigned int cut);
   void PrintEventInfo(const bool detailed = false);
 
-
-
   void IniRapGapRange(); //!< to be called during construction. Sets value to first_central_bin and last_central_bin according to uathresholds
   bool FindRapGap(bool RECO = true); //!< if true - works on RECO, false - on MCtruth
   bool TotalRapGap(short unsigned int ind, bool active_minus, bool active_plus);
@@ -73,7 +71,6 @@ private:
   short unsigned int n_sd_minus_bins[2];
   short unsigned int n_sd_plus_bins[2];
   short unsigned int n_dd_rg_bins[2];
-
 
   void CalculateSDdiffMass(bool info = false); //!< for SD only!!
   void PrintSDdiffMass(bool detailed);
