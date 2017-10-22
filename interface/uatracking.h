@@ -10,26 +10,25 @@
 
 #include "vector"
 
-class uatracking : public uabasecentral
-{
+class uatracking : public uabasecentral {
 public:
-  uatracking(TChain     * tree, 	 //!<tree of ua format
-	      TDirectory * dir,    //!<directory in the output root file
-	      const bool cmstotem, //!<true for merged, false for CMS only
-	      const short          int MC,  //!< -1, 0 - data; >0 MC
-	      const short unsigned int Ncuts //!< number of cuts
-	    );
+  uatracking(TChain      *tree,    //!<tree of ua format
+             TDirectory *dir,     //!<directory in the output root file
+             const bool cmstotem, //!<true for merged, false for CMS only
+             const short          int MC,  //!< -1, 0 - data; >0 MC
+             const short unsigned int Ncuts //!< number of cuts
+            );
   ~uatracking();
-  bool ProceedEvent(const short unsigned int cut=0, const bool fill=false, const bool info=false);
+  bool ProceedEvent(const short unsigned int cut = 0, const bool fill = false, const bool info = false);
   bool FillLastEvent(const short unsigned int cut);
   void PrintEventInfo(const bool detailed = false);
 
-  unsigned int NverticesGood(){return nVtxGoog;};
-  unsigned int Ntracks(){return nTracks;}
-  unsigned int NtracksGood(){return nTracksGood;};
+  unsigned int NverticesGood() {return nVtxGoog;};
+  unsigned int Ntracks() {return nTracks;}
+  unsigned int NtracksGood() {return nTracksGood;};
 private:
-  std::vector<MyVertex>*     Vertices;
-  std::vector<MyTracks>*     Tracks;
+  std::vector<MyVertex>     *Vertices;
+  std::vector<MyTracks>     *Tracks;
 
   unsigned int nVtx;
   unsigned int nVtxGoog;
@@ -41,14 +40,14 @@ private:
 
   void create_histos();
 
-  TH1F ** vertices_h;
+  TH1F **vertices_h;
   //TH1F ** vertices_X_h;
   //TH1F ** vertices_Y_h;
   //TH1F ** vertices_Z_h;
-  TH1F ** tracks_h;
-  TH2F ** tracks_eta_h;
+  TH1F **tracks_h;
+  TH2F **tracks_eta_h;
 
-  ClassDef(uatracking,2);
+  ClassDef(uatracking, 2);
 
 };
 
