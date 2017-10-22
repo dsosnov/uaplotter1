@@ -6,9 +6,10 @@ const short int RNDT      = -100;
 
 //this is wrong for MC
 //const double ENERGYN      = 3999.98095727174496; // energy in GeV from sqrt(S_NN) = 5.023
-const double MOMBEAM        = 3997.7190062; // From EPOS
+const double MOMBEAM        = 3997.7190062; // From EPOS // For Run 1, 5 TeV
 
-const float HF_ETA_MAX    = 5.1; // for HF "trigger" only
+const float HF_ETA_MAX    = 5.20; // for HF "trigger" only
+const float HF_ETA_MIN    = 3.15; // for HF "trigger" only
 
 const float CAS_ETA_MIN   = -6.6;
 const float CAS_ETA_MAX   = -5.2;
@@ -20,17 +21,17 @@ const float T2_ABSETA_MIN = 5.3;
 const float T2_ABSETA_MAX = 6.5;
 const float T2_PT_THR     = 0.04;
 
-const float CENT_TOWER_THR = 2.0;   // energy in GeV
-const float HF_TOWER_THR   = 5.0;   // energy in GeV
-const float ZDC_PXY_THR    = 0.495;   // hernja!!!
-const float MIN_ZDC_ETA    = 8.; //8.2?
+const float CENT_TOWER_THR  = 2.0;        // energy in GeV
+const float HF_TOWER_THR[2] = {5.0, 5.0}; // energy in GeV
+const float ZDC_PXY_THR     = 0.495;      // hernja!!!
+const float MIN_ZDC_ETA     = 8.;         //8.2?
 
-const float MC_E_THR       = 0.;    // energy in GeV
+const float MC_E_THR       = 0.;          // energy in GeV
 
-const float CENT_ETA_ACC   = 2.0;   // eta
+const float CENT_ETA_ACC   = 2.0;         // eta
 //const float CENT_ETA_ACC   = 3.0; // 16Feb15 - test 
 
-const float CALO_ETA_ACC   = 5;   // eta *was 5
+const float CALO_ETA_ACC   = HF_ETA_MAX; // eta *was 5
 
 const float ETA_BIN_W = 0.5;
 const float ETA_MAX   = 6.5;//CALO_ETA_ACC;//ETA_BIN_L[N_ETA_BINS-1]+ETA_BIN_W;
@@ -93,7 +94,8 @@ inline int find_eta_bin(double eta){
       search = (eta>ETA_BIN_L[n]);
       //std::cout << "\t\t\t" << n << "   " << search << std::endl;
       n++;
-    }; n = n-2; 
+    };
+    n = n-2;
   };
   //std::cout << "\t" << eta << "\t\t" << n << std::endl;
   return n;
