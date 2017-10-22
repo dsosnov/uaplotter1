@@ -10,94 +10,95 @@
 //sets first_central_bin and last_central_bin according to uathresholds
 void uaplotter1::IniRapGapRange()
 {
-  short unsigned int bin=0; 
-  while(ETA_BIN_L[bin]<-CALO_ETA_ACC)bin++;
-  first_central_bin=bin;
-  bin=N_ETA_BINS-1;
-  while(ETA_BIN_L[bin]+ETA_BIN_W >CALO_ETA_ACC)bin--;
-  last_central_bin=bin;
+  short unsigned int bin = 0;
+  while (ETA_BIN_L[bin] < -CALO_ETA_ACC)bin++;
+  first_central_bin = bin;
+  bin = N_ETA_BINS - 1;
+  while (ETA_BIN_L[bin] + ETA_BIN_W > CALO_ETA_ACC)bin--;
+  last_central_bin = bin;
 };
 
 
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-bool uaplotter1::FindRapGap(bool RECO){
+bool uaplotter1::FindRapGap(bool RECO)
+{
 
   bool rg = false;
 
   int ind = int(!RECO);
-  if(RECO)
+  if (RECO)
     memset(combined_central_activity, false, sizeof(combined_central_activity));
 
   n_sd_minus_bins[ind] = 0; // [0]-RECO, [1]-MCtruth
   n_sd_plus_bins[ind]  = 0;
   n_dd_rg_bins[ind]    = 0;
 
-  bool diff_cand[3] = {true,false,false}; // -, +, central
-  short unsigned int rg_bins[3]   = {0,   0,   0};     // 
+  bool diff_cand[3] = {true, false, false}; // -, +, central
+  short unsigned int rg_bins[3]   = {0,   0,   0};     //
   short unsigned int max_central_rgbins = 0;
   short unsigned int n_active_bins   = 0;
 
-  for(unsigned int bin = first_central_bin; bin<=last_central_bin; bin++){
+  for (unsigned int bin = first_central_bin; bin <= last_central_bin; bin++) {
 
     bool binactivity;
-    if(RECO){ //<====================== RG on RECO
-      if( (ETA_BIN_L[bin] >= -1*CENT_ETA_ACC) && ((ETA_BIN_L[bin]+ETA_BIN_W)<=CENT_ETA_ACC) ){
-	combined_central_activity[bin] = ( CMSpf->GetActivityLoose(bin) || CMStracking->GetActivityLoose(bin) ); // no _any_ tracks
-      }else{// if ( ( (bin>=3) && (bin<=6) ) || ( (bin>=19) && (bin<=22) ) ){ // !!! TBD to be rewritten
-	combined_central_activity[bin] = ( CMScalo->GetActivityLoose(bin) || CMStracking->GetActivityLoose(bin));
-	// 16 Feb 15************
-	 //std::cout << bin << "\t" << CMScalo->GetHFmaxTower(bin) << std::endl;
-	//combined_central_activity[bin] = ( (CMStracking->GetActivityLoose(bin)) || (CMScalo->GetHFmaxTower(bin)>CENT_TOWER_THR) );
-	//**********************
-      };  
+    if (RECO) { //<====================== RG on RECO
+      if ((ETA_BIN_L[bin] >= -1 * CENT_ETA_ACC) && ((ETA_BIN_L[bin] + ETA_BIN_W) <= CENT_ETA_ACC)) {
+        combined_central_activity[bin] = (CMSpf->GetActivityLoose(bin) || CMStracking->GetActivityLoose(bin));   // no _any_ tracks
+      } else { // if ( ( (bin>=3) && (bin<=6) ) || ( (bin>=19) && (bin<=22) ) ){ // !!! TBD to be rewritten
+        combined_central_activity[bin] = (CMScalo->GetActivityLoose(bin) || CMStracking->GetActivityLoose(bin));
+        // 16 Feb 15************
+        //std::cout << bin << "\t" << CMScalo->GetHFmaxTower(bin) << std::endl;
+        //combined_central_activity[bin] = ( (CMStracking->GetActivityLoose(bin)) || (CMScalo->GetHFmaxTower(bin)>CENT_TOWER_THR) );
+        //**********************
+      };
       binactivity = combined_central_activity[bin];
-    }else{//=========================== RG on MCtruth
+    } else { //=========================== RG on MCtruth
       binactivity = CMSmc->GetActivityLoose(bin);
     };
 
-    if( !binactivity ){
-      if(diff_cand[0]) {
-	rg_bins[0]++;
-      }else{
-	diff_cand[2] = true;
-	rg_bins[2]++;
+    if (!binactivity) {
+      if (diff_cand[0]) {
+        rg_bins[0]++;
+      } else {
+        diff_cand[2] = true;
+        rg_bins[2]++;
       };
-    }else{
+    } else {
       n_active_bins++;
-      if(diff_cand[0]){
-	diff_cand[0] = false;
-      }else{
-	if(diff_cand[2]){
-	  diff_cand[1] = true;
-	  rg_bins[1]   = rg_bins[2];
-	  if(rg_bins[1]>max_central_rgbins) max_central_rgbins=rg_bins[1];
-	  diff_cand[2] = false;
-	  rg_bins[2]   =0;
-	};
+      if (diff_cand[0]) {
+        diff_cand[0] = false;
+      } else {
+        if (diff_cand[2]) {
+          diff_cand[1] = true;
+          rg_bins[1]   = rg_bins[2];
+          if (rg_bins[1] > max_central_rgbins) max_central_rgbins = rg_bins[1];
+          diff_cand[2] = false;
+          rg_bins[2]   = 0;
+        };
       };
     }
 
 
   };//end loop
 
-  if(n_active_bins==0){ // "~elastic"
-    sd_flag_central[ind]=4;       
+  if (n_active_bins == 0) { // "~elastic"
+    sd_flag_central[ind] = 4;
     rg_bins[2] = rg_bins[0];
-  }else if((rg_bins[0]==0) && (max_central_rgbins==0) && (rg_bins[2]==0)){ // ND
-    sd_flag_central[ind]=0;
-  }else if (rg_bins[0]>0){
-    if(rg_bins[2]>0){ 
-      sd_flag_central[ind]=3;        // CD candidate
-    }else{
-      sd_flag_central[ind]=-1;       // SD-
+  } else if ((rg_bins[0] == 0) && (max_central_rgbins == 0) && (rg_bins[2] == 0)) { // ND
+    sd_flag_central[ind] = 0;
+  } else if (rg_bins[0] > 0) {
+    if (rg_bins[2] > 0) {
+      sd_flag_central[ind] = 3;      // CD candidate
+    } else {
+      sd_flag_central[ind] = -1;     // SD-
     };
-  }else{
-    if(rg_bins[2]>0){
-      sd_flag_central[ind]=1;
-    }else if(max_central_rgbins>1){
-      sd_flag_central[ind]=2;        // DD candidate
+  } else {
+    if (rg_bins[2] > 0) {
+      sd_flag_central[ind] = 1;
+    } else if (max_central_rgbins > 1) {
+      sd_flag_central[ind] = 2;      // DD candidate
     };
   };
 
@@ -108,27 +109,27 @@ bool uaplotter1::FindRapGap(bool RECO){
 
   ///////////////////////////////////////////////
   // take into account also sides
-  bool outer_activity_minus; 
+  bool outer_activity_minus;
   bool outer_activity_plus;
-  if(RECO){    
-    if(mc>0){
-      outer_activity_minus = CMSmc->GetT2trigger(false); // minus 
+  if (RECO) {
+    if (mc > 0) {
+      outer_activity_minus = CMSmc->GetT2trigger(false); // minus
       outer_activity_plus  = CMSmc->GetT2trigger(true);  // plus
-    }else if (mc==0){
-      outer_activity_minus = (T2->NPrimtracksMinus()>0);
-      outer_activity_plus  = (T2->NPrimtracksPlus()>0);
-    } else{ // fake case noise
+    } else if (mc == 0 /*&&tree_digi_flag*/) { //TODO check
+      outer_activity_minus = (T2->NPrimtracksMinus() > 0);
+      outer_activity_plus  = (T2->NPrimtracksPlus() > 0);
+    } else { // fake case noise
       outer_activity_minus = false;
       outer_activity_plus  = false;
-    };      
+    };
     TotalRapGap(0, outer_activity_minus, outer_activity_plus);
-  }else{
+  } else {
     outer_activity_minus = false;
     outer_activity_plus  = false;
-    for(unsigned int bin = 0; bin<first_central_bin; bin++)
-	outer_activity_minus = (outer_activity_minus || CMSmc->GetActivityLoose(bin));
-    for(unsigned int bin = N_ETA_BINS-1; bin>last_central_bin; bin--)
-	outer_activity_plus = (outer_activity_plus || CMSmc->GetActivityLoose(bin));
+    for (unsigned int bin = 0; bin < first_central_bin; bin++)
+      outer_activity_minus = (outer_activity_minus || CMSmc->GetActivityLoose(bin));
+    for (unsigned int bin = N_ETA_BINS - 1; bin > last_central_bin; bin--)
+      outer_activity_plus = (outer_activity_plus || CMSmc->GetActivityLoose(bin));
     TotalRapGap(1, outer_activity_minus, outer_activity_plus);
 
     outer_activity_minus = (outer_activity_minus || CMSmc->GetOuterE(false));
@@ -144,8 +145,8 @@ bool uaplotter1::FindRapGap(bool RECO){
   memset(xi_zdc,  0, sizeof(xi_zdc));
   memset(xi_full, 0, sizeof(xi_full));
 
-  xi_mc_out   =0;  // this includes ZDC and CASTOR also!
-  xi_mc_total =0;  // everything from first active bin in reco
+  xi_mc_out   = 0; // this includes ZDC and CASTOR also!
+  xi_mc_total = 0; // everything from first active bin in reco
 
   return rg;
 };
@@ -154,86 +155,87 @@ bool uaplotter1::FindRapGap(bool RECO){
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-bool uaplotter1::TotalRapGap(short unsigned int ind, bool active_minus, bool active_plus){
+bool uaplotter1::TotalRapGap(short unsigned int ind, bool active_minus, bool active_plus)
+{
   bool rg = false;
-    //std::cout << "=====> " << ind << "  " << active_minus << " " << active_plus << std::endl;
-    switch(sd_flag_central[ind]){
-      case 0: // ND
-	if(!active_minus){
-	  if(!active_plus){
-	    sd_flag_total[ind] = 3;
-	  }else{
-	    sd_flag_total[ind] = -1;
-	  };
-	}else{
-	  if(!active_plus) {
-	    sd_flag_total[ind] = 1;
-	  }else{
-	    sd_flag_total[ind] = 0;
-	  }
-	};
-	break;
-      case 2:
-	if(!active_minus){
-	  if(!active_plus){
-	    sd_flag_total[ind] = 3;
-	  }else{
-	    sd_flag_total[ind] = -1;
-	  };
-	}else{
-	  if(!active_plus) {
-	    sd_flag_total[ind] = 1;
-	  }else{
-	    sd_flag_total[ind] = 2;
-	  }
-	};
-      case 3:
-	if(!active_minus){
-	  if(!active_plus){
-	    sd_flag_total[ind] = 3;
-	  }else{
-	    sd_flag_total[ind] = -1;
-	  };
-	}else{
-	  if(!active_plus) {
-	    sd_flag_total[ind] = 1;
-	  }else{
-	    sd_flag_total[ind] = 2;
-	  }
-	};
-	break;
-      case -1:
-	if(!active_minus){
-	  sd_flag_total[ind] = -1;
-	}else{
-	  sd_flag_total[ind] = 2;
-	};
-	break;
-      case +1:
-	if(!active_plus){
-	  sd_flag_total[ind] = 1;
-	}else{
-	  sd_flag_total[ind] = 2;
-	};
-	break;
-      case 4:
-	if(!active_minus){
-	  if(!active_plus){
-	    sd_flag_total[ind] = 4;
-	  }else{
-	    sd_flag_total[ind] = -1;
-	  };
-	}else{
-	  if(!active_plus){
-	    sd_flag_total[ind] = 1;
-	  }else{
-	    sd_flag_total[ind] = 2;
-	  }
-	};
-	break;
-      }; // end switch   
-   rg=(sd_flag_total[ind]!=0);
-   return rg;
+  //std::cout << "=====> " << ind << "  " << active_minus << " " << active_plus << std::endl;
+  switch (sd_flag_central[ind]) {
+    case 0: // ND
+      if (!active_minus) {
+        if (!active_plus) {
+          sd_flag_total[ind] = 3;
+        } else {
+          sd_flag_total[ind] = -1;
+        };
+      } else {
+        if (!active_plus) {
+          sd_flag_total[ind] = 1;
+        } else {
+          sd_flag_total[ind] = 0;
+        }
+      };
+      break;
+    case 2:
+      if (!active_minus) {
+        if (!active_plus) {
+          sd_flag_total[ind] = 3;
+        } else {
+          sd_flag_total[ind] = -1;
+        };
+      } else {
+        if (!active_plus) {
+          sd_flag_total[ind] = 1;
+        } else {
+          sd_flag_total[ind] = 2;
+        }
+      };
+    case 3:
+      if (!active_minus) {
+        if (!active_plus) {
+          sd_flag_total[ind] = 3;
+        } else {
+          sd_flag_total[ind] = -1;
+        };
+      } else {
+        if (!active_plus) {
+          sd_flag_total[ind] = 1;
+        } else {
+          sd_flag_total[ind] = 2;
+        }
+      };
+      break;
+    case -1:
+      if (!active_minus) {
+        sd_flag_total[ind] = -1;
+      } else {
+        sd_flag_total[ind] = 2;
+      };
+      break;
+    case +1:
+      if (!active_plus) {
+        sd_flag_total[ind] = 1;
+      } else {
+        sd_flag_total[ind] = 2;
+      };
+      break;
+    case 4:
+      if (!active_minus) {
+        if (!active_plus) {
+          sd_flag_total[ind] = 4;
+        } else {
+          sd_flag_total[ind] = -1;
+        };
+      } else {
+        if (!active_plus) {
+          sd_flag_total[ind] = 1;
+        } else {
+          sd_flag_total[ind] = 2;
+        }
+      };
+      break;
+  }; // end switch
+  rg = (sd_flag_total[ind] != 0);
+  return rg;
 }
 
 
@@ -241,19 +243,20 @@ bool uaplotter1::TotalRapGap(short unsigned int ind, bool active_minus, bool act
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-void uaplotter1::PrintRapGap(){
+void uaplotter1::PrintRapGap()
+{
   std::cout << "combined central activity:\n\t";
-  for(unsigned int bin=0; bin<N_ETA_BINS; bin++){
+  for (unsigned int bin = 0; bin < N_ETA_BINS; bin++) {
     std::cout << combined_central_activity[bin] << "   ";
-  };std::cout << std::endl;
+  }; std::cout << std::endl;
   std::cout << "diffractive central flag: " << sd_flag_central[0] << "; MC: " << sd_flag_central[1] << std::endl;
   std::cout << "diffractive total   flag: " << sd_flag_total[0] << "; MC: " << sd_flag_total[1] << std::endl;
   std::cout << "max sd bins - : "    << n_sd_minus_bins[0];
-  if(mc>0) std::cout << " (" << n_sd_minus_bins[1] << ")";
+  if (mc > 0) std::cout << " (" << n_sd_minus_bins[1] << ")";
   std::cout << "; max sd bins + : " << n_sd_plus_bins[0];
-  if(mc>0) std::cout << " (" << n_sd_plus_bins[1]  << ")";
+  if (mc > 0) std::cout << " (" << n_sd_plus_bins[1]  << ")";
   std::cout << "; max dd bins : " << n_dd_rg_bins[0];
-  if(mc>0) std::cout << " (" << n_dd_rg_bins[1] << ")";
+  if (mc > 0) std::cout << " (" << n_dd_rg_bins[1] << ")";
   std::cout << std::endl;
 }
 
@@ -273,7 +276,8 @@ void uaplotter1::PrintRapGap(){
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-void uaplotter1::CalculateSDdiffMass(bool info){
+void uaplotter1::CalculateSDdiffMass(bool info)
+{
 
   memset(xi_pf,   0, sizeof(xi_pf));
   memset(xi_calo, 0, sizeof(xi_calo));
@@ -281,8 +285,8 @@ void uaplotter1::CalculateSDdiffMass(bool info){
   memset(xi_zdc,  0, sizeof(xi_zdc));
   memset(xi_full, 0, sizeof(xi_full));
 
-  xi_mc_out   =0;  // this includes ZDC and CASTOR also!
-  xi_mc_total =0;  // everything from first active bin in reco
+  xi_mc_out   = 0; // this includes ZDC and CASTOR also!
+  xi_mc_total = 0; // everything from first active bin in reco
 
   //==================================
   // ZDC contribution
@@ -290,103 +294,103 @@ void uaplotter1::CalculateSDdiffMass(bool info){
   // -1=> rg at -side, X @ +Z => sign -; considered ZDC+: plus = true
   // +1=> rg at +side, X @ -Z => sign +; considered ZDC-: plus = false
   int sign_  = sd_flag_total[0];
-  bool Xplus = !(sign_>0);
+  bool Xplus = !(sign_ > 0);
   // zdc for X side xi ~ (E-Pz)/2Ep ~ 0 (if we don't know pz)
   // zdc for opposite side we can't use
-  if(mc>0) {
+  if (mc > 0) {
     xi_zdc[0] = 0;//2*(CMSmc->GetZDCEn(Xplus)+CMSmc->GetZDCEg(Xplus));
-    xi_zdc[1] = CMSmc->GetZDCEn(Xplus)+CMSmc->GetZDCEg(Xplus)+sign_*(CMSmc->GetZDCPzn(Xplus)+CMSmc->GetZDCPzg(Xplus));
+    xi_zdc[1] = CMSmc->GetZDCEn(Xplus) + CMSmc->GetZDCEg(Xplus) + sign_ * (CMSmc->GetZDCPzn(Xplus) + CMSmc->GetZDCPzg(Xplus));
 //     std::cout << "ZDC:" << CMSmc->GetZDCEn(Xplus)+CMSmc->GetZDCEg(Xplus) << "\t"
-// 			<< (CMSmc->GetZDCPzn(Xplus)+CMSmc->GetZDCPzg(Xplus)) << std::endl;
-  }else{
+//      << (CMSmc->GetZDCPzn(Xplus)+CMSmc->GetZDCPzg(Xplus)) << std::endl;
+  } else {
     xi_zdc[0] = 0;//2*CMSforward->GetZDCEtotal(Xplus);
   };
 
   //==================================
-  // castor  
+  // castor
   // if SD = -1 => makes no sense!
   // if SD = +1
-  if(sign_>0)
-    xi_cas[0] = CMScastor->GetE() * (1+sign_*CAS_TANH_AVE);
+  if (sign_ > 0)
+    xi_cas[0] = CMScastor->GetE() * (1 + sign_ * CAS_TANH_AVE);
 
-  if(mc>0) xi_cas[1] = CMSmc->GetCastorE() + sign_*CMSmc->GetCastorPz();
+  if (mc > 0) xi_cas[1] = CMSmc->GetCastorE() + sign_ * CMSmc->GetCastorPz();
 
   //==================================
   // central region
   short unsigned int start = first_central_bin;
   short unsigned int stop  = last_central_bin;
-  if(Xplus){   // SD-
+  if (Xplus) { // SD-
     start = first_central_bin + n_sd_minus_bins[0]; // based on RECO RG!
-  }else{      // SD+
+  } else {     // SD+
     stop  = last_central_bin  - n_sd_plus_bins[0];  // based on RECO RG!
   };
 
-  for(unsigned int bin = start; bin<=stop; bin++){
-    if( (ETA_BIN_L[bin] >= -1*CENT_ETA_ACC) && ((ETA_BIN_L[bin]+ETA_BIN_W)<=CENT_ETA_ACC) ){
-      xi_pf[0] += ( CMSpf->GetE(bin) + sign_*CMSpf->GetPz(bin) );
-      if(mc>0) 
-	xi_pf[1] += (CMSmc->GetE(bin) + sign_*CMSmc->GetPz(bin) );
-    }else{
-      xi_calo[0] += ( CMScalo->GetE(bin) + sign_*CMScalo->GetPz(bin) );
-      if(mc>0) 
-	xi_calo[1] += (CMSmc->GetE(bin) + sign_*CMSmc->GetPz(bin) );
+  for (unsigned int bin = start; bin <= stop; bin++) {
+    if ((ETA_BIN_L[bin] >= -1 * CENT_ETA_ACC) && ((ETA_BIN_L[bin] + ETA_BIN_W) <= CENT_ETA_ACC)) {
+      xi_pf[0] += (CMSpf->GetE(bin) + sign_ * CMSpf->GetPz(bin));
+      if (mc > 0)
+        xi_pf[1] += (CMSmc->GetE(bin) + sign_ * CMSmc->GetPz(bin));
+    } else {
+      xi_calo[0] += (CMScalo->GetE(bin) + sign_ * CMScalo->GetPz(bin));
+      if (mc > 0)
+        xi_calo[1] += (CMSmc->GetE(bin) + sign_ * CMSmc->GetPz(bin));
     };
   };
 
-  if(mc>0){
+  if (mc > 0) {
     //std::cout << "1)" << xi_mc_out/(4000.*2) << std::endl;
     float eee = 0; float pzzz = 0;
-    if(Xplus){ // RG @ -; X @ +
-      for(unsigned int bin = N_ETA_BINS-1; bin>last_central_bin; bin--){
-	xi_mc_out+=(CMSmc->GetE(bin) + sign_*CMSmc->GetPz(bin) );
-	eee+=CMSmc->GetE(bin); pzzz+=CMSmc->GetPz(bin);
+    if (Xplus) { // RG @ -; X @ +
+      for (unsigned int bin = N_ETA_BINS - 1; bin > last_central_bin; bin--) {
+        xi_mc_out += (CMSmc->GetE(bin) + sign_ * CMSmc->GetPz(bin));
+        eee += CMSmc->GetE(bin); pzzz += CMSmc->GetPz(bin);
       }
-    }else{
-      for(unsigned int bin = 0; bin<first_central_bin; bin++){
-	  xi_mc_out+=(CMSmc->GetE(bin) + sign_*CMSmc->GetPz(bin) );
-	  eee+=CMSmc->GetE(bin); pzzz+=CMSmc->GetPz(bin);
+    } else {
+      for (unsigned int bin = 0; bin < first_central_bin; bin++) {
+        xi_mc_out += (CMSmc->GetE(bin) + sign_ * CMSmc->GetPz(bin));
+        eee += CMSmc->GetE(bin); pzzz += CMSmc->GetPz(bin);
       };
     };
     //std::cout << "2)" << xi_mc_out/(4000.*2) << "\te " << eee << "\tpz " << pzzz << std::endl;
-    xi_mc_out+=(CMSmc->GetOuterE(Xplus) + sign_*CMSmc->GetOuterPz(Xplus));
+    xi_mc_out += (CMSmc->GetOuterE(Xplus) + sign_ * CMSmc->GetOuterPz(Xplus));
     //std::cout << "3)" << xi_mc_out/(4000.*2) << "\te " << eee+CMSmc->GetOuterE(Xplus) << "\tpz " << pzzz+CMSmc->GetOuterPz(Xplus) << std::endl;
-    short int ip = CMSmc->IntactProton(); 
-    if( (ip!=0) && (sign_ != ip) ){ // proton at X side => add it to X
-      xi_mc_out+=(CMSmc->IntactProtonE() + sign_*CMSmc->IntactProtonPz());
+    short int ip = CMSmc->IntactProton();
+    if ((ip != 0) && (sign_ != ip)) { // proton at X side => add it to X
+      xi_mc_out += (CMSmc->IntactProtonE() + sign_ * CMSmc->IntactProtonPz());
     };
   };
 
 
-  if(info){
+  if (info) {
     std::cout << "uaplotter1::CalculateSDdiffMass: sign_, Xplus : " << sign_ << " " << Xplus;
-    if(mc>0) {
+    if (mc > 0) {
       std::cout << "; IntactProton sign: " << CMSmc->IntactProton();
     };
     std::cout << std::endl;
-    if(mc>0)
-      std::cout << "\tZDC MCtruth: Etot, Pztot:" << CMSmc->GetZDCEn(Xplus)+CMSmc->GetZDCEg(Xplus) 
-		<< "; " << CMSmc->GetZDCPzn(Xplus)+CMSmc->GetZDCPzg(Xplus) << std::endl;
-    std::cout << "start/stop bin for central activity: [" << start << " , " << stop << "]" <<std::endl; 
+    if (mc > 0)
+      std::cout << "\tZDC MCtruth: Etot, Pztot:" << CMSmc->GetZDCEn(Xplus) + CMSmc->GetZDCEg(Xplus)
+                << "; " << CMSmc->GetZDCPzn(Xplus) + CMSmc->GetZDCPzg(Xplus) << std::endl;
+    std::cout << "start/stop bin for central activity: [" << start << " , " << stop << "]" << std::endl;
   };
 
   //==================================
   // normalization
-  double denom = 2*4000.;  
+  double denom = 2 * 4000.;
 //   if( CASTORp ){ // CM to the positive side
 //     denom = 2*4000.; // 2*Ep
 //   }else{
 //     denom = 2*4000.; // 2*Z(Pb)*Ep
 //   };
 
-  for(short unsigned int ii = 0; ii<2; ii++){
-    xi_pf[ii]/=denom;     
-    xi_calo[ii]/=denom;   
-    xi_cas[ii]/=denom;    
-    xi_zdc[ii]/=denom;    
-    xi_full[ii]     = xi_pf[ii]+xi_calo[ii]+xi_cas[ii]+xi_zdc[ii];
-  };  
-  xi_mc_out/=denom;
-  xi_mc_total = xi_pf[1]+xi_calo[1]+xi_mc_out;
+  for (short unsigned int ii = 0; ii < 2; ii++) {
+    xi_pf[ii] /= denom;
+    xi_calo[ii] /= denom;
+    xi_cas[ii] /= denom;
+    xi_zdc[ii] /= denom;
+    xi_full[ii]     = xi_pf[ii] + xi_calo[ii] + xi_cas[ii] + xi_zdc[ii];
+  };
+  xi_mc_out /= denom;
+  xi_mc_total = xi_pf[1] + xi_calo[1] + xi_mc_out;
 
   /*
   if(fill){
@@ -406,23 +410,23 @@ void uaplotter1::PrintSDdiffMass(bool detailed)
 {
   std::cout << "==> XI: \n";
   std::cout << "full visible RECO : " << xi_full[0];
-  if(mc>0) std::cout << ";  full visible MCtruth: " << xi_full[1] << "; total MCthruth: " << xi_mc_total;
+  if (mc > 0) std::cout << ";  full visible MCtruth: " << xi_full[1] << "; total MCthruth: " << xi_mc_total;
   std::cout << std::endl;
-  if(detailed){
+  if (detailed) {
     std::cout << "\t pf   RECO: " << xi_pf[0];
-    if(mc>0)
+    if (mc > 0)
       std::cout << "\t pf   MCtruth: " << xi_pf[1];
     std::cout << "\n\t calo RECO: " << xi_calo[0];
-    if(mc>0)
+    if (mc > 0)
       std::cout << "\t calo MCtruth: " << xi_calo[1];
     std::cout << "\n\t cas  RECO: " << xi_cas[0];
-    if(mc>0)
+    if (mc > 0)
       std::cout << "\t cas  MCtruth: " << xi_cas[1];
     std::cout << "\n\t zdc  RECO: " << xi_zdc[0];
-    if(mc>0)
+    if (mc > 0)
       std::cout << "\t zdc  MCtruth: " << xi_zdc[1];
     std::cout << std::endl;
-    if(mc>0)
+    if (mc > 0)
       std::cout << "\tMCtruth outer:" << xi_mc_out << std::endl;
   };
 }
