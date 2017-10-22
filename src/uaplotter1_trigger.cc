@@ -57,28 +57,34 @@ int uaplotter1::DefineTrigger(int trigger_bit_common, bool &tech_bit){
 \param tech_bit    flag if the trigger bit was technical trigger, othervise algo trigger
 \return trigger bit status (DATA) or emulation (MC, tt53) or noise studies conditions
 */
-bool uaplotter1::ProceedTrigger(int trigger_bit, bool tech_bit) //TODO find invocations and disable work with bit 53
+bool uaplotter1::ProceedTrigger(int trigger_bit, bool tech_bit) // TODO find invocations and disable work with bit 53
 {
   bool proceed = true;
 
   if(mc<0){/////////////////// random trigger                                          
     proceed = ( (!CMSevtinfo->CheckHLT("HLT_L1Tech53_MB")) // TODO check
-	     && (!CMSevtinfo->GetL1Bit(10)) // ! L1Tech_BPTX_plus.v0
-	     && (!CMSevtinfo->GetL1Bit(1)) // ! L1_BptxPlus_NotBptxMinus
-             // && (!CMSevtinfo->GetAlgoBit(2)) // ! L1_BeamGas_Hf_BptxPlusPostQuiet
-	     && (CMSevtinfo->GetL1Bit(9)) //
-             // && (!CMSevtinfo->GetTechBit(53))   // ! L1Tech_TOTEM_MinBias.v0  // paranojac
-	      );
-  }else if(trigger_bit>=0) {
-    if(tech_bit){///////////// tech trigger 
-      if( (trigger_bit==53) && (mc>0) ){ // T2 trigger with MC //TODO disable
-	proceed = CMSmc->GetT2trigger(); //TODO to view on this function
-      }else{
-      proceed   = CMSevtinfo->GetL1Bit(trigger_bit);
+                && (!CMSevtinfo->GetL1Bit(10)) // ! L1Tech_BPTX_plus.v0
+                && (!CMSevtinfo->GetL1Bit(1)) // ! L1_BptxPlus_NotBptxMinus
+                // && (!CMSevtinfo->GetAlgoBit(2)) // ! L1_BeamGas_Hf_BptxPlusPostQuiet
+                && (CMSevtinfo->GetL1Bit(9)) //
+                // && (!CMSevtinfo->GetTechBit(53))   // ! L1Tech_TOTEM_MinBias.v0  // paranojac
+      );
+  }else{
+#ifndef NEW_L1
+    if(trigger_bit>=0) {
+      if(tech_bit){///////////// tech trigger 
+        if( (trigger_bit==53) && (mc>0) ){ // T2 trigger with MC //TODO disable
+          proceed = CMSmc->GetT2trigger(); //TODO to view on this function
+        }else{
+          proceed   = CMSevtinfo->GetL1Bit(trigger_bit);
+        }
+      }else{ ////////////////// phys trigger
+        proceed   = CMSevtinfo->GetL1Bit(trigger_bit);
       }
-    }else{ ////////////////// phys trigger
-      proceed   = CMSevtinfo->GetL1Bit(trigger_bit);
     }
+#else
+    proceed   = CMSevtinfo->GetL1Bit(trigger_bit);
+#endif
   }
   return proceed;
 }
