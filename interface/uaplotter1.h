@@ -25,7 +25,7 @@ public:
              const short unsigned int Ncuts = 2             //!< — see uabase::uabase()
             );
   ~uaplotter1();
-  int Loop(const int evts, const int trigger);
+  int Loop(const int evts, const int trigger, vector<string> hlt_path_regexps = {});
   int noiseLoop(const int evts, bool bptxQuiet = true);
   int t2Loop(const int evts);
 

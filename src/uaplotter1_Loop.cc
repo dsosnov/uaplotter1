@@ -7,9 +7,14 @@
 #include "iostream"
 #include "stdlib.h"
 
+#include <algorithm>
+
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-int uaplotter1::Loop(const int evts, const int trigger)
+/*!
+ * \param hlt_path_regexps vector of regexps for HLT paths, that should be enabled at the same time.
+ */
+int uaplotter1::Loop(const int evts, const int trigger, vector<string> hlt_path_regexps)
 {
   if (mc < 0)
     return noiseLoop(evts);
@@ -55,8 +60,9 @@ int uaplotter1::Loop(const int evts, const int trigger)
       CMSmc->ProceedEvent(dummy_cut, false, false);
     };
 
-
-    if (ProceedTrigger(trigger_bit, tech_bit)) {
+    std::vector<bool>hlts; hlts.resize(hlt_path_regexps.size(),false);
+    std::transform(hlt_path_regexps.begin(), hlt_path_regexps.end(), hlts.begin(), [this](string s){return this->CMSevtinfo->CheckHLT(s.c_str(), 1);});
+    if (ProceedTrigger(trigger_bit, tech_bit) && std::all_of(hlts.begin(), hlts.end(), [](bool b) {return b == true;}) ) {
       trigger_evts++;
 
       if (!CMSevtinfo->GetL1Bit(9)) { //<=== !bptx quiet
