@@ -42,6 +42,8 @@ info:
 
 clean:
 	rm -rf $(OBJ) $(SRC)/uaplot_dict*
+
+clean_all: clean
 	cd $(CMS)/utilities; make clean
 	cd $(TOT)/utilities; make clean
 
