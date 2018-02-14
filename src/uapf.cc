@@ -23,7 +23,7 @@ uapf::uapf(TChain *tree,
     tree->SetBranchAddress("particleFlow",          &PFCand);
   };
   create_histos();
-
+  uabasecentral::create_histos();
 }
 
 
@@ -45,6 +45,7 @@ bool uapf::FillLastEvent(const short unsigned int cut)
     std::cout << "uapf::FillLastEvent: required cut number is larger that possible, do nothing. Please define larger uaforward::n_cut!\n";
     return false;
   };
+  uabasecentral::FillLastEvent(cut);
   pfcand_h[cut]->Fill(nPfCand);
   for (unsigned int bin = 0; bin < N_ETA_BINS; bin++) {
     if ((bin >= BINMIN) && (bin <= BINMAX)) {

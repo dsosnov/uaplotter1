@@ -31,6 +31,7 @@ uacalo::uacalo(TChain *tree,
     hf_max_energy_tower[side] = (double*) malloc(nBinsHF*sizeof(double));
 
   create_histos();
+  uabasecentral::create_histos();
 }
 
 
@@ -53,6 +54,7 @@ bool uacalo::FillLastEvent(const short unsigned int cut)
     std::cout << "uatracking::FillLastEvent: required cut number is larger that possible, do nothing. Please define larger uaforward::n_cut!\n";
     return false;
   };
+  uabasecentral::FillLastEvent(cut);
   hf_etotal_minus_h[cut]->Fill(hf_total_energy_tower[0]);
   hf_etotal_plus_h [cut]->Fill(hf_total_energy_tower[1]);
   for (unsigned int bin = 0; bin < N_ETA_BINS; bin++)

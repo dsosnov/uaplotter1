@@ -28,6 +28,7 @@ uatracking::uatracking(TChain *tree,
     tree->SetBranchAddress("generalTracks",          &Tracks);
   };
   create_histos();
+  uabasecentral::create_histos();
 }
 
 
@@ -50,6 +51,7 @@ bool uatracking::FillLastEvent(const short unsigned int cut)
     std::cout << "uatracking::FillLastEvent: required cut number is larger that possible, do nothing. Please define larger uaforward::n_cut!\n";
     return false;
   };
+  uabasecentral::FillLastEvent(cut);
   tracks_h[cut]->Fill(nTracks);
   tracks_h[cut + n_cuts]->Fill(nTracksGood);
   vertices_h[cut]->Fill(nVtx);
