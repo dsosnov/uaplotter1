@@ -87,10 +87,6 @@ bool uacastor::FillLastEvent(const short unsigned int cut)
 bool uacastor::ProceedEvent(const short unsigned int cut, const bool fill, const bool info)
 {
   if (Castor ==  NULL) return false;
-  if (fill && (cut > n_cuts)) {
-    std::cout << "uacastor::ProceedEvent: required cut number is larger that possible, please define larger uaforward::n_cut!\n";
-    return false;
-  };
 
   total_energy = 0;
   total_em_energy    = 0;
