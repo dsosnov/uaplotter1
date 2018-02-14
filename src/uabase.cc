@@ -59,7 +59,7 @@ void uabase::delete_histos(TH1F **h)
   if (h) {
     for (unsigned int i = 0; i < n_each_h1D; i++) delete h[i];
     delete [] h;
-    std::cout << "ok\n";
+//     std::cout << "ok\n";
   }
 }
 
@@ -71,7 +71,7 @@ void uabase::delete_histos(TH2F **h)
   if (h) {
     for (unsigned int i = 0; i < n_each_h2D; i++) delete h[i];
     delete [] h;
-    std::cout << "ok\n";
+//     std::cout << "ok\n";
   }
 }
 
