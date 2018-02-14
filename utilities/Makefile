@@ -3,7 +3,7 @@ OBJ=../lib
 INTERFACE=../interface
 CMS=../../UATree/UADataFormat
 TOT=../../TOTEMdataFormat
-CXXFLAGS+=$(shell root-config --cflags) -Wall -I$(SRC) -I$(INTERFACE) -I$(CMS)/interface -I$(TOT)/interface -ggdb3 -fPIC -std=gnu++14
+CXXFLAGS+=$(shell root-config --cflags) -Wall -I$(SRC) -I$(INTERFACE) -I$(CMS)/interface -I$(TOT)/interface -ggdb3 -fPIC -std=gnu++14 -O2
 LDFLAGS+=$(shell root-config --glibs)  -ggdb3 
 LINKD=uaplot_LinkDef.h
 HEAD=$(filter-out $(INTERFACE)/$(LINKD) $(INTERFACE)/uaplot_dict.h, $(wildcard $(INTERFACE)/*.h))
