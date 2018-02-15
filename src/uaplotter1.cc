@@ -25,11 +25,21 @@ uaplotter1::uaplotter1(const bool               cmstotem,
   tree_digi_flag(cmsdigis),
   ppb(CASTORp),
   dummy_cut(Ncuts + 1),
-  current_event(0)
-{
+  current_event(0),
+  CMSmc(NULL),
+  CMSevtinfo(NULL),
+  CMStracking(NULL),
+  CMSpf(NULL),
+  CMScalo(NULL),
+  CMScastor(NULL),
+  CMSforward(NULL),
+  T2(NULL),
+  RP(NULL),
+  first_central_bin(0),
+  last_central_bin(0),
+  hf_by_processID_t(NULL)
+  {
   updateThresholds(energy, ppb);
-  first_central_bin = 0;
-  last_central_bin  = 0;
   IniRapGapRange();
   if (tree_combined_flag) {
     chainTree = new TChain("cms_totem");
@@ -41,39 +51,31 @@ uaplotter1::uaplotter1(const bool               cmstotem,
 
   outputFile = TFile::Open(str.Data(), "RECREATE");
 
-  CMSmc = 0;
   if (mc > 0) {
     TDirectory *dirMC = outputFile->mkdir("MC");
     CMSmc              = new uamc(chainTree, dirMC, tree_combined_flag, ppb, mc, n_cuts);
   };
 
-  CMSevtinfo  = 0;
   TDirectory *dirEVT = outputFile->mkdir("CMSinfo");
   CMSevtinfo          = new uacmsevtinfo(chainTree, dirEVT, tree_combined_flag, mc, n_cuts);
 
-  CMStracking = 0;
   TDirectory *dirTRK = outputFile->mkdir("CMStracking");
   CMStracking         = new uatracking(chainTree, dirTRK, tree_combined_flag, mc, n_cuts);
 
-  CMScalo    = 0;
   TDirectory *dirCAL = outputFile->mkdir("CMScalo");
   CMScalo             = new uacalo(chainTree, dirCAL, tree_combined_flag, mc, n_cuts);
 
-  CMSpf    = 0;
   TDirectory *dirPF  = outputFile->mkdir("CMSpf");
   CMSpf               = new uapf(chainTree, dirPF, tree_combined_flag, mc, n_cuts);
 
-  CMScastor = 0;
   TDirectory *dirCAS = outputFile->mkdir("CMScastor");
   CMScastor           = new uacastor(chainTree, dirCAS, tree_combined_flag, tree_digi_flag, mc, n_cuts);
 
-  CMSforward = 0;
   if (tree_digi_flag || (mc > 0)) {
     TDirectory *dirZDC = outputFile->mkdir("ZDC");
     CMSforward          = new uaforward(chainTree, dirZDC, tree_combined_flag, zdc56, mc, n_cuts);
   };
 
-  T2        = 0;
   if (tree_combined_flag) {
     TDirectory *dirT2   = outputFile->mkdir("T2");
     T2                  = new uat2(chainTree, dirT2, tree_combined_flag, n_cuts);
@@ -89,7 +91,6 @@ uaplotter1::uaplotter1(const bool               cmstotem,
   create_histos();
   std::cout << "here2\n";
 
-  hf_by_processID_t = NULL;
 //   hf_by_processID_t = new TTree("hf_by_processID","hf_by_processID");
   if (hf_by_processID_t != NULL){
     hf_by_processID_t->Branch("hfMinus",    &(hf_by_processID.hfMinus));
