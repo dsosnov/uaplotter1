@@ -66,9 +66,12 @@ private:
   short unsigned int last_central_bin;
   bool combined_central_activity[N_ETA_BINS];
 
-  // [0]reco, [1]mctruth eta_binning, [2] mctruch total
-  short int sd_flag_central[2]; //!<central_sd_flag: 0 - ND, -1 - SD-, +1 - SD+, 2 DD~central gap(s), 3  cd cand, 4 "elastic"
-  short int sd_flag_total[3];   //!< all MCtruth for MC, T2 events for RECO
+  enum processID: short {
+    pid_nd=0, pid_cd=3, pid_sdm=-1, pid_sdp=1, pid_dd=2, pid_elastic=4, pid_undefined=5,
+    pid_min = pid_sdm, pid_max=pid_elastic
+  }; //!< Types of processID's: \li 0 - ND \li -1 — SD- \li +1 — SD+ \li 2 — DD~central gap(s) \li 3 — CD cand \li 4 — "elastic" \li 5 — "undefined"
+  processID sd_flag_central[2]; //!< all MCtruth for MC, T2 events for RECO
+  processID sd_flag_total[3];   //!< \li [0] — reco, \li [1] — mctruth eta_binning, \li [2] — mctruch total
   short unsigned int n_sd_minus_bins[2];
   short unsigned int n_sd_plus_bins[2];
   short unsigned int n_dd_rg_bins[2];
@@ -105,10 +108,14 @@ private:
   TH2F **xi_cas_mc_reco_h;
   TH2F **xi_zdc_mc_reco_h;
 
+  TH2F **n_sd_minus_bins_plus_bins_h;
+
   TH1F **n_sd_minus_bins_h;
   TH1F **n_sd_plus_bins_h;
   TH1F **central_activity_h;
   TH1F **central_activity_mc_h;
+  TH1F **sd_flag_central_reco_h;
+  TH1F **sd_flag_total_reco_h;
 
   TH1F **xi_reco_full_h;
 

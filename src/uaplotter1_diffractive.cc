@@ -11,10 +11,10 @@
 void uaplotter1::IniRapGapRange()
 {
   short unsigned int bin = 0;
-  while (ETA_BIN_L[bin] < -CALO_ETA_ACC)bin++;
+  while (ETA_BIN_L[bin] < -RG_ETA_ACC)bin++;
   first_central_bin = bin;
   bin = N_ETA_BINS - 1;
-  while (ETA_BIN_L[bin] + ETA_BIN_W > CALO_ETA_ACC)bin--;
+  while (ETA_BIN_L[bin] + ETA_BIN_W > RG_ETA_ACC)bin--;
   last_central_bin = bin;
 };
 
@@ -35,7 +35,7 @@ bool uaplotter1::FindRapGap(bool RECO)
   n_sd_plus_bins[ind]  = 0;
   n_dd_rg_bins[ind]    = 0;
 
-  bool diff_cand[3] = {true, false, false}; // -, +, central
+  bool diff_cand[3] = {true, false, false}; // -, central, +
   short unsigned int rg_bins[3]   = {0,   0,   0};     //
   short unsigned int max_central_rgbins = 0;
   short unsigned int n_active_bins   = 0;
@@ -44,15 +44,10 @@ bool uaplotter1::FindRapGap(bool RECO)
 
     bool binactivity;
     if (RECO) { //<====================== RG on RECO
-      if ((ETA_BIN_L[bin] >= -1 * CENT_ETA_ACC) && ((ETA_BIN_L[bin] + ETA_BIN_W) <= CENT_ETA_ACC)) {
-        combined_central_activity[bin] = (CMSpf->GetActivityLoose(bin) || CMStracking->GetActivityLoose(bin));   // no _any_ tracks
-      } else { // if ( ( (bin>=3) && (bin<=6) ) || ( (bin>=19) && (bin<=22) ) ){ // !!! TBD to be rewritten
-        combined_central_activity[bin] = (CMScalo->GetActivityLoose(bin) || CMStracking->GetActivityLoose(bin));
-        // 16 Feb 15************
-        //std::cout << bin << "\t" << CMScalo->GetHFmaxTower(bin) << std::endl;
-        //combined_central_activity[bin] = ( (CMStracking->GetActivityLoose(bin)) || (CMScalo->GetHFmaxTower(bin)>CENT_TOWER_THR) );
-        //**********************
-      };
+      if(7 < bin && bin < 18) // tracking works good only in [-2.5,2.5]
+        combined_central_activity[bin] = (CMSpf->GetActivityLoose(bin) || CMStracking->GetActivityTight(bin));   // GetActivityLoose or GetActivityTight
+      else
+        combined_central_activity[bin] = CMSpf->GetActivityLoose(bin);
       binactivity = combined_central_activity[bin];
     } else { //=========================== RG on MCtruth
       binactivity = CMSmc->GetActivityLoose(bin);
@@ -80,62 +75,62 @@ bool uaplotter1::FindRapGap(bool RECO)
       };
     }
 
-
   };//end loop
 
-  if (n_active_bins == 0) { // "~elastic"
-    sd_flag_central[ind] = 4;
+  if (n_active_bins == 0) {                           // "~elastic"
+    sd_flag_central[ind] = processID::pid_elastic;
     rg_bins[2] = rg_bins[0];
-  } else if ((rg_bins[0] == 0) && (max_central_rgbins == 0) && (rg_bins[2] == 0)) { // ND
-    sd_flag_central[ind] = 0;
-  } else if (rg_bins[0] > 0) {
-    if (rg_bins[2] > 0) {
-      sd_flag_central[ind] = 3;      // CD candidate
-    } else {
-      sd_flag_central[ind] = -1;     // SD-
-    };
-  } else {
-    if (rg_bins[2] > 0) {
-      sd_flag_central[ind] = 1;
-    } else if (max_central_rgbins > 1) {
-      sd_flag_central[ind] = 2;      // DD candidate
-    };
-  };
+  } else if ((rg_bins[0] == 0) && (rg_bins[2] == 0)){
+    if (max_central_rgbins > 1){
+      sd_flag_central[ind] = processID::pid_dd;       // DD candidate (it was >1 earlies)
+    } else if(max_central_rgbins == 0){               // ND
+      sd_flag_central[ind] = processID::pid_nd;
+    } else if(max_central_rgbins == 1){               // It was an special case, TODO check how it will be better
+      sd_flag_central[ind] = processID::pid_dd;
+    }
+  } else if(rg_bins[2] == 0){
+    sd_flag_central[ind] = processID::pid_sdm;        // SD-
+  } else if(rg_bins[0] == 0){
+    sd_flag_central[ind] = processID::pid_sdp;        // SD+
+  } else if(rg_bins[0] > 0 && rg_bins[2] > 0){
+    sd_flag_central[ind] = processID::pid_cd;         // CD candidate
+  }
 
   n_sd_minus_bins[ind] = rg_bins[0];
   n_sd_plus_bins[ind]  = rg_bins[2];
   n_dd_rg_bins[ind]    = max_central_rgbins;
 
-
-  ///////////////////////////////////////////////
-  // take into account also sides
-  bool outer_activity_minus;
-  bool outer_activity_plus;
-  if (RECO) {
-    if (mc > 0) {
-      outer_activity_minus = CMSmc->GetT2trigger(false); // minus
-      outer_activity_plus  = CMSmc->GetT2trigger(true);  // plus
-    } else if (mc == 0 /*&&tree_digi_flag*/) { //TODO check
-      outer_activity_minus = (T2->NPrimtracksMinus() > 0);
-      outer_activity_plus  = (T2->NPrimtracksPlus() > 0);
-    } else { // fake case noise
-      outer_activity_minus = false;
-      outer_activity_plus  = false;
-    };
-    TotalRapGap(0, outer_activity_minus, outer_activity_plus);
-  } else {
-    outer_activity_minus = false;
-    outer_activity_plus  = false;
-    for (unsigned int bin = 0; bin < first_central_bin; bin++)
-      outer_activity_minus = (outer_activity_minus || CMSmc->GetActivityLoose(bin));
-    for (unsigned int bin = N_ETA_BINS - 1; bin > last_central_bin; bin--)
-      outer_activity_plus = (outer_activity_plus || CMSmc->GetActivityLoose(bin));
-    TotalRapGap(1, outer_activity_minus, outer_activity_plus);
-
-    outer_activity_minus = (outer_activity_minus || CMSmc->GetOuterE(false));
-    outer_activity_plus = (outer_activity_plus || CMSmc->GetOuterE(true));
-    TotalRapGap(2, outer_activity_minus, outer_activity_plus);
-  };
+  sd_flag_total[ind] = sd_flag_central[ind];
+// WARNING temporary disabled finding of total sd flag
+//   ///////////////////////////////////////////////
+//   // take into account also sides
+//   bool outer_activity_minus;
+//   bool outer_activity_plus;
+//   if (RECO) {
+//     if (mc > 0) {
+//       outer_activity_minus = CMSmc->GetT2trigger(false); // minus
+//       outer_activity_plus  = CMSmc->GetT2trigger(true);  // plus
+//     } else if (mc == 0 && tree_digi_flag) {\
+//       outer_activity_minus = (T2->NPrimtracksMinus() > 0);
+//       outer_activity_plus  = (T2->NPrimtracksPlus() > 0);
+//     } else { // fake case noise
+//       outer_activity_minus = false;
+//       outer_activity_plus  = false;
+//     };
+//     TotalRapGap(0, outer_activity_minus, outer_activity_plus);
+//   } else {
+//     outer_activity_minus = false;
+//     outer_activity_plus  = false;
+//     for (unsigned int bin = 0; bin < first_central_bin; bin++)
+//       outer_activity_minus = (outer_activity_minus || CMSmc->GetActivityLoose(bin));
+//     for (unsigned int bin = N_ETA_BINS - 1; bin > last_central_bin; bin--)
+//       outer_activity_plus = (outer_activity_plus || CMSmc->GetActivityLoose(bin));
+//     TotalRapGap(1, outer_activity_minus, outer_activity_plus);
+//
+//     outer_activity_minus = (outer_activity_minus || CMSmc->GetOuterE(false));
+//     outer_activity_plus = (outer_activity_plus || CMSmc->GetOuterE(true));
+//     TotalRapGap(2, outer_activity_minus, outer_activity_plus);
+//   };
 
 
   // below is just to prepare values for diff mass calculation and make sure the values are ok.
@@ -147,11 +142,9 @@ bool uaplotter1::FindRapGap(bool RECO)
 
   xi_mc_out   = 0; // this includes ZDC and CASTOR also!
   xi_mc_total = 0; // everything from first active bin in reco
-
+//   cout << ":2 RapidityGaps type: " << sd_flag_central[ind] << " -> " <<  sd_flag_total[ind] << std::endl;
   return rg;
 };
-
-
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -160,86 +153,86 @@ bool uaplotter1::TotalRapGap(short unsigned int ind, bool active_minus, bool act
   bool rg = false;
   //std::cout << "=====> " << ind << "  " << active_minus << " " << active_plus << std::endl;
   switch (sd_flag_central[ind]) {
-    case 0: // ND
+    case processID::pid_nd: // ND
       if (!active_minus) {
         if (!active_plus) {
-          sd_flag_total[ind] = 3;
+          sd_flag_total[ind] = processID::pid_cd;
         } else {
-          sd_flag_total[ind] = -1;
+          sd_flag_total[ind] = processID::pid_sdm;
         };
       } else {
         if (!active_plus) {
-          sd_flag_total[ind] = 1;
+          sd_flag_total[ind] = processID::pid_sdp;
         } else {
-          sd_flag_total[ind] = 0;
+          sd_flag_total[ind] = processID::pid_nd;
         }
       };
       break;
-    case 2:
+    case processID::pid_dd:
       if (!active_minus) {
         if (!active_plus) {
-          sd_flag_total[ind] = 3;
+          sd_flag_total[ind] = processID::pid_cd;
         } else {
-          sd_flag_total[ind] = -1;
+          sd_flag_total[ind] = processID::pid_sdm;
         };
       } else {
         if (!active_plus) {
-          sd_flag_total[ind] = 1;
+          sd_flag_total[ind] = processID::pid_sdp;
         } else {
-          sd_flag_total[ind] = 2;
+          sd_flag_total[ind] = processID::pid_dd;
         }
       };
-    case 3:
+    case processID::pid_cd:
       if (!active_minus) {
         if (!active_plus) {
-          sd_flag_total[ind] = 3;
+          sd_flag_total[ind] = processID::pid_cd;
         } else {
-          sd_flag_total[ind] = -1;
+          sd_flag_total[ind] = processID::pid_sdm;
         };
       } else {
         if (!active_plus) {
-          sd_flag_total[ind] = 1;
+          sd_flag_total[ind] = processID::pid_sdp;
         } else {
-          sd_flag_total[ind] = 2;
+          sd_flag_total[ind] = processID::pid_dd;
         }
       };
       break;
-    case -1:
+    case processID::pid_sdm:
       if (!active_minus) {
-        sd_flag_total[ind] = -1;
+        sd_flag_total[ind] = processID::pid_sdm;
       } else {
-        sd_flag_total[ind] = 2;
+        sd_flag_total[ind] = processID::pid_dd;
       };
       break;
-    case +1:
+    case processID::pid_sdp:
       if (!active_plus) {
-        sd_flag_total[ind] = 1;
+        sd_flag_total[ind] = processID::pid_sdp;
       } else {
-        sd_flag_total[ind] = 2;
+        sd_flag_total[ind] = processID::pid_dd;
       };
       break;
-    case 4:
+    case processID::pid_elastic:
       if (!active_minus) {
         if (!active_plus) {
-          sd_flag_total[ind] = 4;
+          sd_flag_total[ind] = processID::pid_elastic;
         } else {
-          sd_flag_total[ind] = -1;
+          sd_flag_total[ind] = processID::pid_sdm;
         };
       } else {
         if (!active_plus) {
-          sd_flag_total[ind] = 1;
+          sd_flag_total[ind] = processID::pid_sdp;
         } else {
-          sd_flag_total[ind] = 2;
+          sd_flag_total[ind] = processID::pid_dd;
         }
       };
+      break;
+    case processID::pid_undefined:
+      cout << "uaplotter1::TotalRapGap: undefined PID\n";
       break;
   }; // end switch
-  rg = (sd_flag_total[ind] != 0);
+  rg = (sd_flag_total[ind] != processID::pid_undefined);
   return rg;
 }
-
-
-
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -260,20 +253,6 @@ void uaplotter1::PrintRapGap()
   std::cout << std::endl;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 void uaplotter1::CalculateSDdiffMass(bool info)
@@ -293,7 +272,18 @@ void uaplotter1::CalculateSDdiffMass(bool info)
 
   // -1=> rg at -side, X @ +Z => sign -; considered ZDC+: plus = true
   // +1=> rg at +side, X @ -Z => sign +; considered ZDC-: plus = false
-  int sign_  = sd_flag_total[0];
+  int sign_ = 0;
+  switch (sd_flag_total[0]){
+    case processID::pid_sdm:       sign_ = -1; break;
+    case processID::pid_nd :       sign_ =  0; break;
+    case processID::pid_sdp:       sign_ =  1; break;
+    case processID::pid_dd :       sign_ =  2; break;
+    case processID::pid_cd :       sign_ =  3; break;
+    case processID::pid_elastic:   sign_ =  4; break;
+    case processID::pid_undefined: 
+      cout << "uaplotter1::CalculateSDdiffMass: undefined PID\n";
+      break; 
+  }
   bool Xplus = !(sign_ > 0);
   // zdc for X side xi ~ (E-Pz)/2Ep ~ 0 (if we don't know pz)
   // zdc for opposite side we can't use

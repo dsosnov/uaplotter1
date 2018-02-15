@@ -55,8 +55,8 @@ int uaplotter1::t2Loop(const int evts){
     current_event = i;
 
 
-    memset(sd_flag_central, 0, sizeof(sd_flag_central));
-    memset(sd_flag_total,   0, sizeof(sd_flag_total));
+    memset(sd_flag_central, processID::pid_undefined, sizeof(sd_flag_central));
+    memset(sd_flag_total,   processID::pid_undefined, sizeof(sd_flag_total));
     bool MB = false;
     //std::cout << ProceedTrigger(52,true) << "  " << ProceedTrigger(53,true) << std::endl;
     if(ProceedTrigger(53, true)){
