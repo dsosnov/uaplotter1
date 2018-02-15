@@ -89,8 +89,9 @@ uaplotter1::uaplotter1(const bool               cmstotem,
   create_histos();
   std::cout << "here2\n";
 
-  if(mc>0){
-    hf_by_processID_t = new TTree("hf_by_processID","hf_by_processID");
+  hf_by_processID_t = NULL;
+//   hf_by_processID_t = new TTree("hf_by_processID","hf_by_processID");
+  if (hf_by_processID_t != NULL){
     hf_by_processID_t->Branch("hfMinus",    &(hf_by_processID.hfMinus));
     hf_by_processID_t->Branch("hfPlus",     &(hf_by_processID.hfPlus));
     hf_by_processID_t->Branch("processID",  &(hf_by_processID.processID));
@@ -125,7 +126,7 @@ uaplotter1::~uaplotter1()
     delete T2;
   if (tree_combined_flag || (mc > 0))
     delete RP;
-  if(mc > 0)
+  if (hf_by_processID_t != NULL)
     hf_by_processID_t->Delete();
 }
 
@@ -203,7 +204,7 @@ bool uaplotter1::ProceedEvent(const short unsigned int cut, const bool fill, con
   };
 
   // ********** Short information about MC events ******************
-  if(mc>0&&cut==0){;
+  if(cut==0){;
     hf_by_processID.hfMinus = CMScalo->GetHFmax(0);
     hf_by_processID.hfPlus = CMScalo->GetHFmax(1);
     hf_by_processID.processID = (mc>0) ? CMSmc->GetProcessID() : 0;
@@ -308,7 +309,7 @@ bool uaplotter1::FillLastEvent(const short unsigned int cut)
   sd_flag_total_reco_h[cut]->Fill(sd_flag_total[0]);
 
   // ********** Short information about MC events ******************
-  if(mc>0&&cut==0){;
+  if((hf_by_processID_t != NULL) && (cut==0)){;
     hf_by_processID_t->Fill();
   }
 
