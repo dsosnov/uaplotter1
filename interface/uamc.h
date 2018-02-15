@@ -8,41 +8,41 @@
 class uamc :  public uabasecentral
 {
 public:
-  uamc(TChain     * tree, 	 //!<tree of ua format
-      TDirectory * dir,    //!<directory in the output root file
-      const bool cmstotem, //!<true for merged, false for CMS only
-      const bool              pPb,  //!< true for pPb (p->Castor)
-      const short          int MC,  //!< -1, 0 - data; >0 MC
-      const short unsigned int Ncuts //!< number of cuts
+  uamc(TChain*              tree,     //!<tree of ua format
+       TDirectory*          dir,      //!<directory in the output root file
+       const bool           cmstotem, //!<true for merged, false for CMS only
+       const bool           pPb,      //!< true for pPb (p->Castor)
+       const short          MC,       //!< -1, 0 - data; >0 MC
+       const unsigned short Ncuts     //!< number of cuts
     );
   ~uamc();
-  void      PrintEventInfo(const bool detailed);
-  void      PrintProtonInfo();
-  bool      FillLastEvent(const short unsigned int cut);
-  bool      ProceedEvent(const short unsigned int cut, const bool fill, const bool info);
+  void PrintEventInfo(const bool detailed);
+  void PrintProtonInfo();
+  bool FillLastEvent(const short unsigned int cut);
+  bool ProceedEvent(const short unsigned int cut, const bool fill, const bool info);
 
-  bool      GetT2trigger(){return ( (trksT2[0]>0) || (trksT2[1]>0) ); };
-  bool      GetT2trigger(bool plus){return trksT2[int(plus)]>0;};
-  unsigned int GetNT2trk(bool plus){return trksT2[int(plus)];};
+  bool         GetT2trigger () const {return ( (trksT2[0]>0) || (trksT2[1]>0) ); };
+  bool         GetT2trigger(bool plus) const {return trksT2[int(plus)]>0;};
+  unsigned int GetNT2trk(bool plus) const {return trksT2[int(plus)];};
 
-  double    GetOuterE(bool plus){return outRangeE[int(plus)];};
-  double    GetOuterPz(bool plus){return outRangePz[int(plus)];};
+  double GetOuterE(bool plus) const {return outRangeE[int(plus)];};
+  double GetOuterPz(bool plus) const {return outRangePz[int(plus)];};
 
-  short int IntactProton(){return protonSign;};
-  double    IntactProtonE(){return protonE;};
-  double    IntactProtonPz(){return protonPz;};
-  double    IntactProtonXi(){return protonXi;};
-  double    IntactProtonPt(){return protonPt;};
+  short  IntactProton()   const {return protonSign;};
+  double IntactProtonE()  const {return protonE;};
+  double IntactProtonPz() const {return protonPz;};
+  double IntactProtonXi() const {return protonXi;};
+  double IntactProtonPt() const {return protonPt;};
 
-  double GetZDCEn(bool plus){return eZDCn[int(plus)];};
-  double GetZDCEg(bool plus){return eZDCg[int(plus)];};
-  double GetZDCPzn(bool plus){return pzZDCn[int(plus)];;};
-  double GetZDCPzg(bool plus){return pzZDCg[int(plus)];;};
+  double GetZDCEn(bool plus)  const {return eZDCn[int(plus)];};
+  double GetZDCEg(bool plus)  const {return eZDCg[int(plus)];};
+  double GetZDCPzn(bool plus) const {return pzZDCn[int(plus)];;};
+  double GetZDCPzg(bool plus) const {return pzZDCg[int(plus)];;};
 
-  double GetCastorE(){return castorE;};
-  double GetCastorPz(){return castorPz;};
+  double GetCastorE()  const {return castorE;};
+  double GetCastorPz() const {return castorPz;};
 
-  int GetProcessID(){ for(auto p: *MCthuth) if(p.processID) return p.processID; return 0; }
+  int GetProcessID() const { for(auto p: *MCthuth) if(p.processID) return p.processID; return 0; }
 
 private:
   const bool ppb;
@@ -80,6 +80,7 @@ private:
   TH2F ** proton_pt2_xi_h; //!< X: pt^2;    Y: xi(p`)
 //  TH2F ** proton_e_eta_h;  //!<  X: |eta|;  Y: E(p`)
 //  TH2F ** proton_e_pt2_h;  //!<  X: pt^2;   Y: E(p`)
+
   ClassDef(uamc,2);
 };
 
