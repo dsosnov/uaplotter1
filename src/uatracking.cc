@@ -60,6 +60,14 @@ bool uatracking::FillLastEvent(const short unsigned int cut)
     tracks_eta_h[cut]->Fill(ETA_BIN_L[bin], n_tracks_bin_all[bin]);
     tracks_eta_h[cut + n_cuts]->Fill(ETA_BIN_L[bin], n_tracks_bin_good[bin]);
   };
+  for (auto t: *Tracks) {
+    tracks_pt_h[cut]->Fill(t.pt());
+    tracks_eta_pt_h[cut]->Fill(t.eta(), t.pt());
+    if(t.quality[1]){
+      tracks_pt_h[cut+n_cuts]->Fill(t.pt());
+      tracks_eta_pt_h[cut+n_cuts]->Fill(t.eta(), t.pt());
+    }
+  }
   return true;
 }
 
@@ -92,6 +100,8 @@ bool uatracking::ProceedEvent(const short unsigned int cut, const bool fill, con
 {
   memset(n_tracks_bin_all,  0, sizeof(n_tracks_bin_all));
   memset(n_tracks_bin_good, 0, sizeof(n_tracks_bin_good));
+  memset(pt_maxabs_tracks_bin_all,  0, sizeof(pt_maxabs_tracks_bin_all));
+  memset(pt_maxabs_tracks_bin_good, 0, sizeof(pt_maxabs_tracks_bin_good));
   PrepareArrays(); // cleans eta arrays
   nVtx        = 0;
   nVtxGoog    = 0;
@@ -99,58 +109,37 @@ bool uatracking::ProceedEvent(const short unsigned int cut, const bool fill, con
   nTracksGood = 0;
 
   short unsigned int i = 0;
-  for (std::vector<MyVertex>::iterator v = Vertices->begin(); v != Vertices->end(); ++v) {
-    if ((*v).ndof != 0) { // event vertices
-      nVtx++;
-//       if(fill){
-//  vertices_X_h[cut]->Fill((*v).x);
-//  vertices_Y_h[cut]->Fill((*v).y);
-//  vertices_Z_h[cut]->Fill((*v).z);
-//       };
-      // good vertices
-      if (((*v).ntracks > 1) && (fabs((*v).z) < 15) && (fabs((*v).x) < 0.2) && (fabs((*v).y) < 0.2)) {
-        nVtxGoog++;
-//  if(fill){
-//    vertices_X_h[n_cuts+cut]->Fill((*v).x);
-//    vertices_Y_h[n_cuts+cut]->Fill((*v).y);
-//    vertices_Z_h[n_cuts+cut]->Fill((*v).z);
-//  };
-      };
-    } else { // beam position - fill only once
-//       if(cut==0){
-//  vertices_beamX_h->Fill((*v).x);
-//  vertices_beamY_h->Fill((*v).y);
-//  vertices_beamZ_h->Fill((*v).z);
-//       };
-    };
-  }; // end vertex loop
+  for (auto v: *Vertices) {
+    if (v.ndof == 0) continue;
+    nVtx++;
+    if ((v.ntracks > 1) && (fabs(v.z) < 15) &&
+      (fabs(v.x) < 0.2) && (fabs(v.y) < 0.2)) { // good vertices
+      nVtxGoog++;
+    }
+  } // end vertex loop
 
 
-  for (std::vector<MyTracks>::iterator t = Tracks->begin(); t != Tracks->end(); ++t) {
-    int bin = find_eta_bin((*t).eta());
+  for (auto t: *Tracks) {
+    int bin = find_eta_bin(t.eta());
     n_tracks_bin_all[bin]++;
     nTracks++;
-    if ((*t).quality[1]) {  // tight tracks
-      n_tracks_bin_good[bin]++;
-      nTracksGood++;
-//       if((nvtx_good==1) && ((*t).ed0!=0) && ((*t).edz!=0) && (fabs((*t).d0/(*t).ed0)) && (fabs((*t).dz/(*t).edz)) ){
-//  n_tracks_bin_vtx[bin]++;
-//  n_tracks_vtx++;
-//       };
-    };
+    if ( fabs(t.pt()) > pt_maxabs_tracks_bin_all[bin] ) pt_maxabs_tracks_bin_all[bin] = fabs(t.pt());
+    if (!t.quality[2]) continue; // not hight purity
+    n_tracks_bin_good[bin]++;
+    nTracksGood++;
+    if ( fabs(t.pt()) > pt_maxabs_tracks_bin_good[bin] ) pt_maxabs_tracks_bin_good[bin] = fabs(t.pt());
     if (info) {
       std::cout << "trck# " << i++ << " ";
-      for (int b = 0; b < 5; b++)
-        std::cout << (*t).quality[b];
-      std::cout << " " << (*t).chi2n << " \t\teta: " << (*t).Eta() << "\tphi: " << (*t).Phi()*TMath::RadToDeg() << "\tpt: " << (*t).Pt() << "\tE:" << (*t).energy()
-                << "\t charge:" << (*t).charge;
+      for (int b = 0; b < 5; b++) std::cout << t.quality[b];
+      std::cout << " " << t.chi2n << " \t\teta: " << t.Eta() << "\tphi: " << t.Phi()*TMath::RadToDeg() << "\tpt: " << t.Pt() << "\tE:" << t.energy()
+                << "\t charge:" << t.charge;
       std::cout << std::endl;
-    }; // end info
-  }; // end track loop
+    }
+  }
 
-  for (unsigned short int bin = 0; bin < N_ETA_BINS; bin++) {
+  for (unsigned short int bin = TRCK_ETA_MIN_BIN; bin <= TRCK_ETA_MAX_BIN; bin++) {
     if (n_tracks_bin_all[bin] > 0)  activity_loose[bin] = true;
-    if (n_tracks_bin_good[bin] > 0) activity_tight[bin] = true;
+    if (pt_maxabs_tracks_bin_good[bin] > 0.4) activity_tight[bin] = true;
   };
   if (info)
     PrintEventInfo(true);
@@ -236,7 +225,9 @@ void uatracking::create_histos()
   */
 
   tracks_h     = new TH1F * [n_each_h1D];
+  tracks_pt_h = new TH1F * [n_each_h1D];
   tracks_eta_h = new TH2F * [n_each_h2D];
+  tracks_eta_pt_h = new TH2F * [n_each_h2D];
   for (unsigned int i = 0; i < n_cuts; i++) {
     title1      = "tracks_h["; title1 += i; title1 += "]";
     title2      = title1; title2 += "; ntrcks";
@@ -248,6 +239,16 @@ void uatracking::create_histos()
     tracks_h[i + n_cuts] = new TH1F(title1.Data(), title2.Data(), 201, -1, 200);
     tracks_h[i + n_cuts]->SetDirectory(directory);
 
+    title1      = "tracks_pt_h["; title1 += i; title1 += "]";
+    title2      = title1; title2 += "; p_T;";
+    tracks_pt_h[i] = new TH1F(title1.Data(), title2.Data(), 14000, -7000, 7000);
+    tracks_pt_h[i]->SetDirectory(directory);
+
+    title1      = "tracks_pt_h["; title1 += (i + n_cuts); title1 += "]";
+    title2      = title1; title2 += " good; p_T";
+    tracks_pt_h[i + n_cuts] = new TH1F(title1.Data(), title2.Data(), 14000, -7000, 7000);
+    tracks_pt_h[i + n_cuts]->SetDirectory(directory);
+
     title1      = "tracks_eta_h["; title1 += i; title1 += "]";
     title2      = title1; title2 += "; #eta; N_{all}";
     tracks_eta_h[i] = new TH2F(title1.Data(), title2.Data(), 28, -7, 7, 201, -1, 200);
@@ -258,7 +259,20 @@ void uatracking::create_histos()
     tracks_eta_h[i + n_cuts] = new TH2F(title1.Data(), title2.Data(), 28, -7, 7, 201, -1, 200);
     tracks_eta_h[i + n_cuts]->SetDirectory(directory);
 
+    title1      = "tracks_eta_pt_h["; title1 += i; title1 += "]";
+    title2      = title1; title2 += "; #eta; p_T";
+    tracks_eta_pt_h[i] = new TH2F(title1.Data(), title2.Data(), 28, -7, 7, 14000, -7000, 7000);
+    tracks_eta_pt_h[i]->SetDirectory(directory);
+
+    title1      = "tracks_eta_pt_h["; title1 += (i + n_cuts); title1 += "]";
+    title2      = title1; title2 += " good; #eta; p_T";
+    tracks_eta_pt_h[i + n_cuts] = new TH2F(title1.Data(), title2.Data(), 28, -7, 7, 14000, -7000, 7000);
+    tracks_eta_pt_h[i + n_cuts]->SetDirectory(directory);
+
+
   };
   h1D->push_back(tracks_h);
+  h1D->push_back(tracks_pt_h);
   h2D->push_back(tracks_eta_h);
+  h2D->push_back(tracks_eta_pt_h);
 }

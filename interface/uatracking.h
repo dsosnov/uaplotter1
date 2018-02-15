@@ -37,6 +37,8 @@ private:
 
   unsigned int n_tracks_bin_all [N_ETA_BINS];
   unsigned int n_tracks_bin_good[N_ETA_BINS];
+  double pt_maxabs_tracks_bin_all [N_ETA_BINS];
+  double pt_maxabs_tracks_bin_good[N_ETA_BINS];
 
   void create_histos();
 
@@ -45,7 +47,9 @@ private:
   //TH1F ** vertices_Y_h;
   //TH1F ** vertices_Z_h;
   TH1F **tracks_h;
+  TH1F **tracks_pt_h;
   TH2F **tracks_eta_h;
+  TH2F **tracks_eta_pt_h;
 
   ClassDef(uatracking, 2);
 
