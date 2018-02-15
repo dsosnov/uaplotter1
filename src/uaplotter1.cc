@@ -87,9 +87,7 @@ uaplotter1::uaplotter1(const bool               cmstotem,
   };
 
   //directory = outputFile->mkdir("main");
-  std::cout << "here1\n";
   create_histos();
-  std::cout << "here2\n";
 
 //   hf_by_processID_t = new TTree("hf_by_processID","hf_by_processID");
   if (hf_by_processID_t != NULL){
@@ -223,6 +221,10 @@ bool uaplotter1::ProceedEvent(const short unsigned int cut, const bool fill, con
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 bool uaplotter1::FillLastEvent(const short unsigned int cut)
 {
+  if (cut >= n_cuts) {
+    std::cout << "uaplotter1::FillLastEvent: cut number [" << cut << "] larger then n_cuts [" << n_cuts << "]\n";
+    return false;
+  };
   bool ok = true;
   if (mc > 0)
     ok *= CMSmc->FillLastEvent(cut);
