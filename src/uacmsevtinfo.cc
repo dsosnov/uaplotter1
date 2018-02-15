@@ -55,6 +55,9 @@ uacmsevtinfo::~uacmsevtinfo()
 void uacmsevtinfo::PrintEventInfo(const bool detailed)
 {
   if (detailed) {
+  std::cout << "uacmsevtinfo::PrintEventInfo: Run:\t"      << CMSevtInfo->Run << std::endl;
+  std::cout << "uacmsevtinfo::PrintEventInfo: Bunch:\t"    << CMSevtInfo->Bunch << std::endl;
+  std::cout << "uacmsevtinfo::PrintEventInfo: LumiSect:\t" << CMSevtInfo->LumiSect << std::endl;
     std::cout << "uacmsevtinfo::PrintEventInfo: L1:\n\t";
     for (short unsigned int b = 0; b < CMStrigInfo->triggerResults.size(); b++)
       if (CMStrigInfo->triggerResults.at(b))
