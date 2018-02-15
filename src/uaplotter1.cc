@@ -467,27 +467,27 @@ void uaplotter1::create_histos()
   for (unsigned int i = 0; i < n_each_h2D; i++) {
     title1 = "xi_p_reco_full_h["; title1 += i; title1 += "]";
     title2 = title1; title2 += " ;#xi_{p}; #xi_{RECO_full}";
-    xi_p_reco_full_h[i]    = new TH2F(title1.Data(), title2.Data(), 2200, -1.1, 1.1, 2200, -1.1, 1.1);
+    xi_p_reco_full_h[i]    = new TH2F(title1.Data(), title2.Data(), 22, -1.1, 1.1, 22, -1.1, 1.1);
 
     title1 = "zdcM_vs_castor_h["; title1 += i; title1 += "]";
     title2 = title1; title2 += ";CASTOR E [GeV]; ZDC- E [a.u.]";
-    zdcM_vs_castor_h[i] = new TH2F(title1.Data(), title2.Data(), 6500, -500, 6000, 4200, -2000, 40000);
+    zdcM_vs_castor_h[i] = new TH2F(title1.Data(), title2.Data(), 65, -500, 6000, 42, -2000, 40000);
 
     title1 = "zdcM_vs_T2primM_h["; title1 += i; title1 += "]";
     title2 = title1; title2 += ";N_{tr}(T2-); ZDC- E [a.u.]";
-    zdcM_vs_T2primM_h[i] = new TH2F(title1.Data(), title2.Data(), 110, -10., 100., 4200, -2000, 40000);
+    zdcM_vs_T2primM_h[i] = new TH2F(title1.Data(), title2.Data(), 11, -10., 100., 42, -2000, 40000);
 
     title1 = "ZDCm_vs_xiRP_h["; title1 += i; title1 += "]";
     title2 = title1; title2 += ";#xi_{p}; ZDC- E [a.u.]";
-    ZDCm_vs_xiRP_h[i] = new TH2F(title1.Data(), title2.Data(), 2200, -1.1, 1.1, 420, -2000, 40000);
+    ZDCm_vs_xiRP_h[i] = new TH2F(title1.Data(), title2.Data(), 22, -1.1, 1.1, 42, -2000, 40000);
 
     title1 = "ZDCp_vs_xiRP_h["; title1 += i; title1 += "]";
     title2 = title1; title2 += ";#xi_{p}; ZDC+ E [a.u.]";
-    ZDCp_vs_xiRP_h[i] = new TH2F(title1.Data(), title2.Data(), 2200, -1.1, 1.1, 420, -20000, 400000);
+    ZDCp_vs_xiRP_h[i] = new TH2F(title1.Data(), title2.Data(), 22, -1.1, 1.1, 42, -20000, 400000);
 
     title1 = "FSCmSi8_vs_xiRP_h["; title1 += i; title1 += "]";
     title2 = title1; title2 += ";#xi_{p};q6(FSC-) [fC]";
-    FSCmSi8_vs_xiRP_h[i] = new TH2F(title1.Data(), title2.Data(), 2200, -1.1, 1.1, 200, -3000, 197000);
+    FSCmSi8_vs_xiRP_h[i] = new TH2F(title1.Data(), title2.Data(), 22, -1.1, 1.1, 2, -3000, 197000);
 
     title1 = "FSCmN_vs_xiRP_h["; title1 += i; title1 += "]";
     title2 = title1; title2 += ";#xi_{p};number of FSC channels";
