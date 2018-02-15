@@ -110,7 +110,7 @@ bool uaplotter1::FindRapGap(bool RECO)
 //     if (mc > 0) {
 //       outer_activity_minus = CMSmc->GetT2trigger(false); // minus
 //       outer_activity_plus  = CMSmc->GetT2trigger(true);  // plus
-//     } else if (mc == 0 && tree_digi_flag) {\
+//     } else if (mc == 0 && tree_digi_flag) {
 //       outer_activity_minus = (T2->NPrimtracksMinus() > 0);
 //       outer_activity_plus  = (T2->NPrimtracksPlus() > 0);
 //     } else { // fake case noise
