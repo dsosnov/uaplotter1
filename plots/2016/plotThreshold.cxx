@@ -2,14 +2,18 @@
 void plotThreshold(std::string additionalText = "", std::string ifilename = "uaplot.root")
 {
   // string additionalText=""; string ifilename = "uaplot.root";
-
+  const bool SAVE_THRSHOLDS_BY_BIN = false;
+  
   gStyle->SetOptFit(1);
   gStyle->SetOptStat(0);
   TFile *f = TFile::Open(ifilename.c_str(),"r");
   TH1F *hcal_h, *hf_p_h, *hf_m_h;
   TString hN;
   TCanvas *c1 = new TCanvas("c1", "c1", 800, 600);
-  vector<pair<int,string>> typesOfBptx = { make_pair(0,"bptxxor_"),make_pair(1,"bptxplus_"),make_pair(2,"bptxminus_")};
+  vector<pair<int,string>> typesOfBptx = {
+    make_pair(4,"notracks_bptxxor_"),make_pair(5,"notracks_bptxplus_"),make_pair(6,"notracks_bptxminus_"),make_pair(7,"notracks_bptxquiet_"),
+    make_pair(0,"all_bptxxor_"),make_pair(1,"all_bptxplus_"),make_pair(2,"all_bptxminus_"),make_pair(3,"all_bptxquiet_")
+  };
   { //! For ordinary plots for CaloTower and ParticleFlow
     std::vector<std::tuple<TString, std::string, std::string>> histogramData = {
       std::make_tuple("CMScalo/calotower_e_eta_h[", "Calo Towers", "summary_calotower_e_eta.eps"),
@@ -118,33 +122,35 @@ void plotThreshold(std::string additionalText = "", std::string ifilename = "uap
                 // std::cout << "::4\n";
                 threshold = projection->GetBinLowEdge(currentBin) + projection->GetBinWidth(currentBin);
               }
-              std::cout << "For histogram: " << hN << ", bin: " << b << " threshold at " << threshold << std::endl;
-              //std::cout <<" [ " << sum << " at bin " << currentBin << "; "<< sumI <<" events at bin ]" << std::endl;
-              // std::printf("For histogram: %s, bin: %i threshold at %f [ %f at bin %i]\n", h.Data(), b, threshold, sum, currentBin);
-              // std::printf("{ %f = %f + %i * %f }\n", threshold, projection->GetBinLowEdge(1), currentBin, projection->GetBinWidth(currentBin));
               thresholds_current.push_back(threshold);
-              c2->SetLogy(); c2->SetLogx();
-              projection->SetAxisRange(0.1, 1000);
-              // projection->SetAxisRange(0, 1, "Y");
-              projection->SetTitle(title_main);
-              // projection->Print();
-              projection->Draw();
-              pt->Draw("SAME");
-              if (sumI!=0) {
-                double widthArray[3] = {0.1,threshold,2000};
-                TH1F* th = new TH1F("","",2,widthArray); th->SetBinContent(1,1);
-                // th->SetFillColorAlpha(kYellow,.35);
-                th->SetFillColor(kYellow);
-                th->SetFillStyle(3002);
-                th->SetLineWidth(0);
-                th->Draw("SAME");
+              if(SAVE_THRSHOLDS_BY_BIN){
+                std::cout << "For histogram: " << hN << ", bin: " << b << " threshold at " << threshold << std::endl;
+                //std::cout <<" [ " << sum << " at bin " << currentBin << "; "<< sumI <<" events at bin ]" << std::endl;
+                // std::printf("For histogram: %s, bin: %i threshold at %f [ %f at bin %i]\n", h.Data(), b, threshold, sum, currentBin);
+                // std::printf("{ %f = %f + %i * %f }\n", threshold, projection->GetBinLowEdge(1), currentBin, projection->GetBinWidth(currentBin));
+                c2->SetLogy(); c2->SetLogx();
+                projection->SetAxisRange(0.1, 1000);
+                // projection->SetAxisRange(0, 1, "Y");
+                projection->SetTitle(title_main);
+                // projection->Print();
+                projection->Draw();
+                pt->Draw("SAME");
+                if (sumI!=0) {
+                  double widthArray[3] = {0.1,threshold,2000};
+                  TH1F* th = new TH1F("","",2,widthArray); th->SetBinContent(1,1);
+                  // th->SetFillColorAlpha(kYellow,.35);
+                  th->SetFillColor(kYellow);
+                  th->SetFillStyle(3002);
+                  th->SetLineWidth(0);
+                  th->Draw("SAME");
+                }
+                projection->Draw("SAME");
+                // projection->GetYaxis()->DrawClone("SAME");
+                TString filename = p.second; filename+=title_main; filename+=".eps";
+                c2->SaveAs(filename.Data());
+                c2->Clear();
+                gStyle->SetOptTitle(1);
               }
-              projection->Draw("SAME");
-              // projection->GetYaxis()->DrawClone("SAME");
-              TString filename = p.second; filename+=title_main; filename+=".eps";
-              c2->SaveAs(filename.Data());
-              c2->Clear();
-              gStyle->SetOptTitle(1);
             }
             thresholds.push_back(thresholds_current);
             thresholds_current.clear();
@@ -165,7 +171,7 @@ void plotThreshold(std::string additionalText = "", std::string ifilename = "uap
                                          hs->GetXaxis()->GetBinLowEdge(1),
                                          hs->GetXaxis()->GetBinLowEdge(nbins) + hs->GetXaxis()->GetBinWidth(nbins));
             for(int bin = 0; bin<nbins; ++bin) threshold_h->SetBinContent(bin+1, thresholds.at(i).at(bin));
-            std::cout << "Thresholds for " << namesForHisto.at(i).Data() <<": ";
+            std::cout << "Thresholds for " << namesForHisto.at(i).Data() << " [" << p.second << "; " << hN << "]" <<": ";
             for(int bin = 0; bin<nbins; ++bin) std::cout<< threshold_h->GetBinContent(bin+1) << " ";std::cout << std::endl;
             threshold_h->SetName((namesForHisto.at(i)+additionalText).Data());
             threshold_h->SetXTitle("#eta");
@@ -195,12 +201,8 @@ void plotThreshold(std::string additionalText = "", std::string ifilename = "uap
     std::vector<std::tuple<TString, std::string, std::string>> histogramData = {
       std::make_tuple("CMScalo/hf_max_towerE_minus_h[", "Calo Towers threshold for HF minus side", "hf_max_towerE_minus_h.eps"),
       std::make_tuple("CMScalo/hf_max_towerE_plus_h[", "Calo Towers threshold for HF plus side", "hf_max_towerE_plus_h.eps"),
-      // std::make_tuple("CMScalo/hf_max_towerE_minus_2_h[", "Calo Towers threshold for HF minus side", "hf_max_towerE_minus_2_h.eps"),
-      // std::make_tuple("CMScalo/hf_max_towerE_plus_2_h[", "Calo Towers threshold for HF plus side", "hf_max_towerE_plus_2_h.eps"),
       std::make_tuple("CMScalo/hf_max_towerE_minus_ill_h[", "Calo Towers threshold for ill tower on HF minus side", "hf_max_towerE_minus_ill_h.eps"),
       std::make_tuple("CMScalo/hf_max_towerE_plus_ill_h[", "Calo Towers threshold for ill tower on HF plus side", "hf_max_towerE_plus_ill_h.eps"),
-      // std::make_tuple("CMScalo/hf_max_towerE_minus_2_full_h[", "Calo Towers threshold for HF minus side", "hf_max_towerE_minus_2_full_h.eps"),
-      // std::make_tuple("CMScalo/hf_max_towerE_plus_2_full_h[", "Calo Towers threshold for HF plus side", "hf_max_towerE_plus_2_full_h.eps"),
     };
     for(auto p: typesOfBptx){
       for(auto t: histogramData){

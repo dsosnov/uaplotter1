@@ -1,5 +1,5 @@
 // #include <string>
-void FakeVetoProbabilityStability(int type = 0, double thMinus = 8.5, double thPlus = 8)
+void FakeVetoProbabilityStability(int type = 0, double thMinus = 8, double thPlus = 8)
 {
   gStyle->SetOptFit(1);
   gStyle->SetOptStat(0);
@@ -84,7 +84,8 @@ void FakeVetoProbabilityStability(int type = 0, double thMinus = 8.5, double thP
   auto c = new TCanvas("c1", "c1", 800, 600);
   gPad->SetMargin(0.07, 0.05, 0.10, 0.02);
   {
-    string name = string("P_{Fake} for thresholds equal ") + to_string(thMinus) + string(" and ") + to_string(thPlus) + string(" for HF- and HF+");
+    char thM[10], thP[10]; sprintf(thM,"%.1f",thMinus); sprintf(thP,"%.1f",thPlus);
+    string name = string("P_{Fake} for thresholds equal ") + thM + string(" and ") + thP + string(" for HF- and HF+");
     auto hs = new THStack (name.c_str(),name.c_str());
     auto leg = new TLegend(0.84, 0.89, 0.99, 0.99); //0.14, 0.14, 0.54, 0.34);
     hs->Add(hf_fvp_minus);
@@ -98,7 +99,8 @@ void FakeVetoProbabilityStability(int type = 0, double thMinus = 8.5, double thP
   };
   c->Clear();
   {
-    string name = string("Threshold efficiency for thresholds equal ") + to_string(thMinus) + string(" and ") + to_string(thPlus) + string(" for HF- and HF+");
+    char thM[10], thP[10]; sprintf(thM,"%.1f",thMinus); sprintf(thP,"%.1f",thPlus);
+    string name = string("Threshold efficiency for thresholds equal ") + thM + string(" and ") + thP + string(" for HF- and HF+");
     auto hs = new THStack (name.c_str(),name.c_str());
     auto leg = new TLegend(0.84, 0.89, 0.99, 0.99); //0.14, 0.14, 0.54, 0.34);
     hs->Add(hf_eff_minus);
