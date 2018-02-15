@@ -7,6 +7,10 @@
 #include "TH2F.h"
 #include "TChain.h"
 
+#include "uathresholds.h"
+
+using namespace uathresholds;
+
 class uabase :  public TObject {
 public:
   uabase(const bool               cmstotem = true,          //!< → #tree_combined_flag

@@ -18,7 +18,8 @@ uaplotter1::uaplotter1(const bool               cmstotem,
                        const bool               cmsdigis,
                        const bool               CASTORp,
                        const short int          MC,
-                       const short unsigned int Ncuts
+                       const short unsigned int Ncuts,
+                       const int                energy
                       ):
   uabase(cmstotem, MC, Ncuts),
   tree_digi_flag(cmsdigis),
@@ -26,6 +27,7 @@ uaplotter1::uaplotter1(const bool               cmstotem,
   dummy_cut(Ncuts + 1),
   current_event(0)
 {
+  updateThresholds(energy, ppb);
   first_central_bin = 0;
   last_central_bin  = 0;
   IniRapGapRange();

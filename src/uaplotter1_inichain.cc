@@ -15,24 +15,24 @@ TString uaplotter1::initializeChain()
       zdc56 = false;
       // for new data
       if (ppb) {
-        str = "noise_PARun2016_pPb";
-        chainTree->Add("uatree_noise_pPb.root");
-      } else {
         str = "noise_PARun2016_Pbp";
-        chainTree->Add("uatree_noise_Pbp.root");
+        chainTree->Add("uatree_noise_Pbp*.root");
+      } else {
+        str = "noise_PARun2016_pPb";
+        chainTree->Add("uatree_noise_pPb*.root");
       }
       break;
-     };
+    };
 
     case 0: { // DATA ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
       zdc56 = false;
       // for new data
       if (ppb) {
-        str = "data_PARun2016_pPb";
-        chainTree->Add("uatree_data_pPb.root");
+        str = "data_PARun2016_Pbp";
+        chainTree->Add("uatree_data_Pbp*.root");
       } else {
-         str = "data_PARun2016_Pbp";
-         chainTree->Add("uatree_data_Pbp.root");
+        str = "data_PARun2016_pPb";
+        chainTree->Add("uatree_data_pPb*.root");
       }
       break;
     };
@@ -40,11 +40,11 @@ TString uaplotter1::initializeChain()
     case 1: { // Hijing ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
       zdc56 = false;
       if (ppb) {
-        str = "Hijing_pPb";
-        chainTree->Add("uatree_hijing_pPb.root");
-      } else {
         str = "Hijing_Pbp";
-        chainTree->Add("uatree_hijing_Pbp.root");
+        chainTree->Add("uatree_hijing_Pbp*.root");
+      } else {
+        str = "Hijing_pPb";
+        chainTree->Add("uatree_hijing_pPb*.root");
       };
       break;
     };
@@ -52,11 +52,11 @@ TString uaplotter1::initializeChain()
     case 2: { // EPOS ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
       zdc56 = false;
       if (ppb) {
-        str = "EPOS_pPb";
-        chainTree->Add("uatree_epos_pPb.root");
-      } else {
         str = "EPOS_Pbp";
-        chainTree->Add("uatree_epos_Pbp.root");
+        chainTree->Add("uatree_epos_Pbp*.root");
+      } else {
+        str = "EPOS_pPb";
+        chainTree->Add("uatree_epos_pPb*.root");
       };
       break;
     };
@@ -64,11 +64,11 @@ TString uaplotter1::initializeChain()
     case 3: { // QGSJET ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
       zdc56 = false;
       if (ppb) {
-        str = "QGSJET_pPb";
-        chainTree->Add("uatree_qgsjet_pPb.root");
-      } else {
         str = "QGSJET_Pbp";
-        chainTree->Add("uatree_qgsjet_Pbp.root");
+        chainTree->Add("uatree_qgsjet_Pbp*.root");
+      } else {
+        str = "QGSJET_pPb";
+        chainTree->Add("uatree_qgsjet_pPb*.root");
       };
       break;
     };

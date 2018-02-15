@@ -9,6 +9,12 @@
 
 ClassImp(uacalo)
 
+/*!
+ * \li 'true'  — for calculating activity maximum tower energy at bin used;
+ * \li 'false' — for calculating activity sum energy from bin used;
+ */
+const bool CALO_ACTIVITY_USE_TOWER_ENERGY = false;
+
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 uacalo::uacalo(TChain *tree,
@@ -189,7 +195,9 @@ bool uacalo::ProceedEvent(const short unsigned int cut, const bool fill, const b
 
   // <===================================================compare to threshold
   for (unsigned int bin = 0; bin < N_ETA_BINS; bin++)
-    if ((THR_CALO[bin] > 0) && (energy[bin] > THR_CALO[bin])) {
+    if( (!CALO_ACTIVITY_USE_TOWER_ENERGY && (THR_CALO_SUME().at(bin) > 0) && (energy[bin] > THR_CALO_SUME().at(bin))) ||
+        ( CALO_ACTIVITY_USE_TOWER_ENERGY && (THR_CALO_TWRE().at(bin) > 0) && (energyMax[bin] > THR_CALO_TWRE().at(bin)))
+      ) {
       activity_loose[bin] = true;
       activity_tight[bin] = true;
     };

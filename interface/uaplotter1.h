@@ -22,7 +22,8 @@ public:
              const bool               cmsdigis,             //!< → #tree_digi_flag
              const bool               CASTORp,              //!< → #ppb
              const short int          MC,                   //!< — see uabase::uabase()
-             const short unsigned int Ncuts = 2             //!< — see uabase::uabase()
+             const short unsigned int Ncuts = 2,            //!< — see uabase::uabase()
+             const int                energy = 8            //!< — sqrt(s) in TeV
             );
   ~uaplotter1();
   int Loop(const int evts, const int trigger, vector<string> hlt_path_regexps = {});
@@ -31,7 +32,7 @@ public:
 
 private:
   const bool tree_digi_flag;                                //!< true - with cms digis
-  const bool ppb;                                           //!< true for pPb (p->CASTOR), false for Pbp
+  const bool ppb;                                           //!< true for pPb (p->CASTOR, p == Beam 1), false for Pbp (Pb == Beam 1) //WARNING! old naming convention
   bool zdc56;                                               //!< flag for ZDCdigi proper TS, initialized in initializeChain
   const short unsigned int dummy_cut;                       //!< service variable for processing without histo filling
   unsigned int current_event;

@@ -8,6 +8,12 @@
 
 ClassImp(uapf)
 
+/*!
+ * \li 'true'  — for calculating activity maximum element at bin used;
+ * \li 'false' — for calculating activity sum energy from bin used;
+ */
+const bool PF_ACTIVITY_USE_TOWER_ENERGY = false;
+
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 uapf::uapf(TChain *tree,
@@ -122,7 +128,9 @@ bool uapf::ProceedEvent(const short unsigned int cut, const bool fill, const boo
     }; // end bin >=0
   }; // end loop
   for (unsigned int bin = 0; bin < N_ETA_BINS; bin++) {
-    if ((THR_PFEN[bin] > 0) && (energy[bin] > THR_PFEN[bin])) {
+    if( (!PF_ACTIVITY_USE_TOWER_ENERGY && (THR_PFEN_SUME().at(bin) > 0) && (energy[bin]    > THR_PFEN_SUME().at(bin))) ||
+        ( PF_ACTIVITY_USE_TOWER_ENERGY && (THR_PFEN_TWRE().at(bin) > 0) && (energyMax[bin] > THR_PFEN_TWRE().at(bin)))
+      ) {
       activity_loose[bin] = true;
       activity_tight[bin] = true;
     };
