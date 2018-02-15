@@ -24,9 +24,9 @@ uapf::uapf(TChain *tree,
 {
   PFCand = 0;
   if (tree_combined_flag) {
-    tree->SetBranchAddress("cmsParticleFlowUA",          &PFCand);
+    tree->SetBranchAddress("cmsParticleFlowUA", &PFCand);
   } else {
-    tree->SetBranchAddress("particleFlow",          &PFCand);
+    tree->SetBranchAddress("particleFlow",      &PFCand);
   };
   create_histos();
   uabasecentral::create_histos();

@@ -10,12 +10,12 @@
 
 class uacalo :  public uabasecentral {
 public:
-  uacalo(TChain      *tree,    //!<tree of ua format
-         TDirectory *dir,     //!<directory in the output root file
-         const bool cmstotem, //!<true for merged, false for CMS only
-         const short          int MC,  //!< -1, 0 - data; >0 MC
-         const short unsigned int Ncuts //!< number of cuts
-        );
+  uacalo(TChain*              tree,     //!<tree of ua format
+         TDirectory*          dir,      //!<directory in the output root file
+         const bool           cmstotem, //!<true for merged, false for CMS only
+         const short          MC,       //!< -1, 0 - data; >0 MC
+         const unsigned short Ncuts     //!< number of cuts
+  );
   ~uacalo();
   bool ProceedEvent(const short unsigned int cut = 0, const bool fill = false, const bool info = false);
   bool FillLastEvent(const short unsigned int cut);

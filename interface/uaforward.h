@@ -12,7 +12,7 @@
 /* ZDC and FSC treatment
  * for digis only (at the moment there is no reliable reco)
  * IMPORTANT for ZDC: side = -1 for +Z!
- * ZDC is configured to have firstSample be TS5 in runs 210498-210676, and TS4 in runs 210737-211831 
+ * ZDC is configured to have firstSample be TS5 in runs 210498-210676, and TS4 in runs 210737-211831
  */
 class uaforward: public uabase{
 
