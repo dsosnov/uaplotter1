@@ -66,6 +66,7 @@ private:
   TH2F **calotower_e_eta_phi_h;
   TH2F **calotower_e_eta_phi_minus_h;
   TH2F **calotower_e_eta_phi_plus_h;
+  TH2F **hf_maxTowerE_minus_plus_h;
 
   double EHF[2];
 
