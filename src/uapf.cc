@@ -128,13 +128,14 @@ bool uapf::ProceedEvent(const short unsigned int cut, const bool fill, const boo
     }; // end bin >=0
   }; // end loop
   for (unsigned int bin = 0; bin < N_ETA_BINS; bin++) {
-    if( (!PF_ACTIVITY_USE_TOWER_ENERGY && (THR_PFEN_SUME().at(bin) > 0) && (energy[bin]    > THR_PFEN_SUME().at(bin))) ||
-        ( PF_ACTIVITY_USE_TOWER_ENERGY && (THR_PFEN_TWRE().at(bin) > 0) && (energyMax[bin] > THR_PFEN_TWRE().at(bin)))
-      ) {
-      activity_loose[bin] = true;
-      activity_tight[bin] = true;
-    };
-  };
+    auto thr = (PF_ACTIVITY_USE_TOWER_ENERGY) ? THR_PFEN_TWRE().at(bin) : THR_PFEN_SUME().at(bin); // Current threshold
+    auto e_l = (PF_ACTIVITY_USE_TOWER_ENERGY) ? energyMax[bin]          : energy[bin];             // Energy for comparing with threshold for 'loose activity'
+    auto e_t = (PF_ACTIVITY_USE_TOWER_ENERGY) ? energyMax[bin]          : energy[bin];             // Energy for comparing with threshold for 'tight activity'
+    if(thr > 0){
+      if(e_l > thr) activity_loose[bin] = true;
+      if(e_t > thr) activity_tight[bin] = true;
+    }
+  }
   if (info)
     PrintEventInfo(true);
   if (fill)

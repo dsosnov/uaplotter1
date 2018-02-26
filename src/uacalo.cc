@@ -194,13 +194,15 @@ bool uacalo::ProceedEvent(const short unsigned int cut, const bool fill, const b
   }// end tower loop
 
   // <===================================================compare to threshold
-  for (unsigned int bin = 0; bin < N_ETA_BINS; bin++)
-    if( (!CALO_ACTIVITY_USE_TOWER_ENERGY && (THR_CALO_SUME().at(bin) > 0) && (energy[bin] > THR_CALO_SUME().at(bin))) ||
-        ( CALO_ACTIVITY_USE_TOWER_ENERGY && (THR_CALO_TWRE().at(bin) > 0) && (energyMax[bin] > THR_CALO_TWRE().at(bin)))
-      ) {
-      activity_loose[bin] = true;
-      activity_tight[bin] = true;
-    };
+  for (unsigned int bin = 0; bin < N_ETA_BINS; bin++){
+    auto thr = (CALO_ACTIVITY_USE_TOWER_ENERGY) ? THR_CALO_TWRE().at(bin) : THR_CALO_SUME().at(bin); // Current threshold
+    auto e_l = (CALO_ACTIVITY_USE_TOWER_ENERGY) ? energyMax[bin]          : energy[bin];             // Energy for comparing with threshold for 'loose activity'
+    auto e_t = (CALO_ACTIVITY_USE_TOWER_ENERGY) ? energyMax[bin]          : energy[bin];             // Energy for comparing with threshold for 'tight activity'
+    if(thr > 0){
+      if(e_l > thr) activity_loose[bin] = true;
+      if(e_t > thr) activity_tight[bin] = true;
+    }
+  }
 
   if (info)
     PrintEventInfo(true);
