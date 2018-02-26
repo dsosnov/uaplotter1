@@ -41,7 +41,9 @@ uatracking::~uatracking()
             << h1D->size() << "+" << h2D->size() << " histos" << std::endl;
 }
 
-
+bool isTrackGood(const MyTracks track){
+  return (track.quality[2]) && (track.pt() > 0.4);
+}
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -63,15 +65,12 @@ bool uatracking::FillLastEvent(const short unsigned int cut)
   for (auto t: *Tracks) {
     tracks_pt_h[cut]->Fill(t.pt());
     tracks_eta_pt_h[cut]->Fill(t.eta(), t.pt());
-    if(t.quality[1]){
-      tracks_pt_h[cut+n_cuts]->Fill(t.pt());
-      tracks_eta_pt_h[cut+n_cuts]->Fill(t.eta(), t.pt());
-    }
+    if (!isTrackGood(t)) continue;
+    tracks_pt_h[cut+n_cuts]->Fill(t.pt());
+    tracks_eta_pt_h[cut+n_cuts]->Fill(t.eta(), t.pt());
   }
   return true;
 }
-
-
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -100,8 +99,6 @@ bool uatracking::ProceedEvent(const short unsigned int cut, const bool fill, con
 {
   memset(n_tracks_bin_all,  0, sizeof(n_tracks_bin_all));
   memset(n_tracks_bin_good, 0, sizeof(n_tracks_bin_good));
-  memset(pt_maxabs_tracks_bin_all,  0, sizeof(pt_maxabs_tracks_bin_all));
-  memset(pt_maxabs_tracks_bin_good, 0, sizeof(pt_maxabs_tracks_bin_good));
   PrepareArrays(); // cleans eta arrays
   nVtx        = 0;
   nVtxGoog    = 0;
@@ -123,11 +120,9 @@ bool uatracking::ProceedEvent(const short unsigned int cut, const bool fill, con
     int bin = find_eta_bin(t.eta());
     n_tracks_bin_all[bin]++;
     nTracks++;
-    if ( fabs(t.pt()) > pt_maxabs_tracks_bin_all[bin] ) pt_maxabs_tracks_bin_all[bin] = fabs(t.pt());
-    if (!t.quality[2]) continue; // not hight purity
+    if (!isTrackGood(t)) continue;
     n_tracks_bin_good[bin]++;
     nTracksGood++;
-    if ( fabs(t.pt()) > pt_maxabs_tracks_bin_good[bin] ) pt_maxabs_tracks_bin_good[bin] = fabs(t.pt());
     if (info) {
       std::cout << "trck# " << i++ << " ";
       for (int b = 0; b < 5; b++) std::cout << t.quality[b];
@@ -138,8 +133,8 @@ bool uatracking::ProceedEvent(const short unsigned int cut, const bool fill, con
   }
 
   for (unsigned short int bin = TRCK_ETA_MIN_BIN; bin <= TRCK_ETA_MAX_BIN; bin++) {
-    if (n_tracks_bin_all[bin] > 0)  activity_loose[bin] = true;
-    if (pt_maxabs_tracks_bin_good[bin] > 0.4) activity_tight[bin] = true;
+    if (n_tracks_bin_all[bin]  > 0) activity_loose[bin] = true;
+    if (n_tracks_bin_good[bin] > 0) activity_tight[bin] = true;
   };
   if (info)
     PrintEventInfo(true);
@@ -241,35 +236,33 @@ void uatracking::create_histos()
 
     title1      = "tracks_pt_h["; title1 += i; title1 += "]";
     title2      = title1; title2 += "; p_T;";
-    tracks_pt_h[i] = new TH1F(title1.Data(), title2.Data(), 14000, -7000, 7000);
+    tracks_pt_h[i] = new TH1F(title1.Data(), title2.Data(), 7001, -1, 7000);
     tracks_pt_h[i]->SetDirectory(directory);
 
     title1      = "tracks_pt_h["; title1 += (i + n_cuts); title1 += "]";
     title2      = title1; title2 += " good; p_T";
-    tracks_pt_h[i + n_cuts] = new TH1F(title1.Data(), title2.Data(), 14000, -7000, 7000);
+    tracks_pt_h[i + n_cuts] = new TH1F(title1.Data(), title2.Data(), 7001, -1, 7000);
     tracks_pt_h[i + n_cuts]->SetDirectory(directory);
 
     title1      = "tracks_eta_h["; title1 += i; title1 += "]";
     title2      = title1; title2 += "; #eta; N_{all}";
-    tracks_eta_h[i] = new TH2F(title1.Data(), title2.Data(), 28, -7, 7, 201, -1, 200);
+    tracks_eta_h[i] = new TH2F(title1.Data(), title2.Data(), 12, -3, 3, 201, -1, 200);
     tracks_eta_h[i]->SetDirectory(directory);
 
     title1      = "tracks_eta_h["; title1 += (i + n_cuts); title1 += "]";
     title2      = title1; title2 += " good; #eta; N_{good}";
-    tracks_eta_h[i + n_cuts] = new TH2F(title1.Data(), title2.Data(), 28, -7, 7, 201, -1, 200);
+    tracks_eta_h[i + n_cuts] = new TH2F(title1.Data(), title2.Data(), 12, -3, 3, 201, -1, 200);
     tracks_eta_h[i + n_cuts]->SetDirectory(directory);
 
     title1      = "tracks_eta_pt_h["; title1 += i; title1 += "]";
     title2      = title1; title2 += "; #eta; p_T";
-    tracks_eta_pt_h[i] = new TH2F(title1.Data(), title2.Data(), 28, -7, 7, 14000, -7000, 7000);
+    tracks_eta_pt_h[i] = new TH2F(title1.Data(), title2.Data(), 12, -3, 3, 70010, -1, 7000);
     tracks_eta_pt_h[i]->SetDirectory(directory);
 
     title1      = "tracks_eta_pt_h["; title1 += (i + n_cuts); title1 += "]";
     title2      = title1; title2 += " good; #eta; p_T";
-    tracks_eta_pt_h[i + n_cuts] = new TH2F(title1.Data(), title2.Data(), 28, -7, 7, 14000, -7000, 7000);
+    tracks_eta_pt_h[i + n_cuts] = new TH2F(title1.Data(), title2.Data(), 12, -3, 3, 70010, -1, 7000);
     tracks_eta_pt_h[i + n_cuts]->SetDirectory(directory);
-
-
   };
   h1D->push_back(tracks_h);
   h1D->push_back(tracks_pt_h);
