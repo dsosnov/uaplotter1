@@ -100,29 +100,29 @@ bool uapf::ProceedEvent(const short unsigned int cut, const bool fill, const boo
   memset(energyEM0Max,  0, sizeof(energyEM0Max));
   memset(energyH0Max, 0, sizeof(energyH0Max));
   memset(energyHchMax, 0, sizeof(energyHchMax));
-  for (std::vector<MyPFCand>::iterator pf = PFCand->begin(); pf != PFCand->end(); ++pf) {
+  for (auto pf: *PFCand) {
     nPfCand++;
     if (info)
-      std::cout << "\tpf#" << nPfCand << "  " << (*pf).particleId << " eta: " << (*pf).Eta() << "\tphi: " << (*pf).Phi() << "\tPt: " << (*pf).Pt() << "\tE:" << (*pf).energy() << std::endl;
-    int bin = find_eta_bin((*pf).eta());
+      std::cout << "\tpf#" << nPfCand << "  " << pf.particleId << " eta: " << pf.Eta() << "\tphi: " << pf.Phi() << "\tPt: " << pf.Pt() << "\tE:" << pf.energy() << std::endl;
+    int bin = find_eta_bin(pf.eta());
     if (bin >= 0) {
-      energy[bin] += (*pf).energy();
-      if ((*pf).energy() > energyMax[bin]) energyMax[bin] = (*pf).energy();
-      pt[bin]     += (*pf).Pt();
-      pz[bin]     += (*pf).Pz();
+      energy[bin] += pf.energy();
+      if (pf.energy() > energyMax[bin]) energyMax[bin] = pf.energy();
+      pt[bin] += pf.Pt();
+      pz[bin] += pf.Pz();
       if (mc < 0) { //noise studies
-        if (((*pf).particleId == 5) || ((*pf).particleId == 6) || ((*pf).particleId == 0)) {// h0 and h_HF and unknown
-          energyH0[bin] += (*pf).energy();
-          if ((*pf).energy() > energyH0Max[bin]) energyH0Max[bin] = (*pf).energy();
-         } else if ((*pf).particleId == 1) {                 // charged hadron
-          energyHch[bin] += (*pf).energy();
-          if ((*pf).energy() > energyHchMax[bin]) energyHchMax[bin] = (*pf).energy();
-        } else if (((*pf).particleId == 4) || ((*pf).particleId == 7)) {// gamma and egamma_HF
-          energyEM0[bin] += (*pf).energy();
-          if ((*pf).energy() > energyEM0Max[bin]) energyEM0Max[bin] = (*pf).energy();
-         } else if (((*pf).particleId == 2) || ((*pf).particleId == 3))  {
+        if ((pf.particleId == 5) || (pf.particleId == 6) || (pf.particleId == 0)) {// h0 and h_HF and unknown
+          energyH0[bin] += pf.energy();
+          if (pf.energy() > energyH0Max[bin]) energyH0Max[bin] = pf.energy();
+         } else if (pf.particleId == 1) {                 // charged hadron
+          energyHch[bin] += pf.energy();
+          if (pf.energy() > energyHchMax[bin]) energyHchMax[bin] = pf.energy();
+        } else if ((pf.particleId == 4) || (pf.particleId == 7)) {// gamma and egamma_HF
+          energyEM0[bin] += pf.energy();
+          if (pf.energy() > energyEM0Max[bin]) energyEM0Max[bin] = pf.energy();
+         } else if ((pf.particleId == 2) || (pf.particleId == 3))  {
           std::cout << "lepton???\n";
-          std::cout << "\tpf#" << nPfCand << "  " << (*pf).particleId << " eta: " << (*pf).Eta() << "\tphi: " << (*pf).Phi() << "\tPt: " << (*pf).Pt() << "\tE:" << (*pf).energy() << std::endl;
+          std::cout << "\tpf#" << nPfCand << "  " << pf.particleId << " eta: " << pf.Eta() << "\tphi: " << pf.Phi() << "\tPt: " << pf.Pt() << "\tE:" << pf.energy() << std::endl;
         }
       };
     }; // end bin >=0
