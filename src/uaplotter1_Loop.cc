@@ -57,7 +57,10 @@ int uaplotter1::Loop(const int evts, const int trigger, vector<string> hlt_path_
   short unsigned int bins_merged = 2; // Number of bins will be merged for filling histograms. "1" is histograms for every rg bin, "2" is standard "per one \eta" //TODO
   short unsigned int cuts_count = int(ceil((last_central_bin - first_central_bin + 1 + 1) / double(bins_merged)));
 
+  double inelastic_cut = 3.0; // in GeV
+
   unsigned int kevt = 0;
+  std::vector<bool>hlts;
   for (long unsigned int i = 0; i < nevts; i++) {
     unsigned int kevt_current = i / 1000;
     if (kevt_current > kevt) {
@@ -74,37 +77,37 @@ int uaplotter1::Loop(const int evts, const int trigger, vector<string> hlt_path_
       CMSmc->ProceedEvent(dummy_cut, false, false);
     };
 
-    std::vector<bool>hlts;
+    if (CMSevtinfo->GetL1Bit(9)) continue; //<=== if bptx quiet
+    bptx_active++;
+
     hlts.resize(hlt_path_regexps.size(), false);
     std::transform(hlt_path_regexps.begin(), hlt_path_regexps.end(), hlts.begin(), [this](string s) {return this->CMSevtinfo->CheckHLT(s.c_str(), 1);});
     if ( !( ProceedTrigger(trigger_bit, tech_bit) &&
             std::all_of(hlts.begin(), hlts.end(), [](bool b) {return b == true;})) ) continue; //Check for all hlt paths and l1 bits
     trigger_evts++;
 
-    if (CMSevtinfo->GetL1Bit(9)) continue; //<=== if bptx quiet
-    bptx_active++;
     CMScalo->ProceedEvent(dummy_cut, false, false);
-    bool hf_inelastic[2] = {CMScalo->GetHFmax(0) > 3, CMScalo->GetHFmax(1) > 3};
+    bool hf_inelastic[2] = {CMScalo->GetHFmax(0) > inelastic_cut, CMScalo->GetHFmax(1) > inelastic_cut};
     if ( !hf_inelastic[0] && !hf_inelastic[1] ) continue; //<=== If maximumTower in both HF lesser then 4GeV (inelastic cut)
     hf_inelastic_cut++;
 
-    // <==================================== T2 check
-    bool t2prim = false;
-    if (mc > 0) {
-      if (tech_bit && (trigger_bit == 53)) {
-        t2prim = true; // we already checked in the ProceedTrigger; for MC it is the same!
-      } else {
-        t2prim = ProceedTrigger(53, true);
-      };
-    } else if (tree_combined_flag && (mc == 0)) {
-      T2->ProceedEvent(dummy_cut, false, false);
-      t2prim = ((T2->NPrimtracksMinus() > 0) || (T2->NPrimtracksPlus() > 0));
-    };
-    if (t2prim) t2prim_evts++;
-    // <=====================================
-
+//     // <==================================== T2 check
+//     bool t2prim = false;
+//     if (mc > 0) {
+//       if (tech_bit && (trigger_bit == 53)) {
+//         t2prim = true; // we already checked in the ProceedTrigger; for MC it is the same!
+//       } else {
+//         t2prim = ProceedTrigger(53, true);
+//       };
+//     } else if (tree_combined_flag && (mc == 0)) {
+//       T2->ProceedEvent(dummy_cut, false, false);
+//       t2prim = ((T2->NPrimtracksMinus() > 0) || (T2->NPrimtracksPlus() > 0));
+//     };
+//     if (t2prim) t2prim_evts++;
+//     // <=====================================
+//
     ProceedEvent(dummy_cut, false, false);
-    if (tree_digi_flag && CMSforward->FSCvalid()) goodFSC++;
+//     if (tree_digi_flag && CMSforward->FSCvalid()) goodFSC++;
 
     FillLastEvent(0); // -------------------------------->  all triggered events
     if (mc > 0 && CMSmc->GetProcessID() > 100) {
@@ -117,19 +120,19 @@ int uaplotter1::Loop(const int evts, const int trigger, vector<string> hlt_path_
 
     switch(sd_flag_total[0]){
       case processID::pid_elastic:
-        CalculateSDdiffMass(false);
+//         CalculateSDdiffMass(false);
         FillLastEvent(3);
         elastic_cand++;
         if(hf_inelastic[0]) FillLastEvent(1); //TODO DELETE
         if(hf_inelastic[1]) FillLastEvent(2); //TODO DELETE
         break;
       case processID::pid_sdm:
-        CalculateSDdiffMass(false);
+//         CalculateSDdiffMass(false);
         FillLastEvent(4);
         sd_minus++;
         break;
       case processID::pid_sdp:
-        CalculateSDdiffMass(false);
+//         CalculateSDdiffMass(false);
         FillLastEvent(5);
         sd_plus++;
         break;
@@ -179,8 +182,8 @@ int uaplotter1::Loop(const int evts, const int trigger, vector<string> hlt_path_
   std::cout << "Acceptance: [" << ETA_BIN_L[first_central_bin] << "," << ETA_BIN_L[last_central_bin] + ETA_BIN_W << "]\n";
   std::cout << "Total evts in chain       : " << stat << std::endl;
   std::cout << "Proceeded evts            : " << (current_event + 1)     << std::endl;
-  std::cout << "Triggered evts            : " << trigger_evts << std::endl;
   std::cout << "Active (!bptx quiet)      : " << bptx_active << std::endl;
+  std::cout << "Triggered evts            : " << trigger_evts << std::endl;
   std::cout << "After inelastic cut       : " << hf_inelastic_cut << std::endl;
   std::cout << "\telastic candidates      : " << elastic_cand << "\t\tnd candidates       : " << nd_cand << std::endl;
   std::cout << "\tcd candidates           : " << cd_cand      << "\t\tdd candidates       : " << dd_cand << std::endl;
