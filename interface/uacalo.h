@@ -28,11 +28,11 @@ public:
     short unsigned int side = int(eta>0);
     return hf_max_energy_tower[side][indx];
   }
-  double GetHFmax(unsigned short side){
+  double GetHFmax(bool side){
     double MaxHFtow = 0;
     for (short unsigned int indx = 0; indx < nBinsHF; indx++) {
-      if (MaxHFtow < hf_max_energy_tower[side][indx])
-        MaxHFtow = hf_max_energy_tower[side][indx];
+      if (MaxHFtow < hf_max_energy_tower[int(side)][indx])
+        MaxHFtow = hf_max_energy_tower[int(side)][indx];
     }
     return MaxHFtow;
   }
