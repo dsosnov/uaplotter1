@@ -144,51 +144,51 @@ bool uacalo::ProceedEvent(const short unsigned int cut, const bool fill, const b
   PrepareArrays();                                          // cleans eta arrays
   memset(energyMax, 0, sizeof(energyMax));
 
-  for (std::vector<MyCaloTower>::iterator it = Towers->begin(); it != Towers->end(); ++it) {
-    if (it->Pt() > 0) {
-      int bin = find_eta_bin(it->eta());
+  for (auto it: *Towers) {
+    if (it.Pt() > 0) {
+      int bin = find_eta_bin(it.eta());
       if (bin >= 0) {
-        energy[bin] += it->energy();
-        pz[bin]     += it->Pz();
-        pt[bin]     += it->Pt();
-        if (it->hasHF) {
-          if (it->energy() > HF_TOWER_THR[it->zside > 0])
+        energy[bin] += it.energy();
+        pz[bin]     += it.Pz();
+        pt[bin]     += it.Pt();
+        if (it.hasHF) {
+          if (it.energy() > HF_TOWER_THR[it.zside > 0])
             calotowers[bin]++;
         } else {
-          if (it->energy() > CENT_TOWER_THR)
+          if (it.energy() > CENT_TOWER_THR)
             calotowers[bin]++;
         };
       }; // end if bin
 
       //___________________________________________________________________
-      if ((it->hasHF) && (fabs(it->eta()) <= CALO_ETA_ACC) && (fabs(it->eta()) > HF_ETA_MIN)) {
+      if ((it.hasHF) && (fabs(it.eta()) <= CALO_ETA_ACC) && (fabs(it.eta()) > HF_ETA_MIN)) {
 
-        if (it->eta() >= -4.363 && it->eta() <= -4.191 &&
-            it->phi() >= -M_PI + M_PI / 18 * 8 && it->phi() <= -M_PI + M_PI / 18 * 9) {
-          if (it->energy() > hf_max_energy_tower_ill[0]) hf_max_energy_tower_ill[0] = it->energy();
-        } else if (it->eta() >= 3.839 && it->eta() <= 4.013 &&
-                   it->phi() >= -M_PI + M_PI / 18 * 5 && it->phi() <= -M_PI + M_PI / 18 * 6) {
-          if (it->energy() > hf_max_energy_tower_ill[1]) hf_max_energy_tower_ill[1] = it->energy();
+        if (it.eta() >= -4.363 && it.eta() <= -4.191 &&
+            it.phi() >= -M_PI + M_PI / 18 * 8 && it.phi() <= -M_PI + M_PI / 18 * 9) {
+          if (it.energy() > hf_max_energy_tower_ill[0]) hf_max_energy_tower_ill[0] = it.energy();
+        } else if (it.eta() >= 3.839 && it.eta() <= 4.013 &&
+                   it.phi() >= -M_PI + M_PI / 18 * 5 && it.phi() <= -M_PI + M_PI / 18 * 6) {
+          if (it.energy() > hf_max_energy_tower_ill[1]) hf_max_energy_tower_ill[1] = it.energy();
         } else {
-          short unsigned int side = int (it->eta() > 0);
-          short unsigned int indx = find_eta_bin (CALO_ETA_ACC) - find_eta_bin (fabs (it->eta()));
-          if (it->energy() > hf_max_energy_tower[side][indx]) {
-            hf_max_energy_tower[side][indx] = it->energy();
+          short unsigned int side = int (it.eta() > 0);
+          short unsigned int indx = find_eta_bin (CALO_ETA_ACC) - find_eta_bin (fabs (it.eta()));
+          if (it.energy() > hf_max_energy_tower[side][indx]) {
+            hf_max_energy_tower[side][indx] = it.energy();
           }
         }
 
         // here HF "trigger" only
-        if (fabs(it->eta()) < HF_ETA_MAX) {
-          short unsigned ind = int(it->zside > 0);
-          if ( (!(it->eta() >= -4.363 && it->eta() <= -4.191 && it->phi() >= -M_PI + M_PI / 18 * 8 && it->phi() <= -M_PI + M_PI / 18 * 9))
-            && (!(it->eta() >=  3.839 && it->eta() <=  4.013 && it->phi() >= -M_PI + M_PI / 18 * 5 && it->phi() <= -M_PI + M_PI / 18 * 6)) ){
-              hf_total_energy_tower[ind] += it->energy(); //HF energy without energy from ill towers
+        if (fabs(it.eta()) < HF_ETA_MAX) {
+          short unsigned ind = int(it.zside > 0);
+          if ( (!(it.eta() >= -4.363 && it.eta() <= -4.191 && it.phi() >= -M_PI + M_PI / 18 * 8 && it.phi() <= -M_PI + M_PI / 18 * 9))
+            && (!(it.eta() >=  3.839 && it.eta() <=  4.013 && it.phi() >= -M_PI + M_PI / 18 * 5 && it.phi() <= -M_PI + M_PI / 18 * 6)) ){
+              hf_total_energy_tower[ind] += it.energy(); //HF energy without energy from ill towers
           }
-          if (!hf_trigger_tower[ind] && (it->energy() > HF_TOWER_THR[ind]))
+          if (!hf_trigger_tower[ind] && (it.energy() > HF_TOWER_THR[ind]))
             hf_trigger_tower[ind] = true;
         };
       }; // end HF
-      if (it->energy() > energyMax[bin]) energyMax[bin] = it->energy();
+      if (it.energy() > energyMax[bin]) energyMax[bin] = it.energy();
      //___________________________________________________________________
     }
   }// end tower loop
