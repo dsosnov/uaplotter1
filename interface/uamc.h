@@ -36,11 +36,15 @@ public:
 
   double GetZDCEn(bool plus)  const {return eZDCn[int(plus)];};
   double GetZDCEg(bool plus)  const {return eZDCg[int(plus)];};
-  double GetZDCPzn(bool plus) const {return pzZDCn[int(plus)];;};
-  double GetZDCPzg(bool plus) const {return pzZDCg[int(plus)];;};
+  double GetZDCPzn(bool plus) const {return pzZDCn[int(plus)];};
+  double GetZDCPzg(bool plus) const {return pzZDCg[int(plus)];};
 
   double GetCastorE()  const {return castorE;};
   double GetCastorPz() const {return castorPz;};
+
+  double GetHFE(bool side)   const {return hfE[int(side)]    ;};
+  double GetHFPz(bool side)  const {return hfPz[int(side)]   ;};
+  double GetHFmax(bool side) const {return hfE_max[int(side)];};
 
   int GetProcessID() const { for(auto p: *MCthuth) if(p.processID) return p.processID; return 0; }
 
@@ -48,6 +52,8 @@ private:
   const bool ppb;
 
   std::vector<MyGenPart>*  MCthuth;
+
+  double energyMax[N_ETA_BINS];
 
   unsigned int trksT2[2];
 
@@ -58,6 +64,10 @@ private:
   double eZDCg[2];
   double pzZDCn[2];
   double pzZDCg[2];
+
+  double hfE[2];
+  double hfPz[2];
+  double hfE_max[2];
 
   short int protonSign;
   double    protonXi;

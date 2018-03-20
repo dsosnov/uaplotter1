@@ -98,13 +98,17 @@ bool uamc::ProceedEvent(const short unsigned int cut, const bool fill, const boo
   protonPz   = 0;
 
   PrepareArrays();
-  memset(trksT2,     0,     sizeof(trksT2));
-  memset(outRangeE,  0,     sizeof(outRangeE));
-  memset(outRangePz, 0,     sizeof(outRangePz));
-  memset(eZDCn,      0,     sizeof(eZDCn));
-  memset(eZDCg,      0,     sizeof(eZDCg));
-  memset(pzZDCn,     0,     sizeof(pzZDCn));
-  memset(pzZDCg,     0,     sizeof(pzZDCg));
+  memset(trksT2,     0, sizeof(trksT2));
+  memset(outRangeE,  0, sizeof(outRangeE));
+  memset(outRangePz, 0, sizeof(outRangePz));
+  memset(eZDCn,      0, sizeof(eZDCn));
+  memset(eZDCg,      0, sizeof(eZDCg));
+  memset(pzZDCn,     0, sizeof(pzZDCn));
+  memset(pzZDCg,     0, sizeof(pzZDCg));
+  memset(energyMax,  0, sizeof(energyMax));
+  memset(hfE,        0, sizeof(hfE));
+  memset(hfPz,       0, sizeof(hfPz));
+  memset(hfE_max,    0, sizeof(hfE_max));
 
   totalE  = 0;
   totalPz = 0;
@@ -118,24 +122,29 @@ bool uamc::ProceedEvent(const short unsigned int cut, const bool fill, const boo
     float abseta = fabs(eta);
     outer = false;
     zdc   = false;
+    int ind = int(eta > 0);
     //<============================================================= T2 "trigger"
-    if ((abseta > T2_ABSETA_MIN) && (abseta < T2_ABSETA_MAX)) {
+    if ((T2_ABSETA_MIN < abseta) && (abseta < T2_ABSETA_MAX)) {
       if ((part.charge != 0) && part.Pt() > T2_PT_THR) {
-        int ind = int(eta > 0);
         trksT2[ind]++;
       };
     };//========
 
-    if ((eta < CAS_ETA_MAX) && (eta > CAS_ETA_MIN)) { //<=============== Castor
+    if ((CAS_ETA_MIN < eta) && (eta < CAS_ETA_MAX)) { //<=============== Castor
       castorE  += e;
       castorPz += part.Pz();
+    };//=========
+
+    if ((HF_ETA_MIN < abseta) && (abseta < HF_ETA_MAX)) { //<=============== HF
+      hfE[ind]  += e;
+      hfPz[ind] += part.Pz();
+      if(e > hfE_max[ind]) hfE_max[ind] = e;
     };//=========
 
     //                                             <=============== ZDC
     //if((part.charge==0) && (fabs(part.Px())<ZDC_PXY_THR) && (fabs(part.Py())<ZDC_PXY_THR)){
     if ((part.charge == 0) && (abseta > MIN_ZDC_ETA)) {
       zdc = true;
-      int ind = int(eta > 0);
       if (part.pdgId == 2112) {
         eZDCn[ind] += e;
         pzZDCn[ind] += part.Pz();
@@ -174,9 +183,9 @@ bool uamc::ProceedEvent(const short unsigned int cut, const bool fill, const boo
         energy[bin] += e;
         pz[bin]     += part.Pz();
         pt[bin]     += part.Pt();
+        if (e > energyMax[bin]) energyMax[bin] = e;
       } else {
         outer = true;
-        int ind = int(eta > 0);
         outRangeE[ind] += e;
         outRangePz[ind] += part.Pz();
       };
