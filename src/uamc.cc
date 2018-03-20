@@ -112,15 +112,15 @@ bool uamc::ProceedEvent(const short unsigned int cut, const bool fill, const boo
   unsigned int n = 0;
   bool outer, zdc;
 
-  for (std::vector<MyGenPart>::iterator part = MCthuth->begin(); part != MCthuth->end(); ++part) {
-    double e = (*part).energy();
-    float eta    = (*part).eta();
+  for (auto part : *MCthuth) {
+    double e = part.energy();
+    float eta    = part.eta();
     float abseta = fabs(eta);
     outer = false;
     zdc   = false;
     //<============================================================= T2 "trigger"
     if ((abseta > T2_ABSETA_MIN) && (abseta < T2_ABSETA_MAX)) {
-      if (((*part).charge != 0) && (*part).Pt() > T2_PT_THR) {
+      if ((part.charge != 0) && part.Pt() > T2_PT_THR) {
         int ind = int(eta > 0);
         trksT2[ind]++;
       };
@@ -128,20 +128,20 @@ bool uamc::ProceedEvent(const short unsigned int cut, const bool fill, const boo
 
     if ((eta < CAS_ETA_MAX) && (eta > CAS_ETA_MIN)) { //<=============== Castor
       castorE  += e;
-      castorPz += (*part).Pz();
+      castorPz += part.Pz();
     };//=========
 
     //                                             <=============== ZDC
-    //if(((*part).charge==0) && (fabs((*part).Px())<ZDC_PXY_THR) && (fabs((*part).Py())<ZDC_PXY_THR)){
-    if (((*part).charge == 0) && (abseta > MIN_ZDC_ETA)) {
+    //if((part.charge==0) && (fabs(part.Px())<ZDC_PXY_THR) && (fabs(part.Py())<ZDC_PXY_THR)){
+    if ((part.charge == 0) && (abseta > MIN_ZDC_ETA)) {
       zdc = true;
       int ind = int(eta > 0);
-      if ((*part).pdgId == 2112) {
+      if (part.pdgId == 2112) {
         eZDCn[ind] += e;
-        pzZDCn[ind] += (*part).Pz();
+        pzZDCn[ind] += part.Pz();
       } else {
         eZDCg[ind] += e;
-        pzZDCg[ind] += (*part).Pz();
+        pzZDCg[ind] += part.Pz();
       };
     };
 
@@ -153,41 +153,41 @@ bool uamc::ProceedEvent(const short unsigned int cut, const bool fill, const boo
       intact_pcandidate = (eta > 7);
     };
 
-    if (((*part).pdgId == 2212) && intact_pcandidate && (e > 1500.)) { //<===== intact proton
+    if ((part.pdgId == 2212) && intact_pcandidate && (e > 1500.)) { //<===== intact proton
       if (eta > 0) {
         protonSign = 1;
       } else {
         protonSign = -1;
       };
 
-      protonXi = (MOMBEAM - fabs((*part).Pz())) / MOMBEAM;
-      protonPt = (*part).Pt();
-      protonEta = (*part).Eta();
-      protonE  = (*part).E();
-      protonPz = (*part).Pz();
+      protonXi = (MOMBEAM - fabs(part.Pz())) / MOMBEAM;
+      protonPt = part.Pt();
+      protonEta = part.Eta();
+      protonE  = part.E();
+      protonPz = part.Pz();
     } else { //<==================================================== all other particles
       totalE += e;
-      totalPz += (*part).Pz();
+      totalPz += part.Pz();
 
-      int bin = find_eta_bin((*part).eta());
+      int bin = find_eta_bin(part.eta());
       if (bin >= 0) {
         energy[bin] += e;
-        pz[bin]     += (*part).Pz();
-        pt[bin]     += (*part).Pt();
+        pz[bin]     += part.Pz();
+        pt[bin]     += part.Pt();
       } else {
         outer = true;
         int ind = int(eta > 0);
         outRangeE[ind] += e;
-        outRangePz[ind] += (*part).Pz();
+        outRangePz[ind] += part.Pz();
       };
     };
 
     n++;
     if (info) {
-      std::cout << n << "  id: " << (*part).pdgId << " q: " << (*part).charge << " stat: " << (*part).status
-                << "\teta: " << (*part).Eta() << "\tphi: " << (*part).Phi() << "\tPz: " << (*part).Pz()
-                << "\tPt: " << (*part).Pt() << "\tE:" << (*part).energy()
-                << "\t" << (*part).energy() - (*part).Pz() << "\t" << (*part).energy() + (*part).Pz() << "\touter: " << outer << "\tzdc: " << zdc << std::endl;
+      std::cout << n << "  id: " << part.pdgId << " q: " << part.charge << " stat: " << part.status
+                << "\teta: " << part.Eta() << "\tphi: " << part.Phi() << "\tPz: " << part.Pz()
+                << "\tPt: " << part.Pt() << "\tE:" << part.energy()
+                << "\t" << part.energy() - part.Pz() << "\t" << part.energy() + part.Pz() << "\touter: " << outer << "\tzdc: " << zdc << std::endl;
     };
   }; // end loop
 
