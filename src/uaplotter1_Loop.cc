@@ -143,6 +143,8 @@ int uaplotter1::Loop(const int evts, const int trigger, vector<string> hlt_path_
       case processID::pid_nd:
         FillLastEvent(7);
         nd_cand++;
+        if(hf_inelastic[0]) FillLastEvent(16);
+        if(hf_inelastic[1]) FillLastEvent(17);
         break;
       case processID::pid_dd:
         FillLastEvent(8);
