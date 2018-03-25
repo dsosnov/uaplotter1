@@ -175,6 +175,11 @@ bool uamc::ProceedEvent(const short unsigned int cut, const bool fill, const boo
       protonE  = part.E();
       protonPz = part.Pz();
     } else { //<==================================================== all other particles
+      double phi = part.Phi();
+      if ( (eta >= -4.363 && eta <= -4.191 && phi >= -M_PI + M_PI / 18 * 8 && phi <= -M_PI + M_PI / 18 * 9) ||
+           (eta >=  3.839 && eta <=  4.013 && phi >= -M_PI + M_PI / 18 * 5 && phi <= -M_PI + M_PI / 18 * 6) ){
+        continue;
+      }
       totalE += e;
       totalPz += part.Pz();
 
