@@ -381,6 +381,7 @@ void uaplotter1::create_histos()
     diff_flag_mc_full_reco_full_h     = new TH2F * [n_each_h2D];
     diff_flag_mc_total_mc_central_h   = new TH2F * [n_each_h2D];
     diff_flag_mc_full_mc_central_h    = new TH2F * [n_each_h2D];
+
     n_sd_minus_bins_mcreco_mctruth_h         = new TH2F * [n_each_h2D];
     n_sd_plus_bins_mcreco_mctruth_h          = new TH2F * [n_each_h2D];
 
@@ -394,12 +395,12 @@ void uaplotter1::create_histos()
     xi_cas_mc_reco_h       = new TH2F * [n_each_h2D];
     xi_zdc_mc_reco_h       = new TH2F * [n_each_h2D];
 
-    n_sd_minus_bins_mctruth_pid_inelastic_h        = new TH2F * [n_each_h2D];
-    n_sd_plus_bins_mctruth_pid_inelastic_h         = new TH2F * [n_each_h2D];
-    n_sd_minus_bins_reco_pid_inelastic_veto_h = new TH2F * [n_each_h2D];
-    n_sd_plus_bins_reco_pid_inelastic_veto_h  = new TH2F * [n_each_h2D];
-    n_sd_minus_bins_mctruth_pid_inelastic_veto_h   = new TH2F * [n_each_h2D];
-    n_sd_plus_bins_mctruth_pid_inelastic_veto_h    = new TH2F * [n_each_h2D];
+    n_sd_minus_bins_mctruth_pid_inelastic_h      = new TH2F * [n_each_h2D];
+    n_sd_plus_bins_mctruth_pid_inelastic_h       = new TH2F * [n_each_h2D];
+    n_sd_minus_bins_reco_pid_inelastic_veto_h    = new TH2F * [n_each_h2D];
+    n_sd_plus_bins_reco_pid_inelastic_veto_h     = new TH2F * [n_each_h2D];
+    n_sd_minus_bins_mctruth_pid_inelastic_veto_h = new TH2F * [n_each_h2D];
+    n_sd_plus_bins_mctruth_pid_inelastic_veto_h  = new TH2F * [n_each_h2D];
 
     for (unsigned int i = 0; i < n_each_h2D; i++) {
       title1 = "diff_flag_mc_full_reco_central_h["; title1 += i; title1 += "]";
