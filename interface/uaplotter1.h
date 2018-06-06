@@ -93,8 +93,8 @@ private:
   TH2F **diff_flag_mc_full_reco_full_h;    //!< X:mc_total; Y:reco_total
   TH2F **diff_flag_mc_full_mc_central_h;    //!< X:mc_full; Y:mc_central
   TH2F **diff_flag_mc_total_mc_central_h;    //!< X:mc_total; Y:mc_central
-  TH2F **n_sd_minus_bins_mc_reco_h;          //!< X:mc; Y:reco
-  TH2F **n_sd_plus_bins_mc_reco_h;          //!< X:mc; Y:reco
+  TH2F **n_sd_minus_bins_mcreco_mctruth_h;   //!< X:mc; Y:reco
+  TH2F **n_sd_plus_bins_mcreco_mctruth_h;    //!< X:mc; Y:reco
 
   TH2F **xi_mc_p_mc_total_h;       //!< X xi(p), Y:xi_mc_total
   TH2F **xi_mc_p_reco_full_h;       //!< X xi(p), Y:xi_full reco (but does not care about diffraction); MC only
