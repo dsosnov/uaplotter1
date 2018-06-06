@@ -38,10 +38,10 @@ int uaplotter1::Loop(const int evts, const int trigger, vector<string> hlt_path_
   unsigned int sd_plus      = 0;
   unsigned int sd_minus_eta[11];
   unsigned int sd_plus_eta[11];
-  unsigned int rg_minus[11];     // in all topology id's
-  unsigned int rg_plus[11];      // in all topology id's
-  unsigned int rg_minus_hfp[11]; // in all topology id's
-  unsigned int rg_plus_hfm[11];  // in all topology id's
+  unsigned int rg_minus[28];     // in all topology id's
+  unsigned int rg_plus[28];      // in all topology id's
+  unsigned int rg_minus_hfp[28]; // in all topology id's
+  unsigned int rg_plus_hfm[28];  // in all topology id's
   unsigned int goodFSC      = 0;
   unsigned int elastic_cand = 0;
   unsigned int cd_cand      = 0;
@@ -54,7 +54,7 @@ int uaplotter1::Loop(const int evts, const int trigger, vector<string> hlt_path_
   memset(rg_minus_hfp, 0, sizeof(rg_minus_hfp));
   memset(rg_plus_hfm,  0, sizeof(rg_plus_hfm));
 
-  short unsigned int bins_merged = 2; // Number of bins will be merged for filling histograms. "1" is histograms for every rg bin, "2" is standard "per one \eta" //TODO
+  short unsigned int bins_merged = 1; // Number of bins will be merged for filling histograms. "1" is histograms for every rg bin, "2" is standard "per one \eta" //TODO
   short unsigned int cuts_count = int(ceil((last_central_bin - first_central_bin + 1 + 1) / double(bins_merged)));
 
   double inelastic_cut = 3.0; // in GeV
@@ -110,11 +110,7 @@ int uaplotter1::Loop(const int evts, const int trigger, vector<string> hlt_path_
 //     if (tree_digi_flag && CMSforward->FSCvalid()) goodFSC++;
 
     FillLastEvent(0); // -------------------------------->  all triggered events
-    if (mc > 0 && CMSmc->GetProcessID() > 100) {
-      FillLastEvent(CMSmc->GetProcessID() - 100 + 10); // RG by processID: 101="11", 102="12" .. 105="15"
-      if(hf_inelastic[0]) FillLastEvent(CMSmc->GetProcessID() - 100 + 19); // 20 .. 24
-      if(hf_inelastic[1]) FillLastEvent(CMSmc->GetProcessID() - 100 + 24); // 25 .. 29
-    }
+
     if(hf_inelastic[0]) FillLastEvent(9);
     if(hf_inelastic[1]) FillLastEvent(10);
 
@@ -152,34 +148,18 @@ int uaplotter1::Loop(const int evts, const int trigger, vector<string> hlt_path_
         break;
     }
 
-    int cuts_start = 30;
-    for (short unsigned int ii = 0; ii < cuts_count; ii++) {
-      short unsigned int cut   = cuts_start + ii;
-      short unsigned int rgbin = bins_merged * ii;
-      if ((n_sd_minus_bins[0] >= rgbin) && (n_sd_minus_bins[0] < (rgbin + bins_merged))) {
-        if (sd_flag_total[0] == processID::pid_sdm) { // SD-
-          FillLastEvent(cut);
-          sd_minus_eta[ii]++;
-        }
-        if(hf_inelastic[1]){ // HF>(inelastic cut) at plus side (RG at minus side).
-          FillLastEvent(cut + cuts_count*2); //
-          rg_minus_hfp[ii]++;
-        }
-      }
-      if ((n_sd_plus_bins[0] >= rgbin) && (n_sd_plus_bins[0] < (rgbin + bins_merged))) {
-        if (sd_flag_total[0] == processID::pid_sdp) { // SD+
-          FillLastEvent(cut + cuts_count);
-          sd_plus_eta[ii]++;
-        }
-        if(hf_inelastic[0]){  // HF>(inelastic cut) at minus side (for RG at plus side).
-          FillLastEvent(cut + cuts_count*3);
-          rg_plus_hfm[ii]++;
-        }
-      }
+    int cuts_start = 11;
+    auto sd_minus_cut = static_cast<unsigned int>(floor(n_sd_minus_bins[0] / static_cast<double>(bins_merged)));
+    auto sd_plus_cut  = static_cast<unsigned int>(floor(n_sd_plus_bins[0] / static_cast<double>(bins_merged)));
+    if(hf_inelastic[1]){ // HF>(inelastic cut) at plus side (RG at minus side).
+      FillLastEvent(cuts_start + sd_minus_cut); //
+      rg_minus_hfp[sd_minus_cut]++;
+    }
+    if(hf_inelastic[0]){  // HF>(inelastic cut) at minus side (for RG at plus side).
+      FillLastEvent(cuts_start + sd_plus_cut + cuts_count);
+      rg_plus_hfm[sd_plus_cut]++;
     }
 
-    if(n_sd_minus_bins[0] == 0 && hf_inelastic[1]) FillLastEvent(18);
-    if(n_sd_plus_bins[0]  == 0 && hf_inelastic[0]) FillLastEvent(19);
   };// end loop
   std::cout << "Acceptance: [" << ETA_BIN_L[first_central_bin] << "," << ETA_BIN_L[last_central_bin] + ETA_BIN_W << "]\n";
   std::cout << "Total evts in chain       : " << stat << std::endl;
@@ -191,11 +171,6 @@ int uaplotter1::Loop(const int evts, const int trigger, vector<string> hlt_path_
   std::cout << "\tcd candidates           : " << cd_cand      << "\t\tdd candidates       : " << dd_cand << std::endl;
   std::cout << "\tsd- candidates          : " << sd_minus     << "\t\tsd+ candidates      : " << sd_plus << std::endl;
 
-  std::cout   << "\n**** In Singse-Diffractive events only (by topology) ****" << std::endl;
-  std::cout   << "\t\t" << "    Minus side" << "\t" << "     Plus side" << std::endl;
-  for (short unsigned int ii = 0; ii < cuts_count; ii++) {
-    std::cout << ii << " <= |deta| < " << ii + 1 << "\t\t" << sd_minus_eta[ii] << "\t\t" << sd_plus_eta[ii] << std::endl;
-  };
   std::cout   << "\n****                In all events                    ****" << std::endl;
   std::cout   << "\t\t" << "    Minus side" << "\t" << "     Plus side" << std::endl;
   for (short unsigned int ii = 0; ii < cuts_count; ii++) {
