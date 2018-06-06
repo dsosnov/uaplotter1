@@ -33,7 +33,7 @@ int uaplotter1::Loop(const int evts, const int trigger, vector<string> hlt_path_
   unsigned int trigger_evts = 0;
   unsigned int t2prim_evts  = 0;
   unsigned int bptx_active  = 0;
-  unsigned int hf_inelastic_cut = 0;
+  unsigned int hf_inelastic_count = 0;
   unsigned int sd_minus     = 0;
   unsigned int sd_plus      = 0;
   unsigned int sd_minus_eta[11];
@@ -57,7 +57,8 @@ int uaplotter1::Loop(const int evts, const int trigger, vector<string> hlt_path_
   short unsigned int bins_merged = 1; // Number of bins will be merged for filling histograms. "1" is histograms for every rg bin, "2" is standard "per one \eta" //TODO
   short unsigned int cuts_count = int(ceil((last_central_bin - first_central_bin + 1 + 1) / double(bins_merged)));
 
-  double inelastic_cut = 3.0; // in GeV
+  double hf_inelastic_cut = 3.0; // in GeV
+  double hf_veto_cut = 0.005; // in GeV -- seems like empty on particle level
 
   unsigned int kevt = 0;
   std::vector<bool>hlts;
@@ -72,6 +73,8 @@ int uaplotter1::Loop(const int evts, const int trigger, vector<string> hlt_path_
 
     memset(sd_flag_central, processID::pid_undefined, sizeof(sd_flag_central));
     memset(sd_flag_total,   processID::pid_undefined, sizeof(sd_flag_total));
+    memset(hf_inelastic,    false,                    sizeof(hf_inelastic));
+    memset(hf_emptyHF,      false,                    sizeof(hf_emptyHF));
 
     if (mc > 0) { // <============================  do MC loop here
       CMSmc->ProceedEvent(dummy_cut, false, false);
@@ -87,9 +90,14 @@ int uaplotter1::Loop(const int evts, const int trigger, vector<string> hlt_path_
     trigger_evts++;
 
     CMScalo->ProceedEvent(dummy_cut, false, false);
-    bool hf_inelastic[2] = {CMScalo->GetHFmax(0) > inelastic_cut, CMScalo->GetHFmax(1) > inelastic_cut};
+    hf_inelastic[0] = CMScalo->GetHFmax(0) > hf_inelastic_cut;
+    hf_inelastic[1] = CMScalo->GetHFmax(1) > hf_inelastic_cut;
+    if(mc > 0){
+      hf_emptyHF[0] = CMSmc->GetHFmax(0) < hf_veto_cut;
+      hf_emptyHF[1] = CMSmc->GetHFmax(1) < hf_veto_cut;
+    }
     if ( !hf_inelastic[0] && !hf_inelastic[1] ) continue; //<=== If maximumTower in both HF lesser then 4GeV (inelastic cut)
-    hf_inelastic_cut++;
+    hf_inelastic_count++;
 
 //     // <==================================== T2 check
 //     bool t2prim = false;
@@ -166,7 +174,7 @@ int uaplotter1::Loop(const int evts, const int trigger, vector<string> hlt_path_
   std::cout << "Proceeded evts            : " << (current_event + 1)     << std::endl;
   std::cout << "Active (!bptx quiet)      : " << bptx_active << std::endl;
   std::cout << "Triggered evts            : " << trigger_evts << std::endl;
-  std::cout << "After inelastic cut       : " << hf_inelastic_cut << std::endl;
+  std::cout << "After inelastic cut       : " << hf_inelastic_count << std::endl;
   std::cout << "\telastic candidates      : " << elastic_cand << "\t\tnd candidates       : " << nd_cand << std::endl;
   std::cout << "\tcd candidates           : " << cd_cand      << "\t\tdd candidates       : " << dd_cand << std::endl;
   std::cout << "\tsd- candidates          : " << sd_minus     << "\t\tsd+ candidates      : " << sd_plus << std::endl;

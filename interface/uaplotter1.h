@@ -79,6 +79,9 @@ private:
   void CalculateSDdiffMass(bool info = false); //!< for SD only!!
   void PrintSDdiffMass(bool detailed);
 
+  bool hf_inelastic[2]; // is event passed inelastic cut per HF side
+  bool hf_emptyHF[2];   // is event passed 'empty HF' cut (genLevel) per HF side
+
   // [0]reco, [1]mctruth
   double xi_pf[2];
   double xi_calo[2] ;
@@ -126,6 +129,15 @@ private:
   TH2F **FSCmSi8_vs_xiRP_h;
   TH2F **FSCmN_vs_xiRP_h;
   TH2F **FSCmN_vs_castor_h;
+
+  TH2F **n_sd_minus_bins_reco_pid_inelastic_h;
+  TH2F **n_sd_plus_bins_reco_pid_inelastic_h;
+  TH2F **n_sd_minus_bins_mctruth_pid_inelastic_h;
+  TH2F **n_sd_plus_bins_mctruth_pid_inelastic_h;
+  TH2F **n_sd_minus_bins_reco_pid_inelastic_veto_h;
+  TH2F **n_sd_plus_bins_reco_pid_inelastic_veto_h;
+  TH2F **n_sd_minus_bins_mctruth_pid_inelastic_veto_h;
+  TH2F **n_sd_plus_bins_mctruth_pid_inelastic_veto_h;
 
   struct {double hfMinus, hfPlus; int processID; std::vector<bool> l1Triggers;} hf_by_processID;
   TTree* hf_by_processID_t;

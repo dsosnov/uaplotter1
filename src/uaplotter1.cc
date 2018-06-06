@@ -311,6 +311,23 @@ bool uaplotter1::FillLastEvent(const short unsigned int cut)
   sd_flag_central_reco_h[cut]->Fill(sd_flag_central[0]);
   sd_flag_total_reco_h[cut]->Fill(sd_flag_total[0]);
 
+  int pid = 0;
+  if(mc>0){
+    if(CMSmc->GetProcessID() > 100) pid = CMSmc->GetProcessID() - 100;
+    n_sd_minus_bins_mctruth_pid_inelastic_h[cut]->Fill(n_sd_minus_bins[1], pid);
+    n_sd_plus_bins_mctruth_pid_inelastic_h[cut]->Fill(n_sd_plus_bins[1], pid);
+    if(hf_emptyHF[0]){
+      n_sd_minus_bins_reco_pid_inelastic_veto_h[cut]->Fill(n_sd_minus_bins[0], pid);
+      n_sd_minus_bins_mctruth_pid_inelastic_veto_h[cut]->Fill(n_sd_minus_bins[1], pid);
+    }
+    if(hf_emptyHF[1]){
+      n_sd_plus_bins_reco_pid_inelastic_veto_h[cut]->Fill(n_sd_plus_bins[0], pid);
+      n_sd_plus_bins_mctruth_pid_inelastic_veto_h[cut]->Fill(n_sd_plus_bins[1], pid);
+    }
+  }
+  n_sd_minus_bins_reco_pid_inelastic_h[cut]->Fill(n_sd_minus_bins[0], pid);
+  n_sd_plus_bins_reco_pid_inelastic_h[cut]->Fill(n_sd_plus_bins[0], pid);
+
   // ********** Short information about MC events ******************
   if((hf_by_processID_t != NULL) && (cut==0)){;
     hf_by_processID_t->Fill();
@@ -377,6 +394,13 @@ void uaplotter1::create_histos()
     xi_cas_mc_reco_h       = new TH2F * [n_each_h2D];
     xi_zdc_mc_reco_h       = new TH2F * [n_each_h2D];
 
+    n_sd_minus_bins_mctruth_pid_inelastic_h        = new TH2F * [n_each_h2D];
+    n_sd_plus_bins_mctruth_pid_inelastic_h         = new TH2F * [n_each_h2D];
+    n_sd_minus_bins_reco_pid_inelastic_veto_h = new TH2F * [n_each_h2D];
+    n_sd_plus_bins_reco_pid_inelastic_veto_h  = new TH2F * [n_each_h2D];
+    n_sd_minus_bins_mctruth_pid_inelastic_veto_h   = new TH2F * [n_each_h2D];
+    n_sd_plus_bins_mctruth_pid_inelastic_veto_h    = new TH2F * [n_each_h2D];
+
     for (unsigned int i = 0; i < n_each_h2D; i++) {
       title1 = "diff_flag_mc_full_reco_central_h["; title1 += i; title1 += "]";
       title2 = title1; title2 += " ; diff_flag_full_MCtruth; diff_flag_central_RECO";
@@ -442,6 +466,29 @@ void uaplotter1::create_histos()
       title2 = title1; title2 += "; MCtruth; RECO";
       xi_zdc_mc_reco_h[i] = new TH2F(title1.Data(), title2.Data(), 200, -9., 1., 200, -9., 1.);
 
+      title1 = "n_sd_minus_bins_mctruth_pid_inelastic_h["; title1 += i; title1 += "]";
+      title2 = title1; title2 += " ; n_sd_minus_bins (MCtruth); ProcessID";
+      n_sd_minus_bins_mctruth_pid_inelastic_h[i] = new TH2F(title1.Data(), title2.Data(), 30, -1, 29, 6, -0.5, 5.5); //TODO change to ProcessID
+
+      title1 = "n_sd_plus_bins_mctruth_pid_inelastic_h["; title1 += i; title1 += "]";
+      title2 = title1; title2 += " ; n_sd_plus_bins (MCtruth); ProcessID";
+      n_sd_plus_bins_mctruth_pid_inelastic_h[i] = new TH2F(title1.Data(), title2.Data(), 30, -1, 29, 6, -0.5, 5.5); //TODO change to ProcessID
+
+      title1 = "n_sd_minus_bins_reco_pid_inelastic_veto_h["; title1 += i; title1 += "]";
+      title2 = title1; title2 += " ; n_sd_minus_bins (RECO) (with empty HF); ProcessID";
+      n_sd_minus_bins_reco_pid_inelastic_veto_h[i] = new TH2F(title1.Data(), title2.Data(), 30, -1, 29, 6, -0.5, 5.5); //TODO change to ProcessID
+
+      title1 = "n_sd_plus_bins_reco_pid_inelastic_veto_h["; title1 += i; title1 += "]";
+      title2 = title1; title2 += " ; n_sd_plus_bins (RECO) (with empty HF); ProcessID";
+      n_sd_plus_bins_reco_pid_inelastic_veto_h[i] = new TH2F(title1.Data(), title2.Data(), 30, -1, 29, 6, -0.5, 5.5); //TODO change to ProcessID
+
+      title1 = "n_sd_minus_bins_mctruth_pid_inelastic_veto_h["; title1 += i; title1 += "]";
+      title2 = title1; title2 += " ; n_sd_minus_bins (MCtruth) (with empty HF); ProcessID";
+      n_sd_minus_bins_mctruth_pid_inelastic_veto_h[i] = new TH2F(title1.Data(), title2.Data(), 30, -1, 29, 6, -0.5, 5.5); //TODO change to ProcessID
+
+      title1 = "n_sd_plus_bins_mctruth_pid_inelastic_veto_h["; title1 += i; title1 += "]";
+      title2 = title1; title2 += " ; n_sd_plus_bins (MCtruth) (with empty HF); ProcessID";
+      n_sd_plus_bins_mctruth_pid_inelastic_veto_h[i] = new TH2F(title1.Data(), title2.Data(), 30, -1, 29, 6, -0.5, 5.5); //TODO change to ProcessID
     };
 
     h2D->push_back(diff_flag_mc_full_reco_central_h);
@@ -458,6 +505,12 @@ void uaplotter1::create_histos()
     h2D->push_back(xi_pf_mc_reco_h);
     h2D->push_back(xi_cas_mc_reco_h);
     h2D->push_back(xi_zdc_mc_reco_h);
+    h2D->push_back(n_sd_minus_bins_mctruth_pid_inelastic_h);
+    h2D->push_back(n_sd_plus_bins_mctruth_pid_inelastic_h);
+    h2D->push_back(n_sd_minus_bins_reco_pid_inelastic_veto_h);
+    h2D->push_back(n_sd_plus_bins_reco_pid_inelastic_veto_h);
+    h2D->push_back(n_sd_minus_bins_mctruth_pid_inelastic_veto_h);
+    h2D->push_back(n_sd_plus_bins_mctruth_pid_inelastic_veto_h);
   }; // end if mc *******************************************************************
 
 
@@ -472,6 +525,10 @@ void uaplotter1::create_histos()
   FSCmN_vs_castor_h     = new TH2F * [n_each_h2D];
 
   n_sd_minus_bins_plus_bins_h = new TH2F * [n_each_h2D];
+
+  n_sd_minus_bins_reco_pid_inelastic_h = new TH2F * [n_each_h2D];
+  n_sd_plus_bins_reco_pid_inelastic_h  = new TH2F * [n_each_h2D];
+
 
   for (unsigned int i = 0; i < n_each_h2D; i++) {
     title1 = "xi_p_reco_full_h["; title1 += i; title1 += "]";
@@ -509,6 +566,15 @@ void uaplotter1::create_histos()
     title1 = "n_sd_minus_bins_plus_bins_h["; title1 += i; title1 += "]";
     title2 = title1; title2 += " ; RECO sd- bins; RECO sd+ bins";
     n_sd_minus_bins_plus_bins_h[i] = new TH2F(title1.Data(), title2.Data(), 30, -1, 29, 30, -1, 29);
+
+    title1 = "n_sd_minus_bins_reco_pid_inelastic_h["; title1 += i; title1 += "]";
+    title2 = title1; title2 += " ; n_sd_minus_bins (RECO); ProcessID";
+    n_sd_minus_bins_reco_pid_inelastic_h[i] = new TH2F(title1.Data(), title2.Data(), 30, -1, 29, 6, -0.5, 5.5); //TODO change to ProcessID
+
+    title1 = "n_sd_plus_bins_reco_pid_inelastic_h["; title1 += i; title1 += "]";
+    title2 = title1; title2 += " ; n_sd_plus_bins (RECO); ProcessID";
+    n_sd_plus_bins_reco_pid_inelastic_h[i] = new TH2F(title1.Data(), title2.Data(), 30, -1, 29, 6, -0.5, 5.5); //TODO change to ProcessID
+
   };
   h2D->push_back(xi_p_reco_full_h);
   h2D->push_back(zdcM_vs_castor_h);
@@ -519,6 +585,8 @@ void uaplotter1::create_histos()
   h2D->push_back(FSCmN_vs_xiRP_h);
   h2D->push_back(FSCmN_vs_castor_h);
   h2D->push_back(n_sd_minus_bins_plus_bins_h);
+  h2D->push_back(n_sd_minus_bins_reco_pid_inelastic_h);
+  h2D->push_back(n_sd_plus_bins_reco_pid_inelastic_h);
 
   n_sd_minus_bins_h         = new TH1F * [n_each_h1D];
   n_sd_plus_bins_h          = new TH1F * [n_each_h1D];
