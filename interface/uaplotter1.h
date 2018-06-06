@@ -68,7 +68,7 @@ private:
 
   enum processID: short {
     pid_nd=0, pid_cd=3, pid_sdm=-1, pid_sdp=1, pid_dd=2, pid_elastic=4, pid_undefined=5,
-    pid_min = pid_sdm, pid_max=pid_elastic
+    pid_min = pid_sdm, pid_max=pid_undefined
   }; //!< Types of processID's: \li 0 - ND \li -1 — SD- \li +1 — SD+ \li 2 — DD~central gap(s) \li 3 — CD cand \li 4 — "elastic" \li 5 — "undefined"
   processID sd_flag_central[2]; //!< all MCtruth for MC, T2 events for RECO
   processID sd_flag_total[3];   //!< \li [0] — reco, \li [1] — mctruth eta_binning, \li [2] — mctruch total

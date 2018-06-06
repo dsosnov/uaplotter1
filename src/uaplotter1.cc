@@ -380,23 +380,27 @@ void uaplotter1::create_histos()
     for (unsigned int i = 0; i < n_each_h2D; i++) {
       title1 = "diff_flag_mc_full_reco_central_h["; title1 += i; title1 += "]";
       title2 = title1; title2 += " ; diff_flag_full_MCtruth; diff_flag_central_RECO";
-      diff_flag_mc_full_reco_central_h[i] = new TH2F(title1.Data(), title2.Data(),  8, processID::pid_min - 1.5, processID::pid_max + 1.5,
-                                                                                    8, processID::pid_min - 1.5, processID::pid_max + 1.5);
+      diff_flag_mc_full_reco_central_h[i] = new TH2F(title1.Data(), title2.Data(),
+                                                     pids_count, processID::pid_min - 0.5, processID::pid_max + 0.5,
+                                                     pids_count, processID::pid_min - 0.5, processID::pid_max + 0.5);
 
       title1 = "diff_flag_mc_full_reco_full_h["; title1 += i; title1 += "]";
       title2 = title1; title2 += " ; diff_flag_full_MCtruth; diff_flag_full_RECO";
-      diff_flag_mc_full_reco_full_h[i] = new TH2F(title1.Data(), title2.Data(), 8, processID::pid_min - 1.5, processID::pid_max + 1.5,
-                                                                                8, processID::pid_min - 1.5, processID::pid_max + 1.5);
+      diff_flag_mc_full_reco_full_h[i] = new TH2F(title1.Data(), title2.Data(),
+                                                  pids_count, processID::pid_min - 0.5, processID::pid_max + 0.5,
+                                                  pids_count, processID::pid_min - 0.5, processID::pid_max + 0.5);
 
       title1 = "diff_flag_mc_total_mc_central_h["; title1 += i; title1 += "]";
       title2 = title1; title2 += " ; diff_flag_total_MCtruth; diff_flag_central_MCtruth";
-      diff_flag_mc_total_mc_central_h[i] = new TH2F(title1.Data(), title2.Data(), 8, processID::pid_min - 1.5, processID::pid_max + 1.5,
-                                                                                  8, processID::pid_min - 1.5, processID::pid_max + 1.5);
+      diff_flag_mc_total_mc_central_h[i] = new TH2F(title1.Data(), title2.Data(),
+                                                    pids_count, processID::pid_min - 0.5, processID::pid_max + 0.5,
+                                                    pids_count, processID::pid_min - 0.5, processID::pid_max + 0.5);
 
       title1 = "diff_flag_mc_full_mc_central_h["; title1 += i; title1 += "]";
       title2 = title1; title2 += " ; diff_flag_full_MCtruth; diff_flag_central_MCtruth";
-      diff_flag_mc_full_mc_central_h[i] = new TH2F(title1.Data(), title2.Data(),  8, processID::pid_min - 1.5, processID::pid_max + 1.5,
-                                                                                  8, processID::pid_min - 1.5, processID::pid_max + 1.5);
+      diff_flag_mc_full_mc_central_h[i] = new TH2F(title1.Data(), title2.Data(),
+                                                   pids_count, processID::pid_min - 0.5, processID::pid_max + 0.5,
+                                                   pids_count, processID::pid_min - 0.5, processID::pid_max + 0.5);
 
       title1 = "n_sd_minus_bins_mcreco_mctruth_h["; title1 += i; title1 += "]";
       title2 = title1; title2 += " ; RECO sd- bins; MCTruth sd- bins";
@@ -546,11 +550,11 @@ void uaplotter1::create_histos()
 
     title1 = "sd_flag_central_reco_h["; title1 += i; title1 += "]";
     title2 = title1; title2 += " ; diff_flag_central_RECO";
-    sd_flag_central_reco_h[i] = new TH1F(title1.Data(), title2.Data(), 8, processID::pid_min - 1.5, processID::pid_max + 1.5);
+    sd_flag_central_reco_h[i] = new TH1F(title1.Data(), title2.Data(), pids_count, processID::pid_min - 0.5, processID::pid_max + 0.5);
 
     title1 = "sd_flag_total_reco_h["; title1 += i; title1 += "]";
     title2 = title1; title2 += " ; diff_flag_central_RECO";
-    sd_flag_total_reco_h[i] = new TH1F(title1.Data(), title2.Data(), 8, processID::pid_min - 1.5, processID::pid_max + 1.5);
+    sd_flag_total_reco_h[i] = new TH1F(title1.Data(), title2.Data(), pids_count, processID::pid_min - 0.5, processID::pid_max + 0.5);
   };
   h1D->push_back(n_sd_minus_bins_h);
   h1D->push_back(n_sd_plus_bins_h);
