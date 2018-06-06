@@ -50,7 +50,7 @@ bool uaplotter1::FindRapGap(bool RECO)
         combined_central_activity[bin] = CMSpf->GetActivityLoose(bin);
       binactivity = combined_central_activity[bin];
     } else { //=========================== RG on MCtruth
-      binactivity = CMSmc->GetActivityLoose(bin);
+      binactivity = CMSmc->GetActivityTight(bin);
     };
 
     if (!binactivity) {
