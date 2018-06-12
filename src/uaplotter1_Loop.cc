@@ -147,8 +147,8 @@ int uaplotter1::Loop(const int evts, const int trigger, vector<string> hlt_path_
       case processID::pid_nd:
         FillLastEvent(7);
         nd_cand++;
-        if(hf_inelastic[0]) FillLastEvent(16);
-        if(hf_inelastic[1]) FillLastEvent(17);
+        if(hf_inelastic[0]) FillLastEvent(11);
+        if(hf_inelastic[1]) FillLastEvent(12);
         break;
       case processID::pid_dd:
         FillLastEvent(8);
@@ -156,7 +156,7 @@ int uaplotter1::Loop(const int evts, const int trigger, vector<string> hlt_path_
         break;
     }
 
-    int cuts_start = 11;
+    int cuts_start = 13;
     auto sd_minus_cut = static_cast<unsigned int>(floor(n_sd_minus_bins[0] / static_cast<double>(bins_merged)));
     auto sd_plus_cut  = static_cast<unsigned int>(floor(n_sd_plus_bins[0] / static_cast<double>(bins_merged)));
     if(hf_inelastic[1]){ // HF>(inelastic cut) at plus side (RG at minus side).
