@@ -248,7 +248,11 @@ bool uaplotter1::FillLastEvent(const short unsigned int cut)
     diff_flag_mc_full_mc_central_h[cut]->Fill(sd_flag_total[1], sd_flag_central[1]);
     diff_flag_mc_total_mc_central_h[cut]->Fill(sd_flag_total[2], sd_flag_central[1]);
     n_sd_minus_bins_mcreco_mctruth_h[cut]->Fill(n_sd_minus_bins[0], n_sd_minus_bins[1]);
+    if(hf_emptyHF[0])
+      n_sd_minus_bins_mcreco_mctruth_emptyHF_h[cut]->Fill(n_sd_minus_bins[0], n_sd_minus_bins[1]);
     n_sd_plus_bins_mcreco_mctruth_h[cut]->Fill(n_sd_plus_bins[0], n_sd_plus_bins[1]);
+    if(hf_emptyHF[1])
+      n_sd_plus_bins_mcreco_mctruth_emptyHF_h[cut]->Fill(n_sd_plus_bins[0], n_sd_plus_bins[1]);
     for (short unsigned int bin = 0; bin < N_ETA_BINS; bin++)
       if (CMSmc->GetActivityLoose(bin))
         central_activity_mc_h[cut]->Fill(find_eta(bin));
@@ -384,6 +388,8 @@ void uaplotter1::create_histos()
 
     n_sd_minus_bins_mcreco_mctruth_h         = new TH2F * [n_each_h2D];
     n_sd_plus_bins_mcreco_mctruth_h          = new TH2F * [n_each_h2D];
+    n_sd_minus_bins_mcreco_mctruth_emptyHF_h = new TH2F * [n_each_h2D];
+    n_sd_plus_bins_mcreco_mctruth_emptyHF_h  = new TH2F * [n_each_h2D];
 
     xi_mc_p_mc_total_h     = new TH2F * [n_each_h2D];
     xi_mc_p_reco_full_h    = new TH2F * [n_each_h2D];
@@ -434,6 +440,14 @@ void uaplotter1::create_histos()
       title1 = "n_sd_plus_bins_mcreco_mctruth_h["; title1 += i; title1 += "]";
       title2 = title1; title2 += " ; RECO sd+ bins; MCTruth sd+ bins";
       n_sd_plus_bins_mcreco_mctruth_h[i] = new TH2F(title1.Data(), title2.Data(), 30, -1, 29, 30, -1, 29);
+
+      title1 = "n_sd_minus_bins_mcreco_mctruth_emptyHF_h["; title1 += i; title1 += "]";
+      title2 = title1; title2 += " ; RECO sd- bins; MCTruth sd- bins";
+      n_sd_minus_bins_mcreco_mctruth_emptyHF_h[i] = new TH2F(title1.Data(), title2.Data(), 30, -1, 29, 30, -1, 29);
+
+      title1 = "n_sd_plus_bins_mcreco_mctruth_emptyHF_h["; title1 += i; title1 += "]";
+      title2 = title1; title2 += " ; RECO sd+ bins; MCTruth sd+ bins";
+      n_sd_plus_bins_mcreco_mctruth_emptyHF_h[i] = new TH2F(title1.Data(), title2.Data(), 30, -1, 29, 30, -1, 29);
 
       title1 = "xi_mc_p_mc_total_h["; title1 += i; title1 += "]";
       title2 = title1; title2 += " ; #xi_{p}; #xi_{MCtruth_total}";
@@ -498,6 +512,8 @@ void uaplotter1::create_histos()
     h2D->push_back(diff_flag_mc_total_mc_central_h);
     h2D->push_back(n_sd_minus_bins_mcreco_mctruth_h);
     h2D->push_back(n_sd_plus_bins_mcreco_mctruth_h);
+    h2D->push_back(n_sd_minus_bins_mcreco_mctruth_emptyHF_h);
+    h2D->push_back(n_sd_plus_bins_mcreco_mctruth_emptyHF_h);
     h2D->push_back(xi_mc_p_mc_total_h);
     h2D->push_back(xi_mc_p_reco_full_h);
     h2D->push_back(xi_mc_total_mc_full_h);
