@@ -86,7 +86,7 @@ bool uaplotter1::FindRapGap(bool RECO)
     } else if(max_central_rgbins == 0){               // ND
       sd_flag_central[ind] = processID::pid_nd;
     } else if(max_central_rgbins == 1){               // It was an special case, TODO check how it will be better
-      sd_flag_central[ind] = processID::pid_dd;
+      sd_flag_central[ind] = processID::pid_nd;
     }
   } else if(rg_bins[2] == 0){
     sd_flag_central[ind] = processID::pid_sdm;        // SD-
