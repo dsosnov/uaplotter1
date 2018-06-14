@@ -34,8 +34,12 @@ namespace uathresholds {
 
   constexpr float RG_ETA_ACC   = 3.0; // Maximum eta for getting RG in CMS. Default: CALO_ETA_ACC. Change when you want to find rapidity gaps for \eta = (-RG_ETA_ACC, RG_ETA_ACC)
 
-  constexpr float TRCK_ETA_MAX_BIN = 17; //eta = 2.5
-  constexpr float TRCK_ETA_MIN_BIN = 8;  //eta = -2.5
+  constexpr float TRCK_ETA_MAX = 2.5; //eta = 2.5
+  constexpr float TRCK_ETA_MIN = -2.5;  //eta = -2.5
+  constexpr int   TRCK_ETA_MAX_BIN = 17; //eta = 2.5
+  constexpr int   TRCK_ETA_MIN_BIN = 8;  //eta = -2.5
+
+  constexpr float TRCK_PT_THR = 0.4; // pT threshold in GeV
 
   constexpr float ETA_BIN_W = 0.5;
   constexpr float ETA_MAX   = 6.5;//CALO_ETA_ACC;//ETA_BIN_L[N_ETA_BINS-1]+ETA_BIN_W;

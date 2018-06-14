@@ -189,6 +189,8 @@ bool uamc::ProceedEvent(const short unsigned int cut, const bool fill, const boo
         pz[bin]     += part.Pz();
         pt[bin]     += part.Pt();
         if (e > energyMax[bin]) energyMax[bin] = e;
+        if (part.charge != 0 && part.Pt() > ptChargedMax[bin])
+          ptChargedMax[bin] = part.Pt();
       } else {
         outer = true;
         outRangeE[ind] += e;
@@ -209,11 +211,12 @@ bool uamc::ProceedEvent(const short unsigned int cut, const bool fill, const boo
   if (ppb)   sgn = -1;
   totalXi = (totalE + sgn * totalPz) / (2 * MOMBEAM); // TBD check it!
 
-  for (unsigned int bin = 0; bin < N_ETA_BINS; bin++)
-    if (energy[bin] > 0) {
-      activity_loose[bin] = true;
+  for (unsigned int bin = 0; bin < N_ETA_BINS; bin++){
+    if (energy[bin] > 0) activity_loose[bin] = true;
+    if (energy[bin] > THR_PFEN_SUME().at(bin)) activity_tight[bin] = true;
+    if (TRCK_ETA_MIN_BIN <= bin && bin <= TRCK_ETA_MAX_BIN && ptChargedMax[bin] > TRCK_PT_THR)
       activity_tight[bin] = true;
-    };
+  }
   if (fill)
     FillLastEvent(cut);
   if (info)

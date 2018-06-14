@@ -59,7 +59,7 @@ private:
   void PrintEventInfo(const bool detailed = false);
 
   void IniRapGapRange(); //!< to be called during construction. Sets value to first_central_bin and last_central_bin according to uathresholds
-  bool FindRapGap(bool RECO = true); //!< if true - works on RECO, false - on MCtruth
+  bool FindRapGap(int ind = 0); //!< if 0 - works on RECO, 1 - on MCtruth (tight), 2 - on MCtruth (loose)
   bool TotalRapGap(short unsigned int ind, bool active_minus, bool active_plus);
   void PrintRapGap();
   short unsigned int first_central_bin;
@@ -70,11 +70,11 @@ private:
     pid_nd=0, pid_cd=3, pid_sdm=-1, pid_sdp=1, pid_dd=2, pid_elastic=4, pid_undefined=5,
     pid_min = pid_sdm, pid_max=pid_undefined
   }; //!< Types of processID's: \li 0 - ND \li -1 — SD- \li +1 — SD+ \li 2 — DD~central gap(s) \li 3 — CD cand \li 4 — "elastic" \li 5 — "undefined"
-  processID sd_flag_central[2]; //!< all MCtruth for MC, T2 events for RECO
-  processID sd_flag_total[3];   //!< \li [0] — reco, \li [1] — mctruth eta_binning, \li [2] — mctruch total
-  short unsigned int n_sd_minus_bins[2];
-  short unsigned int n_sd_plus_bins[2];
-  short unsigned int n_dd_rg_bins[2];
+  processID sd_flag_central[3]; //!< all MCtruth for MC, T2 events for RECO
+  processID sd_flag_total[5];   //!< \li [0] — reco, \li [1] — mctruth eta_binning (tight), \li [2] — mctruch total (tight), \li [3], [4] - the same for mctruth (loose)
+  short unsigned int n_sd_minus_bins[3]; //!< \li [0] — reco, \li [1] — mctruth (tight), \li [2] — mctruth (loose)
+  short unsigned int n_sd_plus_bins[3];  //!< \li [0] — reco, \li [1] — mctruth (tight), \li [2] — mctruth (loose)
+  short unsigned int n_dd_rg_bins[3];    //!< \li [0] — reco, \li [1] — mctruth (tight), \li [2] — mctruth (loose)
 
   void CalculateSDdiffMass(bool info = false); //!< for SD only!!
   void PrintSDdiffMass(bool detailed);

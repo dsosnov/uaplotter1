@@ -22,12 +22,12 @@ void uaplotter1::IniRapGapRange()
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-bool uaplotter1::FindRapGap(bool RECO)
+bool uaplotter1::FindRapGap(int ind) // 0 - RECO, 1 - MCTruth (Tight), 2 - MCTruth (Loose) 
 {
 
   bool rg = false;
 
-  int ind = int(!RECO);
+  bool RECO = (ind == 0);
   if (RECO)
     memset(combined_central_activity, false, sizeof(combined_central_activity));
 
@@ -49,9 +49,13 @@ bool uaplotter1::FindRapGap(bool RECO)
       else
         combined_central_activity[bin] = CMSpf->GetActivityLoose(bin);
       binactivity = combined_central_activity[bin];
-    } else { //=========================== RG on MCtruth
+    } else if (ind == 1) { //=========================== RG on MCtruth (Tight)
       binactivity = CMSmc->GetActivityTight(bin);
-    };
+    } else if (ind == 2) { //=========================== RG on MCtruth (Loose)
+      binactivity = CMSmc->GetActivityLoose(bin);
+    } else {
+      return rg;
+    }
 
     if (!binactivity) {
       if (diff_cand[0]) {
@@ -125,11 +129,11 @@ bool uaplotter1::FindRapGap(bool RECO)
 //       outer_activity_minus = (outer_activity_minus || CMSmc->GetActivityLoose(bin));
 //     for (unsigned int bin = N_ETA_BINS - 1; bin > last_central_bin; bin--)
 //       outer_activity_plus = (outer_activity_plus || CMSmc->GetActivityLoose(bin));
-//     TotalRapGap(1, outer_activity_minus, outer_activity_plus);
+//     TotalRapGap(2 * ind - 1, outer_activity_minus, outer_activity_plus);
 //
 //     outer_activity_minus = (outer_activity_minus || CMSmc->GetOuterE(false));
 //     outer_activity_plus = (outer_activity_plus || CMSmc->GetOuterE(true));
-//     TotalRapGap(2, outer_activity_minus, outer_activity_plus);
+//     TotalRapGap(2 * ind, outer_activity_minus, outer_activity_plus);
 //   };
 
 

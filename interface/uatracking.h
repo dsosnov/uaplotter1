@@ -37,6 +37,8 @@ private:
 
   unsigned int n_tracks_bin_all [N_ETA_BINS];
   unsigned int n_tracks_bin_good[N_ETA_BINS];
+  float ptMax_bin_all [N_ETA_BINS];
+  float ptMax_bin_good[N_ETA_BINS];
 
   void create_histos();
 

@@ -184,9 +184,11 @@ bool uaplotter1::ProceedEvent(const short unsigned int cut, const bool fill, con
   };
 
   // ********** RapGap ******************
-  FindRapGap(true); // RG in RECO
-  if (proceed_mc)
-    FindRapGap(false); // RG in MCtruth
+  FindRapGap(0); // RG in RECO
+  if (proceed_mc){
+    FindRapGap(1); // RG in MCtruth
+    FindRapGap(2); // RG in MCtruth
+  }
 
   // ************* SD ******************************************************
   if (sd_flag_central[0] != processID::pid_nd && (sd_flag_total[0] == processID::pid_sdm || sd_flag_total[0] == processID::pid_sdp)) {

@@ -42,7 +42,7 @@ uatracking::~uatracking()
 }
 
 bool isTrackGood(const MyTracks track){
-  return (track.quality[2]) && (track.pt() > 0.4);
+  return (track.quality[2]);
 }
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -99,6 +99,8 @@ bool uatracking::ProceedEvent(const short unsigned int cut, const bool fill, con
 {
   memset(n_tracks_bin_all,  0, sizeof(n_tracks_bin_all));
   memset(n_tracks_bin_good, 0, sizeof(n_tracks_bin_good));
+  memset(ptMax_bin_all,  0, sizeof(ptMax_bin_all));
+  memset(ptMax_bin_good, 0, sizeof(ptMax_bin_good));
   PrepareArrays(); // cleans eta arrays
   nVtx        = 0;
   nVtxGoog    = 0;
@@ -120,7 +122,9 @@ bool uatracking::ProceedEvent(const short unsigned int cut, const bool fill, con
     int bin = find_eta_bin(t.eta());
     n_tracks_bin_all[bin]++;
     nTracks++;
+    if (t.pt() > ptMax_bin_all[bin]) ptMax_bin_all[bin] = t.pt();
     if (!isTrackGood(t)) continue;
+    if (t.pt() > ptMax_bin_good[bin]) ptMax_bin_good[bin] = t.pt();
     n_tracks_bin_good[bin]++;
     nTracksGood++;
     if (info) {
@@ -133,8 +137,8 @@ bool uatracking::ProceedEvent(const short unsigned int cut, const bool fill, con
   }
 
   for (unsigned short int bin = TRCK_ETA_MIN_BIN; bin <= TRCK_ETA_MAX_BIN; bin++) {
-    if (n_tracks_bin_all[bin]  > 0) activity_loose[bin] = true;
-    if (n_tracks_bin_good[bin] > 0) activity_tight[bin] = true;
+    if (ptMax_bin_all[bin]  > TRCK_PT_THR) activity_loose[bin] = true;
+    if (ptMax_bin_good[bin] > TRCK_PT_THR) activity_tight[bin] = true;
   };
   if (info)
     PrintEventInfo(true);
