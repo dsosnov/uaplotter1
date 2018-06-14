@@ -255,6 +255,18 @@ bool uaplotter1::FillLastEvent(const short unsigned int cut)
     n_sd_plus_bins_mcreco_mctruth_h[cut]->Fill(n_sd_plus_bins[0], n_sd_plus_bins[1]);
     if(hf_emptyHF[1])
       n_sd_plus_bins_mcreco_mctruth_emptyHF_h[cut]->Fill(n_sd_plus_bins[0], n_sd_plus_bins[1]);
+    n_sd_minus_bins_mcreco_mctruthLoose_h[cut]->Fill(n_sd_minus_bins[0], n_sd_minus_bins[2]);
+    if(hf_emptyHF[0])
+      n_sd_minus_bins_mcreco_mctruthLoose_emptyHF_h[cut]->Fill(n_sd_minus_bins[0], n_sd_minus_bins[2]);
+    n_sd_plus_bins_mcreco_mctruthLoose_h[cut]->Fill(n_sd_plus_bins[0], n_sd_plus_bins[2]);
+    if(hf_emptyHF[1])
+      n_sd_plus_bins_mcreco_mctruthLoose_emptyHF_h[cut]->Fill(n_sd_plus_bins[0], n_sd_plus_bins[2]);
+    n_sd_minus_bins_mctruth_mctruthLoose_h[cut]->Fill(n_sd_minus_bins[1], n_sd_minus_bins[2]);
+    if(hf_emptyHF[0])
+      n_sd_minus_bins_mctruth_mctruthLoose_emptyHF_h[cut]->Fill(n_sd_minus_bins[1], n_sd_minus_bins[2]);
+    n_sd_plus_bins_mctruth_mctruthLoose_h[cut]->Fill(n_sd_plus_bins[1], n_sd_plus_bins[2]);
+    if(hf_emptyHF[1])
+      n_sd_plus_bins_mctruth_mctruthLoose_emptyHF_h[cut]->Fill(n_sd_plus_bins[1], n_sd_plus_bins[2]);
     for (short unsigned int bin = 0; bin < N_ETA_BINS; bin++)
       if (CMSmc->GetActivityLoose(bin))
         central_activity_mc_h[cut]->Fill(find_eta(bin));
@@ -322,13 +334,17 @@ bool uaplotter1::FillLastEvent(const short unsigned int cut)
     if(CMSmc->GetProcessID() > 100) pid = CMSmc->GetProcessID() - 100;
     n_sd_minus_bins_mctruth_pid_inelastic_h[cut]->Fill(n_sd_minus_bins[1], pid);
     n_sd_plus_bins_mctruth_pid_inelastic_h[cut]->Fill(n_sd_plus_bins[1], pid);
+    n_sd_minus_bins_mctruthLoose_pid_inelastic_h[cut]->Fill(n_sd_minus_bins[2], pid);
+    n_sd_plus_bins_mctruthLoose_pid_inelastic_h[cut]->Fill(n_sd_plus_bins[2], pid);
     if(hf_emptyHF[0]){
       n_sd_minus_bins_reco_pid_inelastic_veto_h[cut]->Fill(n_sd_minus_bins[0], pid);
       n_sd_minus_bins_mctruth_pid_inelastic_veto_h[cut]->Fill(n_sd_minus_bins[1], pid);
+      n_sd_minus_bins_mctruthLoose_pid_inelastic_veto_h[cut]->Fill(n_sd_minus_bins[2], pid);
     }
     if(hf_emptyHF[1]){
       n_sd_plus_bins_reco_pid_inelastic_veto_h[cut]->Fill(n_sd_plus_bins[0], pid);
       n_sd_plus_bins_mctruth_pid_inelastic_veto_h[cut]->Fill(n_sd_plus_bins[1], pid);
+      n_sd_plus_bins_mctruthLoose_pid_inelastic_veto_h[cut]->Fill(n_sd_plus_bins[2], pid);
     }
   }
   n_sd_minus_bins_reco_pid_inelastic_h[cut]->Fill(n_sd_minus_bins[0], pid);
@@ -392,6 +408,14 @@ void uaplotter1::create_histos()
     n_sd_plus_bins_mcreco_mctruth_h          = new TH2F * [n_each_h2D];
     n_sd_minus_bins_mcreco_mctruth_emptyHF_h = new TH2F * [n_each_h2D];
     n_sd_plus_bins_mcreco_mctruth_emptyHF_h  = new TH2F * [n_each_h2D];
+    n_sd_minus_bins_mcreco_mctruthLoose_h         = new TH2F * [n_each_h2D];
+    n_sd_plus_bins_mcreco_mctruthLoose_h          = new TH2F * [n_each_h2D];
+    n_sd_minus_bins_mcreco_mctruthLoose_emptyHF_h = new TH2F * [n_each_h2D];
+    n_sd_plus_bins_mcreco_mctruthLoose_emptyHF_h  = new TH2F * [n_each_h2D];
+    n_sd_minus_bins_mctruth_mctruthLoose_h         = new TH2F * [n_each_h2D];
+    n_sd_plus_bins_mctruth_mctruthLoose_h          = new TH2F * [n_each_h2D];
+    n_sd_minus_bins_mctruth_mctruthLoose_emptyHF_h = new TH2F * [n_each_h2D];
+    n_sd_plus_bins_mctruth_mctruthLoose_emptyHF_h  = new TH2F * [n_each_h2D];
 
     xi_mc_p_mc_total_h     = new TH2F * [n_each_h2D];
     xi_mc_p_reco_full_h    = new TH2F * [n_each_h2D];
@@ -409,6 +433,10 @@ void uaplotter1::create_histos()
     n_sd_plus_bins_reco_pid_inelastic_veto_h     = new TH2F * [n_each_h2D];
     n_sd_minus_bins_mctruth_pid_inelastic_veto_h = new TH2F * [n_each_h2D];
     n_sd_plus_bins_mctruth_pid_inelastic_veto_h  = new TH2F * [n_each_h2D];
+    n_sd_minus_bins_mctruthLoose_pid_inelastic_h      = new TH2F * [n_each_h2D];
+    n_sd_plus_bins_mctruthLoose_pid_inelastic_h       = new TH2F * [n_each_h2D];
+    n_sd_minus_bins_mctruthLoose_pid_inelastic_veto_h = new TH2F * [n_each_h2D];
+    n_sd_plus_bins_mctruthLoose_pid_inelastic_veto_h  = new TH2F * [n_each_h2D];
 
     for (unsigned int i = 0; i < n_each_h2D; i++) {
       title1 = "diff_flag_mc_full_reco_central_h["; title1 += i; title1 += "]";
@@ -450,6 +478,38 @@ void uaplotter1::create_histos()
       title1 = "n_sd_plus_bins_mcreco_mctruth_emptyHF_h["; title1 += i; title1 += "]";
       title2 = title1; title2 += " ; RECO sd+ bins; MCTruth sd+ bins";
       n_sd_plus_bins_mcreco_mctruth_emptyHF_h[i] = new TH2F(title1.Data(), title2.Data(), 30, -1, 29, 30, -1, 29);
+
+      title1 = "n_sd_minus_bins_mcreco_mctruthLoose_h["; title1 += i; title1 += "]";
+      title2 = title1; title2 += " ; RECO sd- bins; MCTruth (Loose) sd- bins";
+      n_sd_minus_bins_mcreco_mctruthLoose_h[i] = new TH2F(title1.Data(), title2.Data(), 30, -1, 29, 30, -1, 29);
+
+      title1 = "n_sd_plus_bins_mcreco_mctruthLoose_h["; title1 += i; title1 += "]";
+      title2 = title1; title2 += " ; RECO sd+ bins; MCTruth (Loose) sd+ bins";
+      n_sd_plus_bins_mcreco_mctruthLoose_h[i] = new TH2F(title1.Data(), title2.Data(), 30, -1, 29, 30, -1, 29);
+
+      title1 = "n_sd_minus_bins_mcreco_mctruthLoose_emptyHF_h["; title1 += i; title1 += "]";
+      title2 = title1; title2 += " ; RECO sd- bins; MCTruth (Loose) sd- bins";
+      n_sd_minus_bins_mcreco_mctruthLoose_emptyHF_h[i] = new TH2F(title1.Data(), title2.Data(), 30, -1, 29, 30, -1, 29);
+
+      title1 = "n_sd_plus_bins_mcreco_mctruthLoose_emptyHF_h["; title1 += i; title1 += "]";
+      title2 = title1; title2 += " ; RECO sd+ bins; MCTruth (Loose) sd+ bins";
+      n_sd_plus_bins_mcreco_mctruthLoose_emptyHF_h[i] = new TH2F(title1.Data(), title2.Data(), 30, -1, 29, 30, -1, 29);
+
+      title1 = "n_sd_minus_bins_mctruth_mctruthLoose_h["; title1 += i; title1 += "]";
+      title2 = title1; title2 += " ; MCTruth sd- bins; MCTruth (Loose) sd- bins";
+      n_sd_minus_bins_mctruth_mctruthLoose_h[i] = new TH2F(title1.Data(), title2.Data(), 30, -1, 29, 30, -1, 29);
+
+      title1 = "n_sd_plus_bins_mctruth_mctruthLoose_h["; title1 += i; title1 += "]";
+      title2 = title1; title2 += " ; MCTruth sd+ bins; MCTruth (Loose) sd+ bins";
+      n_sd_plus_bins_mctruth_mctruthLoose_h[i] = new TH2F(title1.Data(), title2.Data(), 30, -1, 29, 30, -1, 29);
+
+      title1 = "n_sd_minus_bins_mctruth_mctruthLoose_emptyHF_h["; title1 += i; title1 += "]";
+      title2 = title1; title2 += " ; MCTruth sd- bins; MCTruth (Loose) sd- bins";
+      n_sd_minus_bins_mctruth_mctruthLoose_emptyHF_h[i] = new TH2F(title1.Data(), title2.Data(), 30, -1, 29, 30, -1, 29);
+
+      title1 = "n_sd_plus_bins_mctruth_mctruthLoose_emptyHF_h["; title1 += i; title1 += "]";
+      title2 = title1; title2 += " ; MCTruth sd+ bins; MCTruth (Loose) sd+ bins";
+      n_sd_plus_bins_mctruth_mctruthLoose_emptyHF_h[i] = new TH2F(title1.Data(), title2.Data(), 30, -1, 29, 30, -1, 29);
 
       title1 = "xi_mc_p_mc_total_h["; title1 += i; title1 += "]";
       title2 = title1; title2 += " ; #xi_{p}; #xi_{MCtruth_total}";
@@ -506,6 +566,22 @@ void uaplotter1::create_histos()
       title1 = "n_sd_plus_bins_mctruth_pid_inelastic_veto_h["; title1 += i; title1 += "]";
       title2 = title1; title2 += " ; n_sd_plus_bins (MCtruth) (with empty HF); ProcessID";
       n_sd_plus_bins_mctruth_pid_inelastic_veto_h[i] = new TH2F(title1.Data(), title2.Data(), 30, -1, 29, 6, -0.5, 5.5); //TODO change to ProcessID
+
+      title1 = "n_sd_minus_bins_mctruthLoose_pid_inelastic_h["; title1 += i; title1 += "]";
+      title2 = title1; title2 += " ; n_sd_minus_bins (MCtruth[Loose]); ProcessID";
+      n_sd_minus_bins_mctruthLoose_pid_inelastic_h[i] = new TH2F(title1.Data(), title2.Data(), 30, -1, 29, 6, -0.5, 5.5); //TODO change to ProcessID
+
+      title1 = "n_sd_plus_bins_mctruthLoose_pid_inelastic_h["; title1 += i; title1 += "]";
+      title2 = title1; title2 += " ; n_sd_plus_bins (MCtruth[Loose]); ProcessID";
+      n_sd_plus_bins_mctruthLoose_pid_inelastic_h[i] = new TH2F(title1.Data(), title2.Data(), 30, -1, 29, 6, -0.5, 5.5); //TODO change to ProcessID
+
+      title1 = "n_sd_minus_bins_mctruthLoose_pid_inelastic_veto_h["; title1 += i; title1 += "]";
+      title2 = title1; title2 += " ; n_sd_minus_bins (MCtruth[Loose]) (with empty HF); ProcessID";
+      n_sd_minus_bins_mctruthLoose_pid_inelastic_veto_h[i] = new TH2F(title1.Data(), title2.Data(), 30, -1, 29, 6, -0.5, 5.5); //TODO change to ProcessID
+
+      title1 = "n_sd_plus_bins_mctruthLoose_pid_inelastic_veto_h["; title1 += i; title1 += "]";
+      title2 = title1; title2 += " ; n_sd_plus_bins (MCtruth[Loose]) (with empty HF); ProcessID";
+      n_sd_plus_bins_mctruthLoose_pid_inelastic_veto_h[i] = new TH2F(title1.Data(), title2.Data(), 30, -1, 29, 6, -0.5, 5.5); //TODO change to ProcessID
     };
 
     h2D->push_back(diff_flag_mc_full_reco_central_h);
@@ -516,6 +592,14 @@ void uaplotter1::create_histos()
     h2D->push_back(n_sd_plus_bins_mcreco_mctruth_h);
     h2D->push_back(n_sd_minus_bins_mcreco_mctruth_emptyHF_h);
     h2D->push_back(n_sd_plus_bins_mcreco_mctruth_emptyHF_h);
+    h2D->push_back(n_sd_minus_bins_mcreco_mctruthLoose_h);
+    h2D->push_back(n_sd_plus_bins_mcreco_mctruthLoose_h);
+    h2D->push_back(n_sd_minus_bins_mcreco_mctruthLoose_emptyHF_h);
+    h2D->push_back(n_sd_plus_bins_mcreco_mctruthLoose_emptyHF_h);
+    h2D->push_back(n_sd_minus_bins_mctruth_mctruthLoose_h);
+    h2D->push_back(n_sd_plus_bins_mctruth_mctruthLoose_h);
+    h2D->push_back(n_sd_minus_bins_mctruth_mctruthLoose_emptyHF_h);
+    h2D->push_back(n_sd_plus_bins_mctruth_mctruthLoose_emptyHF_h);
     h2D->push_back(xi_mc_p_mc_total_h);
     h2D->push_back(xi_mc_p_reco_full_h);
     h2D->push_back(xi_mc_total_mc_full_h);
@@ -530,6 +614,10 @@ void uaplotter1::create_histos()
     h2D->push_back(n_sd_plus_bins_reco_pid_inelastic_veto_h);
     h2D->push_back(n_sd_minus_bins_mctruth_pid_inelastic_veto_h);
     h2D->push_back(n_sd_plus_bins_mctruth_pid_inelastic_veto_h);
+    h2D->push_back(n_sd_minus_bins_mctruthLoose_pid_inelastic_h);
+    h2D->push_back(n_sd_plus_bins_mctruthLoose_pid_inelastic_h);
+    h2D->push_back(n_sd_minus_bins_mctruthLoose_pid_inelastic_veto_h);
+    h2D->push_back(n_sd_plus_bins_mctruthLoose_pid_inelastic_veto_h);
   }; // end if mc *******************************************************************
 
 
