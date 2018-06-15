@@ -106,6 +106,7 @@ bool uamc::ProceedEvent(const short unsigned int cut, const bool fill, const boo
   memset(pzZDCn,     0, sizeof(pzZDCn));
   memset(pzZDCg,     0, sizeof(pzZDCg));
   memset(energyMax,  0, sizeof(energyMax));
+  memset(ptChargedMax,  0, sizeof(ptChargedMax));
   memset(hfE,        0, sizeof(hfE));
   memset(hfPz,       0, sizeof(hfPz));
   memset(hfE_max,    0, sizeof(hfE_max));
