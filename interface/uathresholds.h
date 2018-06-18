@@ -129,8 +129,8 @@ namespace uathresholds {
     std::vector<float> pf_2_5_ppb = { 0, 0, 0,  5.7,  7.2,  5.4,  7.8, 27.0, 5.3, 3.4, 2.4, 1.9, 2.7, 2.3, 1.6, 2.3, 3.7, 5.6, 21.2, 10.8, 30.3, 11.2,  9.4, 0, 0, 0 }; // Run2, 5TeV pPb (p-> <-Pb)
     std::vector<float> pf_2_8_pbp = { 0, 0, 0, 11.1, 13.2, 12.2, 13.6, 27.6, 5.6, 3.5, 2.5, 1.9, 2.7, 2.3, 1.7, 2.4, 3.9, 5.9, 22.4, 16.2, 31.1, 17.5, 14.1, 0, 0, 0 }; // Run2, 8TeV Pbp (Pb-> <-p)
     std::vector<float> pf_2_8_ppb = { 0, 0, 0, 13.4, 16.4, 15.3, 16.9, 27.4, 5.5, 3.5, 2.5, 1.9, 2.7, 2.3, 1.7, 2.4, 3.8, 5.8, 21.8, 15.9, 31.7, 17.1, 13.6, 0, 0, 0 }; // Run2, 8TeV pPb (p-> <-Pb)
-    std::vector<float> pf_2_8_pbp_unified = { 0, 0, 0, 0, 0, 0, 0, 27.6, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 27.6, 0, 0, 0, 0, 0, 0, 0 }; // Run2, 8TeV Pbp (Pb-> <-p) [new thresholds, unified for central region]
-    std::vector<float> pf_2_8_ppb_unified = { 0, 0, 0, 0, 0, 0, 0, 27.4, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 27.4, 0, 0, 0, 0, 0, 0, 0 }; // Run2, 8TeV pPb (p-> <-Pb) [new thresholds, unified for central region]
+    std::vector<float> pf_2_8_pbp_unified = { 0, 0, 0, 0, 0, 0, 0, 27.6, 6.0, 6.0, 6.0, 6.0, 6.0, 6.0, 6.0, 6.0, 6.0, 6.0, 27.6, 0, 0, 0, 0, 0, 0, 0 }; // Run2, 8TeV Pbp (Pb-> <-p) [new thresholds, unified for central region]
+    std::vector<float> pf_2_8_ppb_unified = { 0, 0, 0, 0, 0, 0, 0, 27.4, 6.0, 6.0, 6.0, 6.0, 6.0, 6.0, 6.0, 6.0, 6.0, 6.0, 27.4, 0, 0, 0, 0, 0, 0, 0 }; // Run2, 8TeV pPb (p-> <-Pb) [new thresholds, unified for central region]
     auto thr_p = &t0;
     switch (_run){
       case 1: {
