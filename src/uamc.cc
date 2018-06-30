@@ -110,6 +110,7 @@ bool uamc::ProceedEvent(const short unsigned int cut, const bool fill, const boo
   memset(hfE,        0, sizeof(hfE));
   memset(hfPz,       0, sizeof(hfPz));
   memset(hfE_max,    0, sizeof(hfE_max));
+  memset(blindSpot_max, 0, sizeof(blindSpot_max));
 
   totalE  = 0;
   totalPz = 0;
@@ -142,6 +143,10 @@ bool uamc::ProceedEvent(const short unsigned int cut, const bool fill, const boo
       if(e > hfE_max[ind]) hfE_max[ind] = e;
     };//=========
 
+    if((3.0 < abseta) && (abseta < HF_ETA_MIN)){ //<====== Blind Spot
+      if(e > blindSpot_max[ind]) blindSpot_max[ind] = e;
+    }
+    
     //                                             <=============== ZDC
     //if((part.charge==0) && (fabs(part.Px())<ZDC_PXY_THR) && (fabs(part.Py())<ZDC_PXY_THR)){
     if ((part.charge == 0) && (abseta > MIN_ZDC_ETA)) {

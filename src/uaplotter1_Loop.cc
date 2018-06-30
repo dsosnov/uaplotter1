@@ -75,6 +75,7 @@ int uaplotter1::Loop(const int evts, const int trigger, vector<string> hlt_path_
     memset(sd_flag_total,   processID::pid_undefined, sizeof(sd_flag_total));
     memset(hf_inelastic,    false,                    sizeof(hf_inelastic));
     memset(hf_emptyHF,      false,                    sizeof(hf_emptyHF));
+    memset(hf_blindFilled,      false,                    sizeof(hf_blindFilled));
 
     if (mc > 0) { // <============================  do MC loop here
       CMSmc->ProceedEvent(dummy_cut, false, false);
@@ -95,6 +96,8 @@ int uaplotter1::Loop(const int evts, const int trigger, vector<string> hlt_path_
     if(mc > 0){
       hf_emptyHF[0] = CMSmc->GetHFmax(0) < hf_veto_cut;
       hf_emptyHF[1] = CMSmc->GetHFmax(1) < hf_veto_cut;
+      hf_blindFilled[0] = CMSmc->GetBlindSpotMax(0) > hf_inelastic_cut;
+      hf_blindFilled[1] = CMSmc->GetBlindSpotMax(1) > hf_inelastic_cut;
     }
     if ( !hf_inelastic[0] && !hf_inelastic[1] ) continue; //<=== If maximumTower in both HF lesser then 4GeV (inelastic cut)
     hf_inelastic_count++;

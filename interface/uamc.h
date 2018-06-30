@@ -45,6 +45,7 @@ public:
   double GetHFE(bool side)   const {return hfE[int(side)]    ;};
   double GetHFPz(bool side)  const {return hfPz[int(side)]   ;};
   double GetHFmax(bool side) const {return hfE_max[int(side)];};
+  double GetBlindSpotMax(bool side) const {return blindSpot_max[int(side)];};
 
   int GetProcessID() const { for(auto p: *MCthuth) if(p.processID) return p.processID; return 0; }
 
@@ -69,6 +70,7 @@ private:
   double hfE[2];
   double hfPz[2];
   double hfE_max[2];
+  double blindSpot_max[2]; // [3.0, 3.15)
 
   short int protonSign;
   double    protonXi;
