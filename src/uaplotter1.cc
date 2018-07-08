@@ -604,11 +604,11 @@ void uaplotter1::create_histos()
       title2 = title1; title2 += " ; n_sd_plus_bins (RECO) (with empty HF); ProcessID";
       n_sd_plus_bins_reco_pid_inelastic_veto_blindFilled_h[i] = new TH2F(title1.Data(), title2.Data(), 30, -1, 29, 6, -0.5, 5.5); //TODO change to ProcessID
 
-      title1 = "n_sd_minus_bins_mctruth_pid_inelastic_blindFilled_veto_h["; title1 += i; title1 += "]";
+      title1 = "n_sd_minus_bins_mctruth_pid_inelastic_veto_blindFilled_h["; title1 += i; title1 += "]";
       title2 = title1; title2 += " ; n_sd_minus_bins (MCtruth) (with empty HF); ProcessID";
       n_sd_minus_bins_mctruth_pid_inelastic_veto_blindFilled_h[i] = new TH2F(title1.Data(), title2.Data(), 30, -1, 29, 6, -0.5, 5.5); //TODO change to ProcessID
 
-      title1 = "n_sd_plus_bins_mctruth_pid_inelastic_blindFilled_veto_h["; title1 += i; title1 += "]";
+      title1 = "n_sd_plus_bins_mctruth_pid_inelastic_veto_blindFilled_h["; title1 += i; title1 += "]";
       title2 = title1; title2 += " ; n_sd_plus_bins (MCtruth) (with empty HF); ProcessID";
       n_sd_plus_bins_mctruth_pid_inelastic_veto_blindFilled_h[i] = new TH2F(title1.Data(), title2.Data(), 30, -1, 29, 6, -0.5, 5.5); //TODO change to ProcessID
     };
