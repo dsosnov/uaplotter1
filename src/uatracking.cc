@@ -62,12 +62,28 @@ bool uatracking::FillLastEvent(const short unsigned int cut)
     tracks_eta_n_h[cut]->Fill(ETA_BIN_L[bin], n_tracks_bin_all[bin]);
     tracks_eta_n_h[cut + n_cuts]->Fill(ETA_BIN_L[bin], n_tracks_bin_good[bin]);
   };
+  double energySum[12]; memset(energySum, 0, sizeof(energySum));
+  double energySum_good[12];  memset(energySum_good, 0, sizeof(energySum_good));
   for (auto t: *Tracks) {
+    auto bin = static_cast<int>(floor((t.eta() + 3.0) / 0.5));
+    if(bin < 0 || bin >= 12) continue;
     tracks_pt_h[cut]->Fill(t.pt());
     tracks_eta_pt_h[cut]->Fill(t.eta(), t.pt());
+    tracks_eta_smallpt_h[cut]->Fill(t.eta(), t.pt());
+    tracks_eta_eTrk_h[cut]->Fill(t.eta(), t.e());
+    energySum[bin] += t.e();
     if (!isTrackGood(t)) continue;
+    // if (t.pt() < TRCK_PT_THR) continue;
     tracks_pt_h[cut+n_cuts]->Fill(t.pt());
     tracks_eta_pt_h[cut+n_cuts]->Fill(t.eta(), t.pt());
+    tracks_eta_smallpt_h[cut+n_cuts]->Fill(t.eta(), t.pt());
+    tracks_eta_eTrk_h[cut+n_cuts]->Fill(t.eta(), t.e());
+    energySum_good[bin] += t.e();
+  }
+  for(int i = 0; i < 12; i++){
+    auto etai = i * 0.5 - 3.0 + 0.25;
+    tracks_eta_eSum_h[cut]->Fill(etai, energySum[i]);
+    tracks_eta_eSum_h[cut+n_cuts]->Fill(etai, energySum_good[i]);
   }
   return true;
 }
@@ -227,12 +243,14 @@ void uatracking::create_histos()
   tracks_pt_h = new TH1F * [n_each_h1D];
   tracks_eta_n_h = new TH2F * [n_each_h2D];
   tracks_eta_pt_h = new TH2F * [n_each_h2D];
+  tracks_eta_smallpt_h = new TH2F * [n_each_h2D];
+  tracks_eta_eSum_h = new TH2F * [n_each_h2D];
+  tracks_eta_eTrk_h = new TH2F * [n_each_h2D];
   for (unsigned int i = 0; i < n_cuts; i++) {
     title1      = "tracks_h["; title1 += i; title1 += "]";
     title2      = title1; title2 += "; ntrcks";
     tracks_h[i] = new TH1F(title1.Data(), title2.Data(), 201, -1, 200);
     tracks_h[i]->SetDirectory(directory);
-
     title1      = "tracks_h["; title1 += (i + n_cuts); title1 += "]";
     title2      = title1; title2 += " good; ntrcks";
     tracks_h[i + n_cuts] = new TH1F(title1.Data(), title2.Data(), 201, -1, 200);
@@ -242,7 +260,6 @@ void uatracking::create_histos()
     title2      = title1; title2 += "; p_T;";
     tracks_pt_h[i] = new TH1F(title1.Data(), title2.Data(), 7001, -1, 7000);
     tracks_pt_h[i]->SetDirectory(directory);
-
     title1      = "tracks_pt_h["; title1 += (i + n_cuts); title1 += "]";
     title2      = title1; title2 += " good; p_T";
     tracks_pt_h[i + n_cuts] = new TH1F(title1.Data(), title2.Data(), 7001, -1, 7000);
@@ -262,14 +279,44 @@ void uatracking::create_histos()
     title2      = title1; title2 += "; #eta; p_T";
     tracks_eta_pt_h[i] = new TH2F(title1.Data(), title2.Data(), 12, -3, 3, 70010, -1, 7000);
     tracks_eta_pt_h[i]->SetDirectory(directory);
-
     title1      = "tracks_eta_pt_h["; title1 += (i + n_cuts); title1 += "]";
     title2      = title1; title2 += " good; #eta; p_T";
     tracks_eta_pt_h[i + n_cuts] = new TH2F(title1.Data(), title2.Data(), 12, -3, 3, 70010, -1, 7000);
     tracks_eta_pt_h[i + n_cuts]->SetDirectory(directory);
+
+    /****************************************************************/
+    title1      = "tracks_eta_smallpt_h["; title1 += i; title1 += "]";
+    title2      = title1; title2 += "; #eta; p_T";
+    tracks_eta_smallpt_h[i] = new TH2F(title1.Data(), title2.Data(), 12, -3, 3, 100, 0, 1);
+    tracks_eta_smallpt_h[i]->SetDirectory(directory);
+    title1      = "tracks_eta_smallpt_h["; title1 += (i + n_cuts); title1 += "]";
+    title2      = title1; title2 += " good; #eta; p_T";
+    tracks_eta_smallpt_h[i + n_cuts] = new TH2F(title1.Data(), title2.Data(), 12, -3, 3, 100, 0, 1);
+    tracks_eta_smallpt_h[i + n_cuts]->SetDirectory(directory);
+
+    title1      = "tracks_eta_eSum_h["; title1 += i; title1 += "]";
+    title2      = title1; title2 += "; #eta; E_{Sum}";
+    tracks_eta_eSum_h[i] = new TH2F(title1.Data(), title2.Data(), 12, -3, 3, 10000, 0, 100);
+    tracks_eta_eSum_h[i]->SetDirectory(directory);
+    title1      = "tracks_eta_eSum_h["; title1 += (i + n_cuts); title1 += "]";
+    title2      = title1; title2 += " good; #eta; E_{Sum}";
+    tracks_eta_eSum_h[i + n_cuts] = new TH2F(title1.Data(), title2.Data(), 12, -3, 3, 10000, 0, 100);
+    tracks_eta_eSum_h[i + n_cuts]->SetDirectory(directory);
+
+    title1      = "tracks_eta_eTrk_h["; title1 += i; title1 += "]";
+    title2      = title1; title2 += "; #eta; E_{Trck}";
+    tracks_eta_eTrk_h[i] = new TH2F(title1.Data(), title2.Data(), 12, -3, 3, 1000, 0, 10);
+    tracks_eta_eTrk_h[i]->SetDirectory(directory);
+    title1      = "tracks_eta_eTrk_h["; title1 += (i + n_cuts); title1 += "]";
+    title2      = title1; title2 += " good; #eta; E_{Trck}";
+    tracks_eta_eTrk_h[i + n_cuts] = new TH2F(title1.Data(), title2.Data(), 12, -3, 3, 1000, 0, 10);
+    tracks_eta_eTrk_h[i + n_cuts]->SetDirectory(directory);
   };
   h1D->push_back(tracks_h);
   h1D->push_back(tracks_pt_h);
   h2D->push_back(tracks_eta_n_h);
   h2D->push_back(tracks_eta_pt_h);
+  h2D->push_back(tracks_eta_smallpt_h);
+  h2D->push_back(tracks_eta_eSum_h);
+  h2D->push_back(tracks_eta_eTrk_h);
 }

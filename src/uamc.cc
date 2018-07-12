@@ -52,6 +52,34 @@ bool uamc::FillLastEvent(const short unsigned int cut)
   proton_pt2_xi_h[cut]->Fill(pt2, protonXi);
   //proton_e_eta_h[cut]->Fill(fabs(protonEta), protonE);
   //proton_e_pt2_h[cut]->Fill(pt2, protonE);
+
+  double energySum_neut[12]; memset(energySum_neut, 0, sizeof(energySum_neut));
+  double energySum_utracks[12]; memset(energySum_utracks, 0, sizeof(energySum_utracks));
+  double energySum_tracks[12]; memset(energySum_utracks, 0, sizeof(energySum_utracks));
+  for (auto part : *MCthuth) {
+    auto bin = static_cast<int>(floor((part.eta() + 3.0) / 0.5));
+    if(bin < 0 || bin >= 12) continue;
+    if(part.charge == 0){
+      energySum_neut[bin] += part.E();
+      neut_eta_eMC_h[cut]->Fill(part.eta(), part.E());
+    } else {
+      energySum_utracks[bin] += part.E();
+      utracks_eta_smallpt_h[cut]->Fill(part.eta(), part.Pt());      
+      utracks_eta_eMC_h[cut]->Fill(part.eta(), part.E());      
+      if(part.Pt() > TRCK_PT_THR){
+        energySum_tracks[bin] += part.E();
+        tracks_eta_smallpt_h[cut]->Fill(part.eta(), part.Pt());      
+        tracks_eta_eMC_h[cut]->Fill(part.eta(), part.E());      
+      }
+    }
+  }
+  for (unsigned int i = 0; i < 12; i++) {
+    auto etai = i * 0.5 - 3.0 + 0.25;
+    utracks_eta_eSum_h[cut]->Fill(etai, energySum_utracks[i]);
+    tracks_eta_eSum_h[cut]->Fill(etai, energySum_tracks[i]);
+    neut_eta_eSum_h[cut]->Fill(etai, energySum_neut[i]);
+  }
+
   return true;
 }
 
@@ -252,6 +280,15 @@ void uamc::create_histos()
   //proton_e_pt2_h  = new TH2F * [n_each_h2D];
   proton_pt2_xi_h = new TH2F * [n_each_h2D];
   proton_xi_mc_h  = new TH2F * [n_each_h2D];
+  tracks_eta_smallpt_h  = new TH2F*[n_each_h2D];
+  tracks_eta_eSum_h  = new TH2F*[n_each_h2D];
+  tracks_eta_eMC_h  = new TH2F*[n_each_h2D];
+  utracks_eta_smallpt_h  = new TH2F*[n_each_h2D];
+  utracks_eta_eSum_h  = new TH2F*[n_each_h2D];
+  utracks_eta_eMC_h  = new TH2F*[n_each_h2D];
+  neut_eta_eSum_h  = new TH2F*[n_each_h2D];
+  neut_eta_eMC_h  = new TH2F*[n_each_h2D];
+
 
   TString title1, title2;
   for (unsigned int i = 0; i < n_cuts; i++) {
@@ -284,6 +321,47 @@ void uamc::create_histos()
     title2 = title1; title2 += " ;#xi_{direct}; #xi_{X}]";
     proton_xi_mc_h[i] = new TH2F(title1.Data(), title2.Data(), 102, -0.1, 1.1, 102, -0.1, 1.1);
     proton_xi_mc_h[i]->SetDirectory(directory);
+
+    /****************************************************************/
+    title1      = "tracks_eta_smallpt_h["; title1 += i; title1 += "]";
+    title2      = title1; title2 += "; #eta; p_T";
+    tracks_eta_smallpt_h[i] = new TH2F(title1.Data(), title2.Data(), 12, -3, 3, 100, 0, 1);
+    tracks_eta_smallpt_h[i]->SetDirectory(directory);
+
+    title1      = "tracks_eta_eSum_h["; title1 += i; title1 += "]";
+    title2      = title1; title2 += "; #eta; E_{Sum}";
+    tracks_eta_eSum_h[i] = new TH2F(title1.Data(), title2.Data(), 12, -3, 3, 10000, 0, 100);
+    tracks_eta_eSum_h[i]->SetDirectory(directory);
+
+    title1      = "tracks_eta_eMC_h["; title1 += i; title1 += "]";
+    title2      = title1; title2 += "; #eta; E_{MCTruth}";
+    tracks_eta_eMC_h[i] = new TH2F(title1.Data(), title2.Data(), 12, -3, 3, 1000, 0, 10);
+    tracks_eta_eMC_h[i]->SetDirectory(directory);
+
+    title1      = "utracks_eta_smallpt_h["; title1 += i; title1 += "]";
+    title2      = title1; title2 += "; #eta; p_T";
+    utracks_eta_smallpt_h[i] = new TH2F(title1.Data(), title2.Data(), 12, -3, 3, 100, 0, 1);
+    utracks_eta_smallpt_h[i]->SetDirectory(directory);
+
+    title1      = "utracks_eta_eSum_h["; title1 += i; title1 += "]";
+    title2      = title1; title2 += "; #eta; E_{Sum}";
+    utracks_eta_eSum_h[i] = new TH2F(title1.Data(), title2.Data(), 12, -3, 3, 10000, 0, 100);
+    utracks_eta_eSum_h[i]->SetDirectory(directory);
+
+    title1      = "utracks_eta_eMC_h["; title1 += i; title1 += "]";
+    title2      = title1; title2 += "; #eta; E_{MCTruth}";
+    utracks_eta_eMC_h[i] = new TH2F(title1.Data(), title2.Data(), 12, -3, 3, 1000, 0, 10);
+    utracks_eta_eMC_h[i]->SetDirectory(directory);
+
+    title1      = "neut_eta_eSum_h["; title1 += i; title1 += "]";
+    title2      = title1; title2 += "; #eta; E_{Sum}";
+    neut_eta_eSum_h[i] = new TH2F(title1.Data(), title2.Data(), 12, -3, 3, 10000, 0, 100);
+    neut_eta_eSum_h[i]->SetDirectory(directory);
+
+    title1      = "neut_eta_eMC_h["; title1 += i; title1 += "]";
+    title2      = title1; title2 += "; #eta; E_{MCTruth}";
+    neut_eta_eMC_h[i] = new TH2F(title1.Data(), title2.Data(), 12, -3, 3, 1000, 0, 10);
+    neut_eta_eMC_h[i]->SetDirectory(directory);
   };
   h1D->push_back(proton_pt2_h);
   h1D->push_back(proton_e_h);
@@ -291,4 +369,14 @@ void uamc::create_histos()
   //h2D->push_back(proton_e_eta_h);
   //h2D->push_back(proton_e_pt2_h);
   h2D->push_back(proton_xi_mc_h);
+
+  h2D->push_back(tracks_eta_smallpt_h);
+  h2D->push_back(tracks_eta_eSum_h);
+  h2D->push_back(tracks_eta_eMC_h);
+  h2D->push_back(utracks_eta_smallpt_h);
+  h2D->push_back(utracks_eta_eSum_h);
+  h2D->push_back(utracks_eta_eMC_h);
+  h2D->push_back(neut_eta_eSum_h);
+  h2D->push_back(neut_eta_eMC_h);
+
 }

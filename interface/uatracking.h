@@ -51,6 +51,9 @@ private:
   TH1F **tracks_pt_h;
   TH2F **tracks_eta_n_h;
   TH2F **tracks_eta_pt_h;
+  TH2F **tracks_eta_smallpt_h;
+  TH2F **tracks_eta_eSum_h;
+  TH2F **tracks_eta_eTrk_h;
 
   ClassDef(uatracking, 2);
 

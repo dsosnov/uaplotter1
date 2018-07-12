@@ -96,6 +96,15 @@ private:
 //  TH2F ** proton_e_eta_h;  //!<  X: |eta|;  Y: E(p`)
 //  TH2F ** proton_e_pt2_h;  //!<  X: pt^2;   Y: E(p`)
 
+  TH2F ** tracks_eta_smallpt_h;
+  TH2F ** tracks_eta_eSum_h;
+  TH2F ** tracks_eta_eMC_h;
+  TH2F ** utracks_eta_smallpt_h;
+  TH2F ** utracks_eta_eSum_h;
+  TH2F ** utracks_eta_eMC_h;
+  TH2F ** neut_eta_eSum_h;
+  TH2F ** neut_eta_eMC_h;
+
   ClassDef(uamc,2);
 };
 
