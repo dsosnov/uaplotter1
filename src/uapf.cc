@@ -58,14 +58,12 @@ bool uapf::FillLastEvent(const short unsigned int cut)
       pf_e_eta_h[cut]->Fill(ETA_BIN_L[bin], energy[bin]);
       pf_eMaxTower_eta_h[cut]->Fill(ETA_BIN_L[bin], energyMax[bin]);
       //pf_pt_eta_h[cut]->Fill(ETA_BIN_L[bin], pt[bin]);
-      if (mc < 0) {                                         // noise studies
-        pf_e_em0_h[cut]->Fill(ETA_BIN_L[bin], energyEM0[bin]);
-        pf_eMaxTower_em0_h[cut]->Fill(ETA_BIN_L[bin], energyEM0Max[bin]);
-        pf_e_h0_h[cut]->Fill(ETA_BIN_L[bin], energyH0[bin]);
-        pf_eMaxTower_h0_h[cut]->Fill(ETA_BIN_L[bin], energyH0Max[bin]);
-        pf_e_hch_h[cut]->Fill(ETA_BIN_L[bin], energyHch[bin]);
-        pf_eMaxTower_hch_h[cut]->Fill(ETA_BIN_L[bin], energyHchMax[bin]);
-       };
+      pf_e_em0_h[cut]->Fill(ETA_BIN_L[bin], energyEM0[bin]);
+      pf_eMaxTower_em0_h[cut]->Fill(ETA_BIN_L[bin], energyEM0Max[bin]);
+      pf_e_h0_h[cut]->Fill(ETA_BIN_L[bin], energyH0[bin]);
+      pf_eMaxTower_h0_h[cut]->Fill(ETA_BIN_L[bin], energyH0Max[bin]);
+      pf_e_hch_h[cut]->Fill(ETA_BIN_L[bin], energyHch[bin]);
+      pf_eMaxTower_hch_h[cut]->Fill(ETA_BIN_L[bin], energyHchMax[bin]);
     };
   };
   return true;
@@ -110,21 +108,19 @@ bool uapf::ProceedEvent(const short unsigned int cut, const bool fill, const boo
       if (pf.energy() > energyMax[bin]) energyMax[bin] = pf.energy();
       pt[bin] += pf.Pt();
       pz[bin] += pf.Pz();
-      if (mc < 0) { //noise studies
-        if ((pf.particleId == 5) || (pf.particleId == 6) || (pf.particleId == 0)) {// h0 and h_HF and unknown
-          energyH0[bin] += pf.energy();
-          if (pf.energy() > energyH0Max[bin]) energyH0Max[bin] = pf.energy();
-         } else if (pf.particleId == 1) {                 // charged hadron
-          energyHch[bin] += pf.energy();
-          if (pf.energy() > energyHchMax[bin]) energyHchMax[bin] = pf.energy();
-        } else if ((pf.particleId == 4) || (pf.particleId == 7)) {// gamma and egamma_HF
-          energyEM0[bin] += pf.energy();
-          if (pf.energy() > energyEM0Max[bin]) energyEM0Max[bin] = pf.energy();
-         } else if ((pf.particleId == 2) || (pf.particleId == 3))  {
-          std::cout << "lepton???\n";
-          std::cout << "\tpf#" << nPfCand << "  " << pf.particleId << " eta: " << pf.Eta() << "\tphi: " << pf.Phi() << "\tPt: " << pf.Pt() << "\tE:" << pf.energy() << std::endl;
-        }
-      };
+      if ((pf.particleId == 5) || (pf.particleId == 6) || (pf.particleId == 0)) {// h0 and h_HF and unknown
+        energyH0[bin] += pf.energy();
+        if (pf.energy() > energyH0Max[bin]) energyH0Max[bin] = pf.energy();
+      } else if (pf.particleId == 1) {                 // charged hadron
+        energyHch[bin] += pf.energy();
+        if (pf.energy() > energyHchMax[bin]) energyHchMax[bin] = pf.energy();
+      } else if ((pf.particleId == 4) || (pf.particleId == 7)) {// gamma and egamma_HF
+        energyEM0[bin] += pf.energy();
+        if (pf.energy() > energyEM0Max[bin]) energyEM0Max[bin] = pf.energy();
+      } else if ((pf.particleId == 2) || (pf.particleId == 3))  {
+        std::cout << "lepton???\n";
+        std::cout << "\tpf#" << nPfCand << "  " << pf.particleId << " eta: " << pf.Eta() << "\tphi: " << pf.Phi() << "\tPt: " << pf.Pt() << "\tE:" << pf.energy() << std::endl;
+      }
     }; // end bin >=0
   }; // end loop
   for (unsigned int bin = 0; bin < N_ETA_BINS; bin++) {
@@ -156,14 +152,12 @@ void uapf::create_histos()
   pf_eMaxTower_eta_h  = new TH2F*[n_each_h2D];
   //pf_pt_eta_h = new TH2F*[n_each_h2D];
   // neutral
-  if (mc < 0) {                                             // noise studies
-    pf_e_h0_h  = new TH2F*[n_each_h2D];
-    pf_eMaxTower_h0_h  = new TH2F*[n_each_h2D];
-    pf_e_hch_h = new TH2F*[n_each_h2D];
-    pf_eMaxTower_hch_h = new TH2F*[n_each_h2D];
-    pf_e_em0_h = new TH2F*[n_each_h2D];
-    pf_eMaxTower_em0_h = new TH2F*[n_each_h2D];
-  };
+  pf_e_h0_h  = new TH2F*[n_each_h2D];
+  pf_eMaxTower_h0_h  = new TH2F*[n_each_h2D];
+  pf_e_hch_h = new TH2F*[n_each_h2D];
+  pf_eMaxTower_hch_h = new TH2F*[n_each_h2D];
+  pf_e_em0_h = new TH2F*[n_each_h2D];
+  pf_eMaxTower_em0_h = new TH2F*[n_each_h2D];
 
   for (unsigned int i = 0; i < n_cuts; i++) {
     title1 = "pfcand_h["; title1 += i; title1 += "]";
@@ -186,49 +180,45 @@ void uapf::create_histos()
     pf_pt_eta_h[i] = new TH2F(title1.Data(), title2.Data(), 28, -7,7, 21000, -100, 2000);
     pf_pt_eta_h[i]->SetDirectory(directory);
     */
-    if (mc < 0) {
-      title1 = "pf_e_h0_h["; title1 += i; title1 += "]";
-      title2 = title1; title2 += "; #eta;E [GeV]";
-      pf_e_h0_h[i] = new TH2F(title1.Data(), title2.Data(), 28, -7, 7, 21000, -100, 2000);
-      pf_e_h0_h[i]->SetDirectory(directory);
+    title1 = "pf_e_h0_h["; title1 += i; title1 += "]";
+    title2 = title1; title2 += "; #eta;E [GeV]";
+    pf_e_h0_h[i] = new TH2F(title1.Data(), title2.Data(), 28, -7, 7, 21000, -100, 2000);
+    pf_e_h0_h[i]->SetDirectory(directory);
 
-      title1 = "pf_eMaxTower_h0_h["; title1 += i; title1 += "]";
-      title2 = title1; title2 += "; #eta;E_{Tower} [GeV]";
-      pf_eMaxTower_h0_h[i] = new TH2F(title1.Data(), title2.Data(), 28, -7, 7, 21000, -100, 2000);
-      pf_eMaxTower_h0_h[i]->SetDirectory(directory);
+    title1 = "pf_eMaxTower_h0_h["; title1 += i; title1 += "]";
+    title2 = title1; title2 += "; #eta;E_{Tower} [GeV]";
+    pf_eMaxTower_h0_h[i] = new TH2F(title1.Data(), title2.Data(), 28, -7, 7, 21000, -100, 2000);
+    pf_eMaxTower_h0_h[i]->SetDirectory(directory);
 
-      title1 = "pf_e_hch_h["; title1 += i; title1 += "]";
-      title2 = title1; title2 += "; #eta;E [GeV]";
-      pf_e_hch_h[i] = new TH2F(title1.Data(), title2.Data(), 28, -7, 7, 21000, -100, 2000);
-      pf_e_hch_h[i]->SetDirectory(directory);
+    title1 = "pf_e_hch_h["; title1 += i; title1 += "]";
+    title2 = title1; title2 += "; #eta;E [GeV]";
+    pf_e_hch_h[i] = new TH2F(title1.Data(), title2.Data(), 28, -7, 7, 21000, -100, 2000);
+    pf_e_hch_h[i]->SetDirectory(directory);
 
-      title1 = "pf_eMaxTower_hch_h["; title1 += i; title1 += "]";
-      title2 = title1; title2 += "; #eta;E_{Tower} [GeV]";
-      pf_eMaxTower_hch_h[i] = new TH2F(title1.Data(), title2.Data(), 28, -7, 7, 21000, -100, 2000);
-      pf_eMaxTower_hch_h[i]->SetDirectory(directory);
+    title1 = "pf_eMaxTower_hch_h["; title1 += i; title1 += "]";
+    title2 = title1; title2 += "; #eta;E_{Tower} [GeV]";
+    pf_eMaxTower_hch_h[i] = new TH2F(title1.Data(), title2.Data(), 28, -7, 7, 21000, -100, 2000);
+    pf_eMaxTower_hch_h[i]->SetDirectory(directory);
 
-      title1 = "pf_e_em0_h["; title1 += i; title1 += "]";
-      title2 = title1; title2 += "; #eta;E [GeV]";
-      pf_e_em0_h[i] = new TH2F(title1.Data(), title2.Data(), 28, -7, 7, 21000, -100, 2000);
-      pf_e_em0_h[i]->SetDirectory(directory);
+    title1 = "pf_e_em0_h["; title1 += i; title1 += "]";
+    title2 = title1; title2 += "; #eta;E [GeV]";
+    pf_e_em0_h[i] = new TH2F(title1.Data(), title2.Data(), 28, -7, 7, 21000, -100, 2000);
+    pf_e_em0_h[i]->SetDirectory(directory);
 
-      title1 = "pf_eMaxTower_em0_h["; title1 += i; title1 += "]";
-      title2 = title1; title2 += "; #eta;E_{Tower} [GeV]";
-      pf_eMaxTower_em0_h[i] = new TH2F(title1.Data(), title2.Data(), 28, -7, 7, 21000, -100, 2000);
-      pf_eMaxTower_em0_h[i]->SetDirectory(directory);
-    };
+    title1 = "pf_eMaxTower_em0_h["; title1 += i; title1 += "]";
+    title2 = title1; title2 += "; #eta;E_{Tower} [GeV]";
+    pf_eMaxTower_em0_h[i] = new TH2F(title1.Data(), title2.Data(), 28, -7, 7, 21000, -100, 2000);
+    pf_eMaxTower_em0_h[i]->SetDirectory(directory);
   };
   h1D->push_back(pfcand_h);
   h2D->push_back(pf_e_eta_h);
   h2D->push_back(pf_eMaxTower_eta_h);
   //h2D->push_back(pf_pt_eta_h);
-  if (mc < 0) {
-    h2D->push_back(pf_e_h0_h);
-    h2D->push_back(pf_eMaxTower_h0_h);
-    h2D->push_back(pf_e_hch_h);
-    h2D->push_back(pf_eMaxTower_hch_h);
-    h2D->push_back(pf_e_em0_h);
-    h2D->push_back(pf_eMaxTower_em0_h);
-  };
+  h2D->push_back(pf_e_h0_h);
+  h2D->push_back(pf_eMaxTower_h0_h);
+  h2D->push_back(pf_e_hch_h);
+  h2D->push_back(pf_eMaxTower_hch_h);
+  h2D->push_back(pf_e_em0_h);
+  h2D->push_back(pf_eMaxTower_em0_h);
 }
 //
