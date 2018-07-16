@@ -76,7 +76,7 @@ int uaplotter1::Loop(const int evts, const int trigger, vector<string> hlt_path_
     memset(sd_flag_total,   processID::pid_undefined, sizeof(sd_flag_total));
     memset(hf_inelastic,    false,                    sizeof(hf_inelastic));
     memset(hf_emptyHF,      false,                    sizeof(hf_emptyHF));
-    memset(hf_blindFilled,      false,                    sizeof(hf_blindFilled));
+    memset(hf_blindFilled,  false,                    sizeof(hf_blindFilled));
 
     if (mc > 0) { // <============================  do MC loop here
       CMSmc->ProceedEvent(dummy_cut, false, false);
@@ -172,6 +172,47 @@ int uaplotter1::Loop(const int evts, const int trigger, vector<string> hlt_path_
       FillLastEvent(cuts_start + sd_plus_cut + cuts_count);
       rg_plus_hfm[sd_plus_cut]++;
     }
+    if(hf_emptyHF[0] && hf_inelastic[1]){ // HF>(inelastic cut) at plus side (RG at minus side).
+      FillLastEvent(cuts_start + sd_minus_cut + cuts_count*2); //
+      rg_minus_hfp[sd_minus_cut]++;
+    }
+    if(hf_emptyHF[1] && hf_inelastic[0]){  // HF>(inelastic cut) at minus side (for RG at plus side).
+      FillLastEvent(cuts_start + sd_plus_cut + cuts_count*3);
+      rg_plus_hfm[sd_plus_cut]++;
+    }
+    if(hf_emptyHF[1] && hf_inelastic[0]) FillLastEvent(65);
+    if(hf_emptyHF[0] && hf_inelastic[1]) FillLastEvent(66);
+
+    if( hf_emptyHF[0]
+        && !combined_central_activity[8]
+        && !combined_central_activity[9]
+        && !combined_central_activity[10]
+        && !combined_central_activity[11]
+        && !combined_central_activity[12]
+        && hf_inelastic[1]
+      ) FillLastEvent(67); //
+    if( hf_emptyHF[1]
+        && !combined_central_activity[13]
+        && !combined_central_activity[14]
+        && !combined_central_activity[15]
+        && !combined_central_activity[16]
+        && !combined_central_activity[17]
+        && hf_inelastic[0]
+      ) FillLastEvent(68); //
+    if( hf_emptyHF[0]
+        && !combined_central_activity[8]
+        && !combined_central_activity[9]
+        && !combined_central_activity[10]
+        && !combined_central_activity[11]
+        && !combined_central_activity[12]
+      ) FillLastEvent(69); //
+    if( hf_emptyHF[1]
+        && !combined_central_activity[13]
+        && !combined_central_activity[14]
+        && !combined_central_activity[15]
+        && !combined_central_activity[16]
+        && !combined_central_activity[17]
+      ) FillLastEvent(70); //
 
   };// end loop
   std::cout << "Acceptance: [" << ETA_BIN_L[first_central_bin] << "," << ETA_BIN_L[last_central_bin] + ETA_BIN_W << "]\n";
