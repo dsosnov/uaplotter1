@@ -59,6 +59,7 @@ int uaplotter1::Loop(const int evts, const int trigger, vector<string> hlt_path_
 
   double hf_inelastic_cut = 7.0;   // in GeV
   double hf_veto_cut      = 0.005; // in GeV -- seems like empty on particle level
+  double hf_veto_cut_data = 2.0; // in GeV -- seems like empty on detector level
 
   unsigned int kevt = 0;
   std::vector<bool>hlts;
@@ -98,6 +99,9 @@ int uaplotter1::Loop(const int evts, const int trigger, vector<string> hlt_path_
       hf_emptyHF[1] = CMSmc->GetHFmax(1) < hf_veto_cut;
       hf_blindFilled[0] = CMSmc->GetBlindSpotMax(0) > hf_inelastic_cut;
       hf_blindFilled[1] = CMSmc->GetBlindSpotMax(1) > hf_inelastic_cut;
+    } else {
+      hf_emptyHF[0] = CMScalo->GetHFmax(0) < hf_veto_cut_data;
+      hf_emptyHF[1] = CMScalo->GetHFmax(1) < hf_veto_cut_data;
     }
     if ( !hf_inelastic[0] && !hf_inelastic[1] ) continue; //<=== If maximumTower in both HF lesser then 4GeV (inelastic cut)
     hf_inelastic_count++;
@@ -170,6 +174,37 @@ int uaplotter1::Loop(const int evts, const int trigger, vector<string> hlt_path_
       FillLastEvent(cuts_start + sd_plus_cut + cuts_count);
       rg_plus_hfm[sd_plus_cut]++;
     }
+
+    if( hf_emptyHF[0]
+        && !combined_central_activity[8]
+        && !combined_central_activity[9]
+        && !combined_central_activity[10]
+        && !combined_central_activity[11]
+        && !combined_central_activity[12]
+        && hf_inelastic[1]
+      ) FillLastEvent(40); //
+    if( hf_emptyHF[1]
+        && !combined_central_activity[13]
+        && !combined_central_activity[14]
+        && !combined_central_activity[15]
+        && !combined_central_activity[16]
+        && !combined_central_activity[17]
+        && hf_inelastic[0]
+      ) FillLastEvent(41); //
+    if( hf_emptyHF[0]
+        && !combined_central_activity[8]
+        && !combined_central_activity[9]
+        && !combined_central_activity[10]
+        && !combined_central_activity[11]
+        && !combined_central_activity[12]
+      ) FillLastEvent(42); //
+    if( hf_emptyHF[1]
+        && !combined_central_activity[13]
+        && !combined_central_activity[14]
+        && !combined_central_activity[15]
+        && !combined_central_activity[16]
+        && !combined_central_activity[17]
+      ) FillLastEvent(43); //
 
   };// end loop
   std::cout << "Acceptance: [" << ETA_BIN_L[first_central_bin] << "," << ETA_BIN_L[last_central_bin] + ETA_BIN_W << "]\n";
