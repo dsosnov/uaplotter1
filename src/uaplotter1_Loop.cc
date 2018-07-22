@@ -173,37 +173,6 @@ int uaplotter1::Loop(const int evts, const int trigger, vector<string> hlt_path_
       rg_plus_hfm[sd_plus_cut]++;
     }
 
-    if( hf_emptyHF[0]
-        && !combined_central_activity[8]
-        && !combined_central_activity[9]
-        && !combined_central_activity[10]
-        && !combined_central_activity[11]
-        && !combined_central_activity[12]
-        && hf_inelastic[1]
-      ) FillLastEvent(67); //
-    if( hf_emptyHF[1]
-        && !combined_central_activity[13]
-        && !combined_central_activity[14]
-        && !combined_central_activity[15]
-        && !combined_central_activity[16]
-        && !combined_central_activity[17]
-        && hf_inelastic[0]
-      ) FillLastEvent(68); //
-    if( hf_emptyHF[0]
-        && !combined_central_activity[8]
-        && !combined_central_activity[9]
-        && !combined_central_activity[10]
-        && !combined_central_activity[11]
-        && !combined_central_activity[12]
-      ) FillLastEvent(69); //
-    if( hf_emptyHF[1]
-        && !combined_central_activity[13]
-        && !combined_central_activity[14]
-        && !combined_central_activity[15]
-        && !combined_central_activity[16]
-        && !combined_central_activity[17]
-      ) FillLastEvent(70); //
-
   };// end loop
   std::cout << "Acceptance: [" << ETA_BIN_L[first_central_bin] << "," << ETA_BIN_L[last_central_bin] + ETA_BIN_W << "]\n";
   std::cout << "Total evts in chain       : " << stat << std::endl;
