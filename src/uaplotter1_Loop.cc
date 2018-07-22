@@ -59,7 +59,7 @@ int uaplotter1::Loop(const int evts, const int trigger, vector<string> hlt_path_
 
   double hf_inelastic_cut = 7.0;   // in GeV
   double hf_veto_cut      = 0.005; // in GeV -- seems like empty on particle level
-  double hf_veto_cut_data = 2.0; // in GeV -- seems like empty on detector level
+  double hf_veto_cut_data = 3.0; // in GeV -- seems like empty on detector level
 
   unsigned int kevt = 0;
   std::vector<bool>hlts;
