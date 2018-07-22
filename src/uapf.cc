@@ -118,8 +118,9 @@ bool uapf::ProceedEvent(const short unsigned int cut, const bool fill, const boo
         energyEM0[bin] += pf.energy();
         if (pf.energy() > energyEM0Max[bin]) energyEM0Max[bin] = pf.energy();
       } else if ((pf.particleId == 2) || (pf.particleId == 3))  {
-        std::cout << "lepton???\n";
-        std::cout << "\tpf#" << nPfCand << "  " << pf.particleId << " eta: " << pf.Eta() << "\tphi: " << pf.Phi() << "\tPt: " << pf.Pt() << "\tE:" << pf.energy() << std::endl;
+        if (info)
+          std::cout << "lepton???" << std::endl
+                    << "\tpf#" << nPfCand << "  " << pf.particleId << " eta: " << pf.Eta() << "\tphi: " << pf.Phi() << "\tPt: " << pf.Pt() << "\tE:" << pf.energy() << std::endl;
       }
     }; // end bin >=0
   }; // end loop
