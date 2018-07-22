@@ -106,6 +106,8 @@ bool uamc::ProceedEvent(const short unsigned int cut, const bool fill, const boo
   memset(pzZDCn,     0, sizeof(pzZDCn));
   memset(pzZDCg,     0, sizeof(pzZDCg));
   memset(energyMax,  0, sizeof(energyMax));
+  memset(energyH0,   0, sizeof(energyH0));
+  memset(energyH0Max,  0, sizeof(energyH0Max));
   memset(ptChargedMax,  0, sizeof(ptChargedMax));
   memset(hfE,        0, sizeof(hfE));
   memset(hfPz,       0, sizeof(hfPz));
@@ -197,6 +199,11 @@ bool uamc::ProceedEvent(const short unsigned int cut, const bool fill, const boo
         if (e > energyMax[bin]) energyMax[bin] = e;
         if (part.charge != 0 && part.Pt() > ptChargedMax[bin])
           ptChargedMax[bin] = part.Pt();
+        if (part.charge == 0 && part.pdgId != 22){
+          energyH0[bin] += e;
+          if (e > energyH0Max[bin]) energyH0Max[bin] = e;
+        }
+
       } else {
         outer = true;
         outRangeE[ind] += e;
@@ -219,9 +226,12 @@ bool uamc::ProceedEvent(const short unsigned int cut, const bool fill, const boo
 
   for (unsigned int bin = 0; bin < N_ETA_BINS; bin++){
     if (energy[bin] > 0) activity_loose[bin] = true;
-    if (energy[bin] > THR_PFEN_SUME().at(bin)) activity_tight[bin] = true;
-    if (TRCK_ETA_MIN_BIN <= bin && bin <= TRCK_ETA_MAX_BIN && ptChargedMax[bin] > TRCK_PT_THR)
-      activity_tight[bin] = true;
+    if (TRCK_ETA_MIN_BIN <= bin && bin <= TRCK_ETA_MAX_BIN){
+      if (ptChargedMax[bin] > TRCK_PT_THR) activity_tight[bin] = true;
+      if (energy[bin] > THR_PFEN_SUME().at(bin)) activity_tight[bin] = true;
+    } else {
+      if (energyH0[bin] > THR_PFEN_SUME().at(bin)) activity_tight[bin] = true;
+    }
   }
   if (fill)
     FillLastEvent(cut);

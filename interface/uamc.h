@@ -55,6 +55,8 @@ private:
   std::vector<MyGenPart>*  MCthuth;
 
   double energyMax[N_ETA_BINS];
+  double energyH0[N_ETA_BINS];
+  double energyH0Max[N_ETA_BINS];
   double ptChargedMax[N_ETA_BINS];
 
   unsigned int trksT2[2];
