@@ -99,11 +99,14 @@ private:
   TH2F ** tracks_eta_smallpt_h;
   TH2F ** tracks_eta_eSum_h;
   TH2F ** tracks_eta_eMC_h;
-  TH2F ** utracks_eta_smallpt_h;
-  TH2F ** utracks_eta_eSum_h;
-  TH2F ** utracks_eta_eMC_h;
+  TH2F ** tracks_eta_n_h;
+  TH2F ** charged_eta_smallpt_h;
+  TH2F ** charged_eta_eSum_h;
+  TH2F ** charged_eta_eMC_h;
+  TH2F ** charged_eta_n_h;
   TH2F ** neut_eta_eSum_h;
   TH2F ** neut_eta_eMC_h;
+  TH2F ** neut_eta_n_h;
 
   ClassDef(uamc,2);
 };

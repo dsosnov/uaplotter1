@@ -67,23 +67,38 @@ bool uapf::FillLastEvent(const short unsigned int cut)
     };
   };
   double energySum_pfneut[12]; memset(energySum_pfneut, 0, sizeof(energySum_pfneut));
-  double energySum_pfutracks[12]; memset(energySum_pfutracks, 0, sizeof(energySum_pfutracks));
+  double energySum_pfcharged[12]; memset(energySum_pfcharged, 0, sizeof(energySum_pfcharged));
+  double energySum_pftracks[12]; memset(energySum_pftracks, 0, sizeof(energySum_pftracks));
+  int n_pfneut[12]; memset(n_pfneut, 0, sizeof(n_pfneut));
+  int n_pfcharged[12]; memset(n_pfcharged, 0, sizeof(n_pfcharged));
+  int n_pftracks[12]; memset(n_pftracks, 0, sizeof(n_pftracks));
   for (auto pf: *PFCand) {
     auto bin = static_cast<int>(floor((pf.eta() + 3.0) / 0.5));
     if(bin < 0 || bin >= 12) continue;
     if(pf.charge == 0){
       energySum_pfneut[bin] += pf.E();
       pfneut_eta_ePF_h[cut]->Fill(pf.eta(), pf.E());
-    } else  /*if(pf.Pt() < TRCK_PT_THR)*/{
-      energySum_pfutracks[bin] += pf.E();
-      pfutracks_eta_smallpt_h[cut]->Fill(pf.eta(), pf.Pt());      
-      pfutracks_eta_ePF_h[cut]->Fill(pf.eta(), pf.E());      
+      n_pfneut[bin]++;
+    } else {
+      energySum_pfcharged[bin] += pf.E();
+      pfcharged_eta_smallpt_h[cut]->Fill(pf.eta(), pf.Pt());      
+      pfcharged_eta_ePF_h[cut]->Fill(pf.eta(), pf.E());      
+      n_pfcharged[bin]++;;
+      if(pf.Pt() > TRCK_PT_THR){
+        energySum_pftracks[bin] += pf.E();
+        pftracks_eta_smallpt_h[cut]->Fill(pf.eta(), pf.Pt());      
+        n_pftracks[bin]++;;
+      }
     }
   }
   for (unsigned int i = 0; i < 12; i++) {
     auto etai = i * 0.5 - 3.0 + 0.25;    
-    pfutracks_eta_eSum_h[cut]->Fill(etai, energySum_pfutracks[i]);
+    pfcharged_eta_eSum_h[cut]->Fill(etai, energySum_pfcharged[i]);
     pfneut_eta_eSum_h[cut]->Fill(etai, energySum_pfneut[i]);
+    pfcharged_eta_n_h[cut]->Fill(etai, n_pfcharged[i]);
+    pfneut_eta_n_h[cut]->Fill(etai, n_pfneut[i]);
+    pftracks_eta_eSum_h[cut]->Fill(etai, energySum_pftracks[i]);
+    pftracks_eta_n_h[cut]->Fill(etai, n_pftracks[i]);
   }
   return true;
 }
@@ -176,11 +191,16 @@ void uapf::create_histos()
   pfcand_h    = new TH1F*[n_each_h1D];
   pf_e_eta_h  = new TH2F*[n_each_h2D];
   pf_eMaxTower_eta_h  = new TH2F*[n_each_h2D];
-  pfutracks_eta_smallpt_h  = new TH2F*[n_each_h2D];
-  pfutracks_eta_eSum_h  = new TH2F*[n_each_h2D];
-  pfutracks_eta_ePF_h  = new TH2F*[n_each_h2D];
+  pfcharged_eta_n_h  = new TH2F*[n_each_h2D];
+  pfcharged_eta_smallpt_h  = new TH2F*[n_each_h2D];
+  pfcharged_eta_eSum_h  = new TH2F*[n_each_h2D];
+  pfcharged_eta_ePF_h  = new TH2F*[n_each_h2D];
+  pfneut_eta_n_h  = new TH2F*[n_each_h2D];
   pfneut_eta_eSum_h  = new TH2F*[n_each_h2D];
   pfneut_eta_ePF_h  = new TH2F*[n_each_h2D];
+  pftracks_eta_n_h  = new TH2F*[n_each_h2D];
+  pftracks_eta_smallpt_h  = new TH2F*[n_each_h2D];
+  pftracks_eta_eSum_h  = new TH2F*[n_each_h2D];
   //pf_pt_eta_h = new TH2F*[n_each_h2D];
   // neutral
   pf_e_h0_h  = new TH2F*[n_each_h2D];
@@ -242,20 +262,30 @@ void uapf::create_histos()
     pf_eMaxTower_em0_h[i]->SetDirectory(directory);
 
     /****************************************************************/
-    title1      = "pfutracks_eta_smallpt_h["; title1 += i; title1 += "]";
+    title1      = "pfcharged_eta_smallpt_h["; title1 += i; title1 += "]";
     title2      = title1; title2 += "; #eta; p_T";
-    pfutracks_eta_smallpt_h[i] = new TH2F(title1.Data(), title2.Data(), 12, -3, 3, 100, 0, 1);
-    pfutracks_eta_smallpt_h[i]->SetDirectory(directory);
+    pfcharged_eta_smallpt_h[i] = new TH2F(title1.Data(), title2.Data(), 12, -3, 3, 100, 0, 1);
+    pfcharged_eta_smallpt_h[i]->SetDirectory(directory);
 
-    title1      = "pfutracks_eta_eSum_h["; title1 += i; title1 += "]";
+    title1      = "pfcharged_eta_n_h["; title1 += i; title1 += "]";
+    title2      = title1; title2 += "; #eta; N";
+    pfcharged_eta_n_h[i] = new TH2F(title1.Data(), title2.Data(), 12, -3, 3, 100, 0, 100);
+    pfcharged_eta_n_h[i]->SetDirectory(directory);
+
+    title1      = "pfcharged_eta_eSum_h["; title1 += i; title1 += "]";
     title2      = title1; title2 += "; #eta; E_{Sum}";
-    pfutracks_eta_eSum_h[i] = new TH2F(title1.Data(), title2.Data(), 12, -3, 3, 10000, 0, 100);
-    pfutracks_eta_eSum_h[i]->SetDirectory(directory);
+    pfcharged_eta_eSum_h[i] = new TH2F(title1.Data(), title2.Data(), 12, -3, 3, 10000, 0, 100);
+    pfcharged_eta_eSum_h[i]->SetDirectory(directory);
 
-    title1      = "pfutracks_eta_ePF_h["; title1 += i; title1 += "]";
+    title1      = "pfcharged_eta_ePF_h["; title1 += i; title1 += "]";
     title2      = title1; title2 += "; #eta; E_{PFObject}";
-    pfutracks_eta_ePF_h[i] = new TH2F(title1.Data(), title2.Data(), 12, -3, 3, 1000, 0, 10);
-    pfutracks_eta_ePF_h[i]->SetDirectory(directory);
+    pfcharged_eta_ePF_h[i] = new TH2F(title1.Data(), title2.Data(), 12, -3, 3, 1000, 0, 10);
+    pfcharged_eta_ePF_h[i]->SetDirectory(directory);
+
+    title1      = "pfneut_eta_n_h["; title1 += i; title1 += "]";
+    title2      = title1; title2 += "; #eta; N";
+    pfneut_eta_n_h[i] = new TH2F(title1.Data(), title2.Data(), 12, -3, 3, 100, 0, 100);
+    pfneut_eta_n_h[i]->SetDirectory(directory);
 
     title1      = "pfneut_eta_eSum_h["; title1 += i; title1 += "]";
     title2      = title1; title2 += "; #eta; E_{Sum}";
@@ -266,6 +296,22 @@ void uapf::create_histos()
     title2      = title1; title2 += "; #eta; E_{PFObject}";
     pfneut_eta_ePF_h[i] = new TH2F(title1.Data(), title2.Data(), 12, -3, 3, 1000, 0, 10);
     pfneut_eta_ePF_h[i]->SetDirectory(directory);
+
+    title1      = "pftracks_eta_smallpt_h["; title1 += i; title1 += "]";
+    title2      = title1; title2 += "; #eta; p_T";
+    pftracks_eta_smallpt_h[i] = new TH2F(title1.Data(), title2.Data(), 12, -3, 3, 100, 0, 1);
+    pftracks_eta_smallpt_h[i]->SetDirectory(directory);
+
+    title1      = "pftracks_eta_n_h["; title1 += i; title1 += "]";
+    title2      = title1; title2 += "; #eta; N";
+    pftracks_eta_n_h[i] = new TH2F(title1.Data(), title2.Data(), 12, -3, 3, 100, 0, 100);
+    pftracks_eta_n_h[i]->SetDirectory(directory);
+
+    title1      = "pftracks_eta_eSum_h["; title1 += i; title1 += "]";
+    title2      = title1; title2 += "; #eta; E_{Sum}";
+    pftracks_eta_eSum_h[i] = new TH2F(title1.Data(), title2.Data(), 12, -3, 3, 10000, 0, 100);
+    pftracks_eta_eSum_h[i]->SetDirectory(directory);
+
   };
   h1D->push_back(pfcand_h);
   h2D->push_back(pf_e_eta_h);
@@ -277,10 +323,15 @@ void uapf::create_histos()
   h2D->push_back(pf_eMaxTower_hch_h);
   h2D->push_back(pf_e_em0_h);
   h2D->push_back(pf_eMaxTower_em0_h);
-  h2D->push_back(pfutracks_eta_smallpt_h);
-  h2D->push_back(pfutracks_eta_eSum_h);
-  h2D->push_back(pfutracks_eta_ePF_h);
+  h2D->push_back(pfcharged_eta_smallpt_h);
+  h2D->push_back(pfcharged_eta_eSum_h);
+  h2D->push_back(pfcharged_eta_ePF_h);
   h2D->push_back(pfneut_eta_eSum_h);
   h2D->push_back(pfneut_eta_ePF_h);
+  h2D->push_back(pfcharged_eta_n_h);
+  h2D->push_back(pfneut_eta_n_h);
+  h2D->push_back(pftracks_eta_n_h);
+  h2D->push_back(pftracks_eta_smallpt_h);
+  h2D->push_back(pftracks_eta_eSum_h);
 }
 //

@@ -42,12 +42,16 @@ private:
   double energyHchMax[N_ETA_BINS];
   double energyEM0Max[N_ETA_BINS];
 
-  TH2F ** pfutracks_eta_smallpt_h;
-  TH2F ** pfutracks_eta_eSum_h;
-  TH2F ** pfutracks_eta_ePF_h;
+  TH2F ** pfcharged_eta_smallpt_h;
+  TH2F ** pfcharged_eta_n_h;
+  TH2F ** pfcharged_eta_eSum_h;
+  TH2F ** pfcharged_eta_ePF_h;
   TH2F ** pfneut_eta_eSum_h;
   TH2F ** pfneut_eta_ePF_h;
-
+  TH2F ** pfneut_eta_n_h;
+  TH2F ** pftracks_eta_smallpt_h;
+  TH2F ** pftracks_eta_n_h;
+  TH2F ** pftracks_eta_eSum_h;
 
   ClassDef(uapf,2);
 };
