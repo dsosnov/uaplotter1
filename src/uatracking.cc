@@ -59,8 +59,8 @@ bool uatracking::FillLastEvent(const short unsigned int cut)
   vertices_h[cut]->Fill(nVtx);
   vertices_h[cut + n_cuts]->Fill(nVtxGoog);
   for (unsigned int bin = 0; bin < N_ETA_BINS; bin++) {
-    tracks_eta_h[cut]->Fill(ETA_BIN_L[bin], n_tracks_bin_all[bin]);
-    tracks_eta_h[cut + n_cuts]->Fill(ETA_BIN_L[bin], n_tracks_bin_good[bin]);
+    tracks_eta_n_h[cut]->Fill(ETA_BIN_L[bin], n_tracks_bin_all[bin]);
+    tracks_eta_n_h[cut + n_cuts]->Fill(ETA_BIN_L[bin], n_tracks_bin_good[bin]);
   };
   for (auto t: *Tracks) {
     tracks_pt_h[cut]->Fill(t.pt());
@@ -225,7 +225,7 @@ void uatracking::create_histos()
 
   tracks_h     = new TH1F * [n_each_h1D];
   tracks_pt_h = new TH1F * [n_each_h1D];
-  tracks_eta_h = new TH2F * [n_each_h2D];
+  tracks_eta_n_h = new TH2F * [n_each_h2D];
   tracks_eta_pt_h = new TH2F * [n_each_h2D];
   for (unsigned int i = 0; i < n_cuts; i++) {
     title1      = "tracks_h["; title1 += i; title1 += "]";
@@ -248,15 +248,15 @@ void uatracking::create_histos()
     tracks_pt_h[i + n_cuts] = new TH1F(title1.Data(), title2.Data(), 7001, -1, 7000);
     tracks_pt_h[i + n_cuts]->SetDirectory(directory);
 
-    title1      = "tracks_eta_h["; title1 += i; title1 += "]";
+    title1      = "tracks_eta_n_h["; title1 += i; title1 += "]";
     title2      = title1; title2 += "; #eta; N_{all}";
-    tracks_eta_h[i] = new TH2F(title1.Data(), title2.Data(), 12, -3, 3, 201, -1, 200);
-    tracks_eta_h[i]->SetDirectory(directory);
+    tracks_eta_n_h[i] = new TH2F(title1.Data(), title2.Data(), 12, -3, 3, 201, -1, 200);
+    tracks_eta_n_h[i]->SetDirectory(directory);
 
-    title1      = "tracks_eta_h["; title1 += (i + n_cuts); title1 += "]";
+    title1      = "tracks_eta_n_h["; title1 += (i + n_cuts); title1 += "]";
     title2      = title1; title2 += " good; #eta; N_{good}";
-    tracks_eta_h[i + n_cuts] = new TH2F(title1.Data(), title2.Data(), 12, -3, 3, 201, -1, 200);
-    tracks_eta_h[i + n_cuts]->SetDirectory(directory);
+    tracks_eta_n_h[i + n_cuts] = new TH2F(title1.Data(), title2.Data(), 12, -3, 3, 201, -1, 200);
+    tracks_eta_n_h[i + n_cuts]->SetDirectory(directory);
 
     title1      = "tracks_eta_pt_h["; title1 += i; title1 += "]";
     title2      = title1; title2 += "; #eta; p_T";
@@ -270,6 +270,6 @@ void uatracking::create_histos()
   };
   h1D->push_back(tracks_h);
   h1D->push_back(tracks_pt_h);
-  h2D->push_back(tracks_eta_h);
+  h2D->push_back(tracks_eta_n_h);
   h2D->push_back(tracks_eta_pt_h);
 }

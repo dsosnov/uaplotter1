@@ -48,7 +48,7 @@ private:
   //TH1F ** vertices_Z_h;
   TH1F **tracks_h;
   TH1F **tracks_pt_h;
-  TH2F **tracks_eta_h;
+  TH2F **tracks_eta_n_h;
   TH2F **tracks_eta_pt_h;
 
   ClassDef(uatracking, 2);
