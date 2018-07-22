@@ -67,13 +67,13 @@ bool uatracking::FillLastEvent(const short unsigned int cut)
   for (auto t: *Tracks) {
     auto bin = static_cast<int>(floor((t.eta() + 3.0) / 0.5));
     if(bin < 0 || bin >= 12) continue;
+    if (!isTrackGood(t)) continue;
     tracks_pt_h[cut]->Fill(t.pt());
     tracks_eta_pt_h[cut]->Fill(t.eta(), t.pt());
     tracks_eta_smallpt_h[cut]->Fill(t.eta(), t.pt());
     tracks_eta_eTrk_h[cut]->Fill(t.eta(), t.e());
     energySum[bin] += t.e();
-    if (!isTrackGood(t)) continue;
-    // if (t.pt() < TRCK_PT_THR) continue;
+    if (t.pt() < TRCK_PT_THR) continue;
     tracks_pt_h[cut+n_cuts]->Fill(t.pt());
     tracks_eta_pt_h[cut+n_cuts]->Fill(t.eta(), t.pt());
     tracks_eta_smallpt_h[cut+n_cuts]->Fill(t.eta(), t.pt());
