@@ -337,7 +337,6 @@ bool uaplotter1::FillLastEvent(const short unsigned int cut)
     n_sd_minus_bins_mctruthLoose_pid_inelastic_h[cut]->Fill(n_sd_minus_bins[2], pid);
     n_sd_plus_bins_mctruthLoose_pid_inelastic_h[cut]->Fill(n_sd_plus_bins[2], pid);
     if(hf_emptyHF[0]){
-      n_sd_minus_bins_reco_pid_inelastic_veto_h[cut]->Fill(n_sd_minus_bins[0], pid);
       n_sd_minus_bins_mctruth_pid_inelastic_veto_h[cut]->Fill(n_sd_minus_bins[1], pid);
       n_sd_minus_bins_mctruthLoose_pid_inelastic_veto_h[cut]->Fill(n_sd_minus_bins[2], pid);
       if(hf_blindFilled[0]){
@@ -346,7 +345,6 @@ bool uaplotter1::FillLastEvent(const short unsigned int cut)
       }
     }
     if(hf_emptyHF[1]){
-      n_sd_plus_bins_reco_pid_inelastic_veto_h[cut]->Fill(n_sd_plus_bins[0], pid);
       n_sd_plus_bins_mctruth_pid_inelastic_veto_h[cut]->Fill(n_sd_plus_bins[1], pid);
       n_sd_plus_bins_mctruthLoose_pid_inelastic_veto_h[cut]->Fill(n_sd_plus_bins[2], pid);
       if(hf_blindFilled[1]){      
@@ -357,6 +355,10 @@ bool uaplotter1::FillLastEvent(const short unsigned int cut)
   }
   n_sd_minus_bins_reco_pid_inelastic_h[cut]->Fill(n_sd_minus_bins[0], pid);
   n_sd_plus_bins_reco_pid_inelastic_h[cut]->Fill(n_sd_plus_bins[0], pid);
+  if(hf_emptyHF[0])
+    n_sd_minus_bins_reco_pid_inelastic_veto_h[cut]->Fill(n_sd_minus_bins[0], pid);
+  if(hf_emptyHF[1])
+    n_sd_plus_bins_reco_pid_inelastic_veto_h[cut]->Fill(n_sd_plus_bins[0], pid);
 
   // ********** Short information about MC events ******************
   if((hf_by_processID_t != NULL) && (cut==0)){;
@@ -437,8 +439,6 @@ void uaplotter1::create_histos()
 
     n_sd_minus_bins_mctruth_pid_inelastic_h      = new TH2F * [n_each_h2D];
     n_sd_plus_bins_mctruth_pid_inelastic_h       = new TH2F * [n_each_h2D];
-    n_sd_minus_bins_reco_pid_inelastic_veto_h    = new TH2F * [n_each_h2D];
-    n_sd_plus_bins_reco_pid_inelastic_veto_h     = new TH2F * [n_each_h2D];
     n_sd_minus_bins_mctruth_pid_inelastic_veto_h = new TH2F * [n_each_h2D];
     n_sd_plus_bins_mctruth_pid_inelastic_veto_h  = new TH2F * [n_each_h2D];
     n_sd_minus_bins_mctruthLoose_pid_inelastic_h      = new TH2F * [n_each_h2D];
@@ -564,14 +564,6 @@ void uaplotter1::create_histos()
       title2 = title1; title2 += " ; n_sd_plus_bins (MCtruth); ProcessID";
       n_sd_plus_bins_mctruth_pid_inelastic_h[i] = new TH2F(title1.Data(), title2.Data(), 30, -1, 29, 6, -0.5, 5.5); //TODO change to ProcessID
 
-      title1 = "n_sd_minus_bins_reco_pid_inelastic_veto_h["; title1 += i; title1 += "]";
-      title2 = title1; title2 += " ; n_sd_minus_bins (RECO) (with empty HF); ProcessID";
-      n_sd_minus_bins_reco_pid_inelastic_veto_h[i] = new TH2F(title1.Data(), title2.Data(), 30, -1, 29, 6, -0.5, 5.5); //TODO change to ProcessID
-
-      title1 = "n_sd_plus_bins_reco_pid_inelastic_veto_h["; title1 += i; title1 += "]";
-      title2 = title1; title2 += " ; n_sd_plus_bins (RECO) (with empty HF); ProcessID";
-      n_sd_plus_bins_reco_pid_inelastic_veto_h[i] = new TH2F(title1.Data(), title2.Data(), 30, -1, 29, 6, -0.5, 5.5); //TODO change to ProcessID
-
       title1 = "n_sd_minus_bins_mctruth_pid_inelastic_veto_h["; title1 += i; title1 += "]";
       title2 = title1; title2 += " ; n_sd_minus_bins (MCtruth) (with empty HF); ProcessID";
       n_sd_minus_bins_mctruth_pid_inelastic_veto_h[i] = new TH2F(title1.Data(), title2.Data(), 30, -1, 29, 6, -0.5, 5.5); //TODO change to ProcessID
@@ -639,8 +631,6 @@ void uaplotter1::create_histos()
     h2D->push_back(xi_zdc_mc_reco_h);
     h2D->push_back(n_sd_minus_bins_mctruth_pid_inelastic_h);
     h2D->push_back(n_sd_plus_bins_mctruth_pid_inelastic_h);
-    h2D->push_back(n_sd_minus_bins_reco_pid_inelastic_veto_h);
-    h2D->push_back(n_sd_plus_bins_reco_pid_inelastic_veto_h);
     h2D->push_back(n_sd_minus_bins_mctruth_pid_inelastic_veto_h);
     h2D->push_back(n_sd_plus_bins_mctruth_pid_inelastic_veto_h);
     h2D->push_back(n_sd_minus_bins_mctruthLoose_pid_inelastic_h);
@@ -668,6 +658,8 @@ void uaplotter1::create_histos()
 
   n_sd_minus_bins_reco_pid_inelastic_h = new TH2F * [n_each_h2D];
   n_sd_plus_bins_reco_pid_inelastic_h  = new TH2F * [n_each_h2D];
+  n_sd_minus_bins_reco_pid_inelastic_veto_h    = new TH2F * [n_each_h2D];
+  n_sd_plus_bins_reco_pid_inelastic_veto_h     = new TH2F * [n_each_h2D];
 
 
   for (unsigned int i = 0; i < n_each_h2D; i++) {
@@ -715,6 +707,13 @@ void uaplotter1::create_histos()
     title2 = title1; title2 += " ; n_sd_plus_bins (RECO); ProcessID";
     n_sd_plus_bins_reco_pid_inelastic_h[i] = new TH2F(title1.Data(), title2.Data(), 30, -1, 29, 6, -0.5, 5.5); //TODO change to ProcessID
 
+    title1 = "n_sd_minus_bins_reco_pid_inelastic_veto_h["; title1 += i; title1 += "]";
+    title2 = title1; title2 += " ; n_sd_minus_bins (RECO) (with empty HF); ProcessID";
+    n_sd_minus_bins_reco_pid_inelastic_veto_h[i] = new TH2F(title1.Data(), title2.Data(), 30, -1, 29, 6, -0.5, 5.5); //TODO change to ProcessID
+    
+    title1 = "n_sd_plus_bins_reco_pid_inelastic_veto_h["; title1 += i; title1 += "]";
+    title2 = title1; title2 += " ; n_sd_plus_bins (RECO) (with empty HF); ProcessID";
+    n_sd_plus_bins_reco_pid_inelastic_veto_h[i] = new TH2F(title1.Data(), title2.Data(), 30, -1, 29, 6, -0.5, 5.5); //TODO change to ProcessID
   };
   h2D->push_back(xi_p_reco_full_h);
   h2D->push_back(zdcM_vs_castor_h);
@@ -727,6 +726,8 @@ void uaplotter1::create_histos()
   h2D->push_back(n_sd_minus_bins_plus_bins_h);
   h2D->push_back(n_sd_minus_bins_reco_pid_inelastic_h);
   h2D->push_back(n_sd_plus_bins_reco_pid_inelastic_h);
+  h2D->push_back(n_sd_minus_bins_reco_pid_inelastic_veto_h);
+  h2D->push_back(n_sd_plus_bins_reco_pid_inelastic_veto_h);
 
   n_sd_minus_bins_h         = new TH1F * [n_each_h1D];
   n_sd_plus_bins_h          = new TH1F * [n_each_h1D];

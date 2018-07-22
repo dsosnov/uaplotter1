@@ -128,14 +128,14 @@ int uaplotter1::Loop(const int evts, const int trigger, vector<string> hlt_path_
 
     if(hf_inelastic[0]) FillLastEvent(9);
     if(hf_inelastic[1]) FillLastEvent(10);
+    if(hf_emptyHF[1] && hf_inelastic[0]) FillLastEvent(11);
+    if(hf_emptyHF[0] && hf_inelastic[1]) FillLastEvent(12);
 
     switch(sd_flag_total[0]){
       case processID::pid_elastic:
 //         CalculateSDdiffMass(false);
         FillLastEvent(3);
         elastic_cand++;
-        if(hf_inelastic[0]) FillLastEvent(1); //TODO DELETE
-        if(hf_inelastic[1]) FillLastEvent(2); //TODO DELETE
         break;
       case processID::pid_sdm:
 //         CalculateSDdiffMass(false);
@@ -154,8 +154,6 @@ int uaplotter1::Loop(const int evts, const int trigger, vector<string> hlt_path_
       case processID::pid_nd:
         FillLastEvent(7);
         nd_cand++;
-        if(hf_inelastic[0]) FillLastEvent(11);
-        if(hf_inelastic[1]) FillLastEvent(12);
         break;
       case processID::pid_dd:
         FillLastEvent(8);
@@ -182,7 +180,7 @@ int uaplotter1::Loop(const int evts, const int trigger, vector<string> hlt_path_
         && !combined_central_activity[11]
         && !combined_central_activity[12]
         && hf_inelastic[1]
-      ) FillLastEvent(40); //
+      ) FillLastEvent(67); //
     if( hf_emptyHF[1]
         && !combined_central_activity[13]
         && !combined_central_activity[14]
@@ -190,21 +188,21 @@ int uaplotter1::Loop(const int evts, const int trigger, vector<string> hlt_path_
         && !combined_central_activity[16]
         && !combined_central_activity[17]
         && hf_inelastic[0]
-      ) FillLastEvent(41); //
+      ) FillLastEvent(68); //
     if( hf_emptyHF[0]
         && !combined_central_activity[8]
         && !combined_central_activity[9]
         && !combined_central_activity[10]
         && !combined_central_activity[11]
         && !combined_central_activity[12]
-      ) FillLastEvent(42); //
+      ) FillLastEvent(69); //
     if( hf_emptyHF[1]
         && !combined_central_activity[13]
         && !combined_central_activity[14]
         && !combined_central_activity[15]
         && !combined_central_activity[16]
         && !combined_central_activity[17]
-      ) FillLastEvent(43); //
+      ) FillLastEvent(70); //
 
   };// end loop
   std::cout << "Acceptance: [" << ETA_BIN_L[first_central_bin] << "," << ETA_BIN_L[last_central_bin] + ETA_BIN_W << "]\n";
