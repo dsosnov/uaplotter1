@@ -193,17 +193,18 @@ bool uamc::ProceedEvent(const short unsigned int cut, const bool fill, const boo
 
       int bin = find_eta_bin(part.eta());
       if (bin >= 0) {
-        energy[bin] += e;
-        pz[bin]     += part.Pz();
-        pt[bin]     += part.Pt();
-        if (e > energyMax[bin]) energyMax[bin] = e;
-        if (part.charge != 0 && part.Pt() > ptChargedMax[bin])
-          ptChargedMax[bin] = part.Pt();
-        if (part.charge == 0 && part.pdgId != 22){
-          energyH0[bin] += e;
-          if (e > energyH0Max[bin]) energyH0Max[bin] = e;
+        if(part.pdgId != 22){
+          energy[bin] += e;
+          pz[bin]     += part.Pz();
+          pt[bin]     += part.Pt();
+          if (e > energyMax[bin]) energyMax[bin] = e;
+          if (part.charge != 0 && part.Pt() > ptChargedMax[bin])
+            ptChargedMax[bin] = part.Pt();
+          if (part.charge == 0 && part.pdgId != 22){
+            energyH0[bin] += e;
+            if (e > energyH0Max[bin]) energyH0Max[bin] = e;
+          }
         }
-
       } else {
         outer = true;
         outRangeE[ind] += e;

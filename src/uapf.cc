@@ -103,7 +103,7 @@ bool uapf::ProceedEvent(const short unsigned int cut, const bool fill, const boo
     if (info)
       std::cout << "\tpf#" << nPfCand << "  " << pf.particleId << " eta: " << pf.Eta() << "\tphi: " << pf.Phi() << "\tPt: " << pf.Pt() << "\tE:" << pf.energy() << std::endl;
     int bin = find_eta_bin(pf.eta());
-    if (bin >= 0) {
+    if (bin >= 0 && (pf.particleId != 4) && (pf.particleId != 7)) {
       energy[bin] += pf.energy();
       if (pf.energy() > energyMax[bin]) energyMax[bin] = pf.energy();
       pt[bin] += pf.Pt();
