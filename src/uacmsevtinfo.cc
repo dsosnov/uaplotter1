@@ -170,12 +170,12 @@ void uacmsevtinfo::create_histos()
   for (short unsigned int i = 0; i < n_each_h2D; i++) {
     title1 = "run_vs_bx_h["; title1 += (i); title1 += "]";
     title2 = title1; title2 += ";BCN";
-    run_vs_bx_h[i] = new TH2F(title1.Data(), title2.Data(), 31, -1, 3099, 11, 210490, 211590);
+    run_vs_bx_h[i] = new TH2F(title1.Data(), title2.Data(), 31, 0, 3100, 10, 285480, 286496);
     run_vs_bx_h[i]->SetDirectory(directory);
 
     title1 = "run_vs_ls_h["; title1 += (i); title1 += "]";
     title2 = title1; title2 += ";LS";
-    run_vs_ls_h[i] = new TH2F(title1.Data(), title2.Data(), 10, -2, 1998, 11, 210490, 211590);
+    run_vs_ls_h[i] = new TH2F(title1.Data(), title2.Data(), 10, 0, 2000, 10, 210490, 211590);
     run_vs_ls_h[i]->SetDirectory(directory);
   };
   h2D->push_back(run_vs_bx_h);
