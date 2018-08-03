@@ -175,7 +175,7 @@ void uacmsevtinfo::create_histos()
 
     title1 = "run_vs_ls_h["; title1 += (i); title1 += "]";
     title2 = title1; title2 += ";LS";
-    run_vs_ls_h[i] = new TH2F(title1.Data(), title2.Data(), 20, 0, 2000, 10, 285480, 286496);
+    run_vs_ls_h[i] = new TH2F(title1.Data(), title2.Data(), 200, 0, 2000, 10, 285480, 286496);
     run_vs_ls_h[i]->SetDirectory(directory);
   };
   h2D->push_back(run_vs_bx_h);
