@@ -67,6 +67,7 @@ private:
   MyHLTrig     *CMSHLT;
 
   TH1F **triggers_h;
+  TH1F **lumisections_h;
   TH2F **run_vs_bx_h;
   TH2F **run_vs_ls_h;
 

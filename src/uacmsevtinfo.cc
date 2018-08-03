@@ -91,6 +91,8 @@ bool uacmsevtinfo::FillLastEvent(const short unsigned int cut)
     if (CMStrigInfo->triggerResults.at(L1_TRIGGER_ARRAY.at(tb)))
       triggers_h[cut]->Fill(tb);
 
+  lumisections_h[cut]->Fill(CMSevtInfo->LumiSect);
+
   return true;
 }
 
@@ -150,6 +152,7 @@ void uacmsevtinfo::create_histos()
   n_each_h1D  = n_cuts;
   n_each_h2D  = n_cuts;
   triggers_h  = new TH1F* [n_each_h1D];
+  lumisections_h  = new TH1F* [n_each_h1D];
   run_vs_bx_h = new TH2F* [n_each_h2D];
   run_vs_ls_h = new TH2F* [n_each_h2D];
 
@@ -163,8 +166,15 @@ void uacmsevtinfo::create_histos()
       triggers_h[i]->GetXaxis()->SetBinLabel(b + 1, label.Data());
     };
     triggers_h[i]->SetDirectory(directory);
+
+    title1 = "lumisections_h["; title1 += (i); title1 += "]";
+    title2 = title1; title2 += ";LS";
+    lumisections_h[i] = new TH1F(title1.Data(), title2.Data(), 2000, 0, 2000);
+    lumisections_h[i]->SetDirectory(directory);
+
   };
   h1D->push_back(triggers_h);
+  h1D->push_back(lumisections_h);
 
 
   for (short unsigned int i = 0; i < n_each_h2D; i++) {
