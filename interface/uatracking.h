@@ -23,6 +23,7 @@ public:
   bool FillLastEvent(const short unsigned int cut);
   void PrintEventInfo(const bool detailed = false);
 
+  unsigned int Nvertices() {return nVtx;};
   unsigned int NverticesGood() {return nVtxGoog;};
   unsigned int Ntracks() {return nTracks;}
   unsigned int NtracksGood() {return nTracksGood;};
