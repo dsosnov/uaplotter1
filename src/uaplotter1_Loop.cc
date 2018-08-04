@@ -57,7 +57,7 @@ int uaplotter1::Loop(const int evts, const int trigger, vector<string> hlt_path_
   short unsigned int bins_merged = 1; // Number of bins will be merged for filling histograms. "1" is histograms for every rg bin, "2" is standard "per one \eta" //TODO
   short unsigned int cuts_count = int(ceil((last_central_bin - first_central_bin + 1 + 1) / double(bins_merged)));
 
-  double hf_inelastic_cut = 7.0;   // in GeV
+  double hf_inelastic_cut = 10.0;   // in GeV
   double hf_veto_cut      = 0.005; // in GeV -- seems like empty on particle level
   double hf_veto_cut_data = 3.0; // in GeV -- seems like empty on detector level
 
