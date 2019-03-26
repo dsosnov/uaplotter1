@@ -122,6 +122,7 @@ int uaplotter1::Loop(const int evts, const int trigger, vector<string> hlt_path_
 //     // <=====================================
 //
     ProceedEvent(dummy_cut, false, false);
+    if(CMStracking->Nvertices() > 0) continue;
 //     if (tree_digi_flag && CMSforward->FSCvalid()) goodFSC++;
 
     FillLastEvent(0); // -------------------------------->  all triggered events
